@@ -97,9 +97,9 @@ func (opts *describePipeOptions) validate() error {
 	return nil
 }
 
+// TODO change to predefined errors
 var (
 	errNilOptions                    = errors.New("options cannot be nil")
-	errNilOptionsString              = "options cannot be nil"
 	errCopyStatementRequired         = errors.New("copy statement required")
 	errPatternRequiredForLikeKeyword = errors.New("pattern must be specified for like keyword")
 	errScopeRequiredForInKeyword     = errors.New("exactly one scope must be specified for in keyword")
