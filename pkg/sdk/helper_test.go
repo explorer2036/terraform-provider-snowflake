@@ -667,3 +667,13 @@ func createStage(t *testing.T, client *Client, database *Database, schema *Schem
 		Name:         name,
 	}, stageCleanup
 }
+
+func createNetworkPolicy(t *testing.T, client *Client, req *CreateNetworkPolicyRequest) (error, func()) {
+	t.Helper()
+	ctx := context.Background()
+	err := client.NetworkPolicies.Create(ctx, req)
+	return err, func() {
+		err := client.NetworkPolicies.Drop(ctx, NewDropNetworkPolicyRequest(req.name))
+		require.NoError(t, err)
+	}
+}
