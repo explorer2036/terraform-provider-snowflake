@@ -12,7 +12,7 @@ import (
 
 var (
 	_ validatable = new(createDynamicTableOptions)
-	_ validatable = new(AlterDynamicTableOptions)
+	_ validatable = new(alterDynamicTableOptions)
 	_ validatable = new(dropDynamicTableOptions)
 	_ validatable = new(ShowDynamicTableOptions)
 	_ validatable = new(dynamicTableDescribeOptions)
@@ -21,7 +21,7 @@ var (
 
 type DynamicTables interface {
 	Create(ctx context.Context, request *CreateDynamicTableRequest) error
-	Alter(ctx context.Context, id AccountObjectIdentifier, opts *AlterDynamicTableOptions) error
+	Alter(ctx context.Context, request *AlterDynamicTableRequest) error
 	Describe(ctx context.Context, id AccountObjectIdentifier) (*DynamicTableDetails, error)
 	Drop(ctx context.Context, id AccountObjectIdentifier) error
 	Show(ctx context.Context, opts *ShowDynamicTableOptions) ([]*DynamicTable, error)
@@ -98,8 +98,8 @@ func (dts *DynamicTableSet) validate() error {
 	return nil
 }
 
-// AlterDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-dynamic-table
-type AlterDynamicTableOptions struct {
+// alterDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-dynamic-table
+type alterDynamicTableOptions struct {
 	alter        bool                    `ddl:"static" sql:"ALTER"`
 	dynamicTable bool                    `ddl:"static" sql:"DYNAMIC TABLE"`
 	name         AccountObjectIdentifier `ddl:"identifier"`
@@ -110,7 +110,7 @@ type AlterDynamicTableOptions struct {
 	Set     *DynamicTableSet `ddl:"keyword" sql:"SET"`
 }
 
-func (opts *AlterDynamicTableOptions) validate() error {
+func (opts *alterDynamicTableOptions) validate() error {
 	if opts == nil {
 		return errNilOptions
 	}
@@ -134,22 +134,6 @@ func (opts *AlterDynamicTableOptions) validate() error {
 		}
 	}
 	return nil
-}
-
-func (dt *dynamicTables) Alter(ctx context.Context, id AccountObjectIdentifier, opts *AlterDynamicTableOptions) error {
-	if opts == nil {
-		opts = &AlterDynamicTableOptions{}
-	}
-	opts.name = id
-	if err := opts.validate(); err != nil {
-		return err
-	}
-	sql, err := structToSQL(opts)
-	if err != nil {
-		return err
-	}
-	_, err = dt.client.exec(ctx, sql)
-	return err
 }
 
 // dropDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-dynamic-table

@@ -103,7 +103,7 @@ func TestDynamicTableCreate(t *testing.T) {
 
 func TestDynamicTableAlter(t *testing.T) {
 	t.Run("suspend", func(t *testing.T) {
-		opts := &AlterDynamicTableOptions{
+		opts := &alterDynamicTableOptions{
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
 			},
@@ -116,7 +116,7 @@ func TestDynamicTableAlter(t *testing.T) {
 	})
 
 	t.Run("resume", func(t *testing.T) {
-		opts := &AlterDynamicTableOptions{
+		opts := &alterDynamicTableOptions{
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
 			},
@@ -130,7 +130,7 @@ func TestDynamicTableAlter(t *testing.T) {
 
 	t.Run("with set", func(t *testing.T) {
 		lag := "1 minutes"
-		opts := &AlterDynamicTableOptions{
+		opts := &alterDynamicTableOptions{
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
 			},
@@ -148,7 +148,7 @@ func TestDynamicTableAlter(t *testing.T) {
 	})
 
 	t.Run("validate-opts-exact-one-work", func(t *testing.T) {
-		opts := &AlterDynamicTableOptions{
+		opts := &alterDynamicTableOptions{
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
 			},
