@@ -22,57 +22,51 @@ func TestInt_DynamicTableCreate(t *testing.T) {
 
 	ctx := context.Background()
 	t.Run("test complete", func(t *testing.T) {
-		id := randomAccountObjectIdentifier(t)
+		name := randomAccountObjectIdentifier(t)
 		targetLag := "2 minutes"
 		query := "select id from " + tableTest.ID().FullyQualifiedName()
-		opts := &CreateDynamicTableOptions{
-			OrReplace: Bool(true),
-			Comment:   String("comment"),
-		}
-		err := client.DynamicTables.Create(ctx, id, warehouseTest.ID(), targetLag, query, opts)
+		comment := randomComment(t)
+		err := client.DynamicTables.Create(ctx, NewCreateDynamicTableRequest(name, warehouseTest.ID(), targetLag, query).WithOrReplace(true).WithComment(&comment))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.DynamicTables.Drop(ctx, id)
+			err = client.DynamicTables.Drop(ctx, name)
 			require.NoError(t, err)
 		})
 		entities, err := client.DynamicTables.Show(ctx, &ShowDynamicTableOptions{
 			Like: &Like{
-				Pattern: String(id.Name()),
+				Pattern: String(name.Name()),
 			},
 		})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 
 		entity := entities[0]
-		require.Equal(t, id.Name(), entity.Name)
+		require.Equal(t, name.Name(), entity.Name)
 		require.Equal(t, warehouseTest.ID().Name(), entity.Warehouse)
 		require.Equal(t, targetLag, entity.TargetLag)
 	})
 
 	t.Run("test complete with target lag", func(t *testing.T) {
-		id := randomAccountObjectIdentifier(t)
+		name := randomAccountObjectIdentifier(t)
 		targetLag := "DOWNSTREAM"
 		query := "select id from " + tableTest.ID().FullyQualifiedName()
-		opts := &CreateDynamicTableOptions{
-			OrReplace: Bool(true),
-			Comment:   String("comment"),
-		}
-		err := client.DynamicTables.Create(ctx, id, warehouseTest.ID(), targetLag, query, opts)
+		comment := randomComment(t)
+		err := client.DynamicTables.Create(ctx, NewCreateDynamicTableRequest(name, warehouseTest.ID(), targetLag, query).WithOrReplace(true).WithComment(&comment))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.DynamicTables.Drop(ctx, id)
+			err = client.DynamicTables.Drop(ctx, name)
 			require.NoError(t, err)
 		})
 		entities, err := client.DynamicTables.Show(ctx, &ShowDynamicTableOptions{
 			Like: &Like{
-				Pattern: String(id.Name()),
+				Pattern: String(name.Name()),
 			},
 		})
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 
 		entity := entities[0]
-		require.Equal(t, id.Name(), entity.Name)
+		require.Equal(t, name.Name(), entity.Name)
 		require.Equal(t, warehouseTest.ID().Name(), entity.Warehouse)
 		require.Equal(t, targetLag, entity.TargetLag)
 	})

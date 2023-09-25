@@ -670,10 +670,10 @@ func createStage(t *testing.T, client *Client, database *Database, schema *Schem
 
 func createDynamicTable(t *testing.T, client *Client) (*DynamicTable, func()) {
 	t.Helper()
-	return createDynamicTableWithOptions(t, client, nil, nil, nil, nil, nil)
+	return createDynamicTableWithOptions(t, client, nil, nil, nil, nil)
 }
 
-func createDynamicTableWithOptions(t *testing.T, client *Client, warehouse *Warehouse, database *Database, schema *Schema, table *Table, opts *CreateDynamicTableOptions) (*DynamicTable, func()) {
+func createDynamicTableWithOptions(t *testing.T, client *Client, warehouse *Warehouse, database *Database, schema *Schema, table *Table) (*DynamicTable, func()) {
 	t.Helper()
 	var warehouseCleanup func()
 	if warehouse == nil {
@@ -691,28 +691,23 @@ func createDynamicTableWithOptions(t *testing.T, client *Client, warehouse *Ware
 	if table == nil {
 		table, tableCleanup = createTable(t, client, database, schema)
 	}
-	if opts == nil {
-		opts = &CreateDynamicTableOptions{
-			OrReplace: Bool(true),
-			Comment:   String("comment"),
-		}
-	}
-	id := randomAccountObjectIdentifier(t)
+	name := randomAccountObjectIdentifier(t)
 	targetLag := "2 minutes"
 	query := "select id from " + table.ID().FullyQualifiedName()
+	comment := randomComment(t)
 	ctx := context.Background()
-	err := client.DynamicTables.Create(ctx, id, warehouse.ID(), targetLag, query, opts)
+	err := client.DynamicTables.Create(ctx, NewCreateDynamicTableRequest(name, warehouse.ID(), targetLag, query).WithOrReplace(true).WithComment(&comment))
 	require.NoError(t, err)
 
 	entities, err := client.DynamicTables.Show(ctx, &ShowDynamicTableOptions{
 		Like: &Like{
-			Pattern: String(id.Name()),
+			Pattern: String(name.Name()),
 		},
 	})
 	require.NoError(t, err)
 	require.Equal(t, 1, len(entities))
 	return entities[0], func() {
-		require.NoError(t, client.DynamicTables.Drop(ctx, id))
+		require.NoError(t, client.DynamicTables.Drop(ctx, name))
 		if tableCleanup != nil {
 			tableCleanup()
 		}

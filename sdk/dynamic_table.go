@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	_ validatable = new(CreateDynamicTableOptions)
+	_ validatable = new(createDynamicTableOptions)
 	_ validatable = new(AlterDynamicTableOptions)
 	_ validatable = new(dropDynamicTableOptions)
 	_ validatable = new(ShowDynamicTableOptions)
@@ -20,21 +20,15 @@ var (
 )
 
 type DynamicTables interface {
-	Create(ctx context.Context, id AccountObjectIdentifier, warehouse AccountObjectIdentifier, targetLag string, query string, opts *CreateDynamicTableOptions) error
+	Create(ctx context.Context, request *CreateDynamicTableRequest) error
 	Alter(ctx context.Context, id AccountObjectIdentifier, opts *AlterDynamicTableOptions) error
 	Describe(ctx context.Context, id AccountObjectIdentifier) (*DynamicTableDetails, error)
 	Drop(ctx context.Context, id AccountObjectIdentifier) error
 	Show(ctx context.Context, opts *ShowDynamicTableOptions) ([]*DynamicTable, error)
 }
 
-var _ DynamicTables = (*dynamicTables)(nil)
-
-type dynamicTables struct {
-	client *Client
-}
-
-// CreateDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-dynamic-table
-type CreateDynamicTableOptions struct {
+// createDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-dynamic-table
+type createDynamicTableOptions struct {
 	create       bool                    `ddl:"static" sql:"CREATE"`
 	OrReplace    *bool                   `ddl:"keyword" sql:"OR REPLACE"`
 	dynamicTable bool                    `ddl:"static" sql:"DYNAMIC TABLE"`
@@ -69,7 +63,7 @@ func validateAndSingleQuoteTargetLag(s *string) error {
 	return nil
 }
 
-func (opts *CreateDynamicTableOptions) validate() error {
+func (opts *createDynamicTableOptions) validate() error {
 	if opts == nil {
 		return errNilOptions
 	}
@@ -83,25 +77,6 @@ func (opts *CreateDynamicTableOptions) validate() error {
 		return err
 	}
 	return nil
-}
-
-func (dt *dynamicTables) Create(ctx context.Context, id AccountObjectIdentifier, warehouse AccountObjectIdentifier, targetLag string, query string, opts *CreateDynamicTableOptions) error {
-	if opts == nil {
-		opts = &CreateDynamicTableOptions{}
-	}
-	opts.name = id
-	opts.warehouse = warehouse
-	opts.targetLag = targetLag
-	opts.query = query
-	if err := opts.validate(); err != nil {
-		return err
-	}
-	sql, err := structToSQL(opts)
-	if err != nil {
-		return err
-	}
-	_, err = dt.client.exec(ctx, sql)
-	return err
 }
 
 type DynamicTableSet struct {

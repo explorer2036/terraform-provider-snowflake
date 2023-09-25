@@ -9,7 +9,7 @@ import (
 
 func TestDynamicTableCreate(t *testing.T) {
 	t.Run("complete", func(t *testing.T) {
-		opts := &CreateDynamicTableOptions{
+		opts := &createDynamicTableOptions{
 			OrReplace: Bool(true),
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
@@ -28,7 +28,7 @@ func TestDynamicTableCreate(t *testing.T) {
 	})
 
 	t.Run("complete with target lag", func(t *testing.T) {
-		opts := &CreateDynamicTableOptions{
+		opts := &createDynamicTableOptions{
 			OrReplace: Bool(true),
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
@@ -47,7 +47,7 @@ func TestDynamicTableCreate(t *testing.T) {
 	})
 
 	t.Run("validate-opts-target-lag-string", func(t *testing.T) {
-		opts := &CreateDynamicTableOptions{
+		opts := &createDynamicTableOptions{
 			OrReplace: Bool(true),
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
@@ -65,7 +65,7 @@ func TestDynamicTableCreate(t *testing.T) {
 	})
 
 	t.Run("validate-opts-target-lag-number", func(t *testing.T) {
-		opts := &CreateDynamicTableOptions{
+		opts := &createDynamicTableOptions{
 			OrReplace: Bool(true),
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
@@ -83,7 +83,7 @@ func TestDynamicTableCreate(t *testing.T) {
 	})
 
 	t.Run("validate-opts-target-lag-unit", func(t *testing.T) {
-		opts := &CreateDynamicTableOptions{
+		opts := &createDynamicTableOptions{
 			OrReplace: Bool(true),
 			name: AccountObjectIdentifier{
 				name: "dynamic-table",
