@@ -81,3 +81,27 @@ func NewDescribeDynamicTableRequest(
 	s.name = name
 	return &s
 }
+
+func NewShowDynamicTableRequest() *ShowDynamicTableRequest {
+	return &ShowDynamicTableRequest{}
+}
+
+func (s *ShowDynamicTableRequest) WithLike(like *Like) *ShowDynamicTableRequest {
+	s.like = like
+	return s
+}
+
+func (s *ShowDynamicTableRequest) WithIn(in *In) *ShowDynamicTableRequest {
+	s.in = in
+	return s
+}
+
+func (s *ShowDynamicTableRequest) WithStartsWith(startsWith *string) *ShowDynamicTableRequest {
+	s.startsWith = startsWith
+	return s
+}
+
+func (s *ShowDynamicTableRequest) WithLimitFrom(limitFrom *LimitFrom) *ShowDynamicTableRequest {
+	s.limitFrom = limitFrom
+	return s
+}

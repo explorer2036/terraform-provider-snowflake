@@ -41,3 +41,10 @@ type DropDynamicTableRequest struct {
 type DescribeDynamicTableRequest struct {
 	name AccountObjectIdentifier // required
 }
+
+type ShowDynamicTableRequest struct {
+	like       *Like
+	in         *In
+	startsWith *string
+	limitFrom  *LimitFrom
+}

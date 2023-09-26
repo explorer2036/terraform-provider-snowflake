@@ -8,7 +8,7 @@ var (
 	_ validatable = new(createDynamicTableOptions)
 	_ validatable = new(alterDynamicTableOptions)
 	_ validatable = new(dropDynamicTableOptions)
-	_ validatable = new(ShowDynamicTableOptions)
+	_ validatable = new(showDynamicTableOptions)
 	_ validatable = new(describeDynamicTableOptions)
 	_ validatable = new(DynamicTableSet)
 )
@@ -77,7 +77,7 @@ func (opts *alterDynamicTableOptions) validate() error {
 	return errors.Join(errs...)
 }
 
-func (opts *ShowDynamicTableOptions) validate() error {
+func (opts *showDynamicTableOptions) validate() error {
 	if opts == nil {
 		return errors.Join(errNilOptions)
 	}

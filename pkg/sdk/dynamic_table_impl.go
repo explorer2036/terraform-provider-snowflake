@@ -34,6 +34,16 @@ func (v *dynamicTables) Describe(ctx context.Context, request *DescribeDynamicTa
 	return row.convert(), nil
 }
 
+func (v *dynamicTables) Show(ctx context.Context, request *ShowDynamicTableRequest) ([]DynamicTable, error) {
+	opts := request.toOpts()
+	rows, err := validateAndQuery[dynamicTableRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	result := convertRows[dynamicTableRow, DynamicTable](rows)
+	return result, nil
+}
+
 func (s *CreateDynamicTableRequest) toOpts() *createDynamicTableOptions {
 	return &createDynamicTableOptions{
 		OrReplace: Bool(s.orReplace),
@@ -74,4 +84,21 @@ func (s *DescribeDynamicTableRequest) toOpts() *describeDynamicTableOptions {
 	return &describeDynamicTableOptions{
 		name: s.name,
 	}
+}
+
+func (s *ShowDynamicTableRequest) toOpts() *showDynamicTableOptions {
+	opts := showDynamicTableOptions{}
+	if s.like != nil {
+		opts.Like = s.like
+	}
+	if s.in != nil {
+		opts.In = s.in
+	}
+	if s.startsWith != nil {
+		opts.StartsWith = s.startsWith
+	}
+	if s.limitFrom != nil {
+		opts.LimitFrom = s.limitFrom
+	}
+	return &opts
 }

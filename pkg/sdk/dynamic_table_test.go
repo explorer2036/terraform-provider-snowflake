@@ -126,7 +126,7 @@ func TestDynamicTableDrop(t *testing.T) {
 
 func TestDynamicTableShow(t *testing.T) {
 	t.Run("empty options", func(t *testing.T) {
-		opts := &ShowDynamicTableOptions{}
+		opts := &showDynamicTableOptions{}
 		actual, err := structToSQL(opts)
 		require.NoError(t, err)
 		expected := `SHOW DYNAMIC TABLES`
@@ -134,7 +134,7 @@ func TestDynamicTableShow(t *testing.T) {
 	})
 
 	t.Run("with like", func(t *testing.T) {
-		opts := &ShowDynamicTableOptions{
+		opts := &showDynamicTableOptions{
 			Like: &Like{
 				Pattern: String("dynamic-table"),
 			},

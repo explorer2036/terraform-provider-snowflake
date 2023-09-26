@@ -11,7 +11,7 @@ type DynamicTables interface {
 	Alter(ctx context.Context, request *AlterDynamicTableRequest) error
 	Describe(ctx context.Context, request *DescribeDynamicTableRequest) (*DynamicTableDetails, error)
 	Drop(ctx context.Context, request *DropDynamicTableRequest) error
-	Show(ctx context.Context, opts *ShowDynamicTableOptions) ([]*DynamicTable, error)
+	Show(ctx context.Context, opts *ShowDynamicTableRequest) ([]DynamicTable, error)
 }
 
 // createDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-dynamic-table
@@ -55,14 +55,14 @@ type dropDynamicTableOptions struct {
 	name         AccountObjectIdentifier `ddl:"identifier"`
 }
 
-// ShowDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-dynamic-tables
-type ShowDynamicTableOptions struct {
+// showDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-dynamic-tables
+type showDynamicTableOptions struct {
 	show         bool       `ddl:"static" sql:"SHOW"`
 	dynamicTable bool       `ddl:"static" sql:"DYNAMIC TABLES"`
 	Like         *Like      `ddl:"keyword" sql:"LIKE"`
 	In           *In        `ddl:"keyword" sql:"IN"`
 	StartsWith   *string    `ddl:"parameter,single_quotes,no_equals" sql:"STARTS WITH"`
-	Limit        *LimitFrom `ddl:"keyword" sql:"LIMIT"`
+	LimitFrom    *LimitFrom `ddl:"keyword" sql:"LIMIT"`
 }
 
 type DynamicTableRefreshMode string
@@ -131,7 +131,7 @@ type dynamicTableRow struct {
 	DataTimestamp       time.Time      `db:"data_timestamp"`
 }
 
-func (dtr *dynamicTableRow) toDynamicTable() *DynamicTable {
+func (dtr dynamicTableRow) convert() *DynamicTable {
 	dt := &DynamicTable{
 		CreatedOn:           dtr.CreatedOn,
 		Name:                dtr.Name,
@@ -160,28 +160,6 @@ func (dtr *dynamicTableRow) toDynamicTable() *DynamicTable {
 		dt.LastSuspendedOn = dtr.LastSuspendedOn.Time
 	}
 	return dt
-}
-
-func (dt *dynamicTables) Show(ctx context.Context, opts *ShowDynamicTableOptions) ([]*DynamicTable, error) {
-	if opts == nil {
-		opts = &ShowDynamicTableOptions{}
-	}
-	if err := opts.validate(); err != nil {
-		return nil, err
-	}
-	sql, err := structToSQL(opts)
-	if err != nil {
-		return nil, err
-	}
-	rows := []*dynamicTableRow{}
-	if err := dt.client.query(ctx, &rows, sql); err != nil {
-		return nil, err
-	}
-	entities := make([]*DynamicTable, len(rows))
-	for i, row := range rows {
-		entities[i] = row.toDynamicTable()
-	}
-	return entities, nil
 }
 
 // describeDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/desc-dynamic-table
