@@ -729,7 +729,7 @@ func createDynamicTableWithOptions(t *testing.T, client *Client, warehouse *Ware
 	err := client.DynamicTables.Create(ctx, NewCreateDynamicTableRequest(name, warehouse.ID(), targetLag, query).WithOrReplace(true).WithComment(&comment))
 	require.NoError(t, err)
 
-	entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(name.Name())}))
+	entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(name.Name()))
 	require.NoError(t, err)
 	require.Equal(t, 1, len(entities))
 	return &entities[0], func() {

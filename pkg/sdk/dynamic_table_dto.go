@@ -6,6 +6,7 @@ var (
 	_ optionsProvider[createDynamicTableOptions] = new(CreateDynamicTableRequest)
 	_ optionsProvider[alterDynamicTableOptions]  = new(AlterDynamicTableRequest)
 	_ optionsProvider[dropDynamicTableOptions]   = new(DropDynamicTableRequest)
+	_ optionsProvider[showDynamicTableOptions]   = new(ShowDynamicTableRequest)
 )
 
 type CreateDynamicTableRequest struct {

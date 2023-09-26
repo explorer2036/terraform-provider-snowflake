@@ -86,8 +86,10 @@ func NewShowDynamicTableRequest() *ShowDynamicTableRequest {
 	return &ShowDynamicTableRequest{}
 }
 
-func (s *ShowDynamicTableRequest) WithLike(like *Like) *ShowDynamicTableRequest {
-	s.like = like
+func (s *ShowDynamicTableRequest) WithLike(pattern string) *ShowDynamicTableRequest {
+	s.like = &Like{
+		Pattern: String(pattern),
+	}
 	return s
 }
 

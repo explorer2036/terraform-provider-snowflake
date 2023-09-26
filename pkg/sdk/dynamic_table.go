@@ -12,6 +12,7 @@ type DynamicTables interface {
 	Describe(ctx context.Context, request *DescribeDynamicTableRequest) (*DynamicTableDetails, error)
 	Drop(ctx context.Context, request *DropDynamicTableRequest) error
 	Show(ctx context.Context, opts *ShowDynamicTableRequest) ([]DynamicTable, error)
+	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*DynamicTable, error)
 }
 
 // createDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-dynamic-table

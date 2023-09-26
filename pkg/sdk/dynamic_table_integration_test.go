@@ -34,7 +34,7 @@ func TestInt_DynamicTableCreate(t *testing.T) {
 			err = client.DynamicTables.Drop(ctx, NewDropDynamicTableRequest(name))
 			require.NoError(t, err)
 		})
-		entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(name.Name())}))
+		entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(name.Name()))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 
@@ -57,7 +57,7 @@ func TestInt_DynamicTableCreate(t *testing.T) {
 			err = client.DynamicTables.Drop(ctx, NewDropDynamicTableRequest(name))
 			require.NoError(t, err)
 		})
-		entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(name.Name())}))
+		entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(name.Name()))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 
@@ -91,53 +91,53 @@ func TestInt_DynamicTableAlter(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	// t.Run("aliter with suspend or resume", func(t *testing.T) {
-	// 	dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
-	// 	t.Cleanup(dynamicTableCleanup)
+	t.Run("aliter with suspend or resume", func(t *testing.T) {
+		dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
+		t.Cleanup(dynamicTableCleanup)
 
-	// 	entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(dynamicTable.Name)}))
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, 1, len(entities))
-	// 	require.Equal(t, DynamicTableSchedulingStateRunning, entities[0].SchedulingState)
+		entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(dynamicTable.Name))
+		require.NoError(t, err)
+		require.Equal(t, 1, len(entities))
+		require.Equal(t, DynamicTableSchedulingStateRunning, entities[0].SchedulingState)
 
-	// 	err = client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithSuspend(Bool(true)))
-	// 	require.NoError(t, err)
+		err = client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithSuspend(Bool(true)))
+		require.NoError(t, err)
 
-	// 	entities, err = client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(dynamicTable.Name)}))
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, 1, len(entities))
-	// 	require.Equal(t, DynamicTableSchedulingStateSuspended, entities[0].SchedulingState)
+		entities, err = client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(dynamicTable.Name))
+		require.NoError(t, err)
+		require.Equal(t, 1, len(entities))
+		require.Equal(t, DynamicTableSchedulingStateSuspended, entities[0].SchedulingState)
 
-	// 	err = client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithResume(Bool(true)))
-	// 	require.NoError(t, err)
+		err = client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithResume(Bool(true)))
+		require.NoError(t, err)
 
-	// 	entities, err = client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(dynamicTable.Name)}))
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, 1, len(entities))
-	// 	require.Equal(t, DynamicTableSchedulingStateRunning, entities[0].SchedulingState)
-	// })
+		entities, err = client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(dynamicTable.Name))
+		require.NoError(t, err)
+		require.Equal(t, 1, len(entities))
+		require.Equal(t, DynamicTableSchedulingStateRunning, entities[0].SchedulingState)
+	})
 
-	// t.Run("aliter with refresh", func(t *testing.T) {
-	// 	dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
-	// 	t.Cleanup(dynamicTableCleanup)
+	t.Run("aliter with refresh", func(t *testing.T) {
+		dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
+		t.Cleanup(dynamicTableCleanup)
 
-	// 	err := client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithRefresh(Bool(true)))
-	// 	require.NoError(t, err)
+		err := client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithRefresh(Bool(true)))
+		require.NoError(t, err)
 
-	// 	entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(dynamicTable.Name)}))
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, 1, len(entities))
-	// })
+		entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(dynamicTable.Name))
+		require.NoError(t, err)
+		require.Equal(t, 1, len(entities))
+	})
 
-	// t.Run("aliter with suspend and resume", func(t *testing.T) {
-	// 	dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
-	// 	t.Cleanup(dynamicTableCleanup)
+	t.Run("aliter with suspend and resume", func(t *testing.T) {
+		dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
+		t.Cleanup(dynamicTableCleanup)
 
-	// 	err := client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithSuspend(Bool(true)).WithResume(Bool(true)))
-	// 	require.Error(t, err)
-	// 	expected := "alter statement needs exactly one action from: set, unset, refresh\nfields [Suspend Resume] are incompatible and cannot be set at once"
-	// 	require.Equal(t, expected, err.Error())
-	// })
+		err := client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithSuspend(Bool(true)).WithResume(Bool(true)))
+		require.Error(t, err)
+		expected := "alter statement needs exactly one action from: set, unset, refresh\nfields [Suspend Resume] are incompatible and cannot be set at once"
+		require.Equal(t, expected, err.Error())
+	})
 
 	t.Run("alter with set", func(t *testing.T) {
 		dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
@@ -147,7 +147,7 @@ func TestInt_DynamicTableAlter(t *testing.T) {
 		for _, value := range targetLagCases {
 			err := client.DynamicTables.Alter(ctx, NewAlterDynamicTableRequest(dynamicTable.ID()).WithSet(NewDynamicTableSetRequest().WithTargetLag(&TargetLag{Lagtime: String(value)})))
 			require.NoError(t, err)
-			entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(&Like{Pattern: String(dynamicTable.Name)}))
+			entities, err := client.DynamicTables.Show(ctx, NewShowDynamicTableRequest().WithLike(dynamicTable.Name))
 			require.NoError(t, err)
 			require.Equal(t, 1, len(entities))
 			require.Equal(t, value, entities[0].TargetLag)
