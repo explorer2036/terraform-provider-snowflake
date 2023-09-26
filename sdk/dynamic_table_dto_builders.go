@@ -65,3 +65,19 @@ func (s *DynamicTableSetRequest) WithWarehourse(warehourse *AccountObjectIdentif
 	s.warehourse = warehourse
 	return s
 }
+
+func NewDropDynamicTableRequest(
+	name AccountObjectIdentifier,
+) *DropDynamicTableRequest {
+	s := DropDynamicTableRequest{}
+	s.name = name
+	return &s
+}
+
+func NewDescribeDynamicTableRequest(
+	name AccountObjectIdentifier,
+) *DescribeDynamicTableRequest {
+	s := DescribeDynamicTableRequest{}
+	s.name = name
+	return &s
+}

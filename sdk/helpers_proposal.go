@@ -70,6 +70,10 @@ type convertibleRow[T any] interface {
 	convert() *T
 }
 
+func convertRow[T convertibleRow[U], U any](dbRow T) U {
+	return *(dbRow.convert())
+}
+
 func convertRows[T convertibleRow[U], U any](dbRows *[]T) []U {
 	resultList := make([]U, len(*dbRows))
 	for i, row := range *dbRows {

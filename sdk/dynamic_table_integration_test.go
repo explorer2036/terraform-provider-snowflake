@@ -29,7 +29,7 @@ func TestInt_DynamicTableCreate(t *testing.T) {
 		err := client.DynamicTables.Create(ctx, NewCreateDynamicTableRequest(name, warehouseTest.ID(), targetLag, query).WithOrReplace(true).WithComment(&comment))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.DynamicTables.Drop(ctx, name)
+			err = client.DynamicTables.Drop(ctx, NewDropDynamicTableRequest(name))
 			require.NoError(t, err)
 		})
 		entities, err := client.DynamicTables.Show(ctx, &ShowDynamicTableOptions{
@@ -54,7 +54,7 @@ func TestInt_DynamicTableCreate(t *testing.T) {
 		err := client.DynamicTables.Create(ctx, NewCreateDynamicTableRequest(name, warehouseTest.ID(), targetLag, query).WithOrReplace(true).WithComment(&comment))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.DynamicTables.Drop(ctx, name)
+			err = client.DynamicTables.Drop(ctx, NewDropDynamicTableRequest(name))
 			require.NoError(t, err)
 		})
 		entities, err := client.DynamicTables.Show(ctx, &ShowDynamicTableOptions{
@@ -80,13 +80,13 @@ func TestInt_DynamicTableDescribe(t *testing.T) {
 	t.Cleanup(dynamicTableCleanup)
 
 	t.Run("when dynamic table exists", func(t *testing.T) {
-		_, err := client.DynamicTables.Describe(ctx, dynamicTable.ID())
+		_, err := client.DynamicTables.Describe(ctx, NewDescribeDynamicTableRequest(dynamicTable.ID()))
 		require.NoError(t, err)
 	})
 
 	t.Run("when dynamic table does not exist", func(t *testing.T) {
-		id := NewAccountObjectIdentifier("does_not_exist")
-		_, err := client.DynamicTables.Describe(ctx, id)
+		name := NewAccountObjectIdentifier("does_not_exist")
+		_, err := client.DynamicTables.Describe(ctx, NewDescribeDynamicTableRequest(name))
 		assert.ErrorIs(t, err, ErrObjectNotExistOrAuthorized)
 	})
 }

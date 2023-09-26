@@ -15,15 +15,15 @@ var (
 	_ validatable = new(alterDynamicTableOptions)
 	_ validatable = new(dropDynamicTableOptions)
 	_ validatable = new(ShowDynamicTableOptions)
-	_ validatable = new(dynamicTableDescribeOptions)
+	_ validatable = new(describeDynamicTableOptions)
 	_ validatable = new(DynamicTableSet)
 )
 
 type DynamicTables interface {
 	Create(ctx context.Context, request *CreateDynamicTableRequest) error
 	Alter(ctx context.Context, request *AlterDynamicTableRequest) error
-	Describe(ctx context.Context, id AccountObjectIdentifier) (*DynamicTableDetails, error)
-	Drop(ctx context.Context, id AccountObjectIdentifier) error
+	Describe(ctx context.Context, request *DescribeDynamicTableRequest) (*DynamicTableDetails, error)
+	Drop(ctx context.Context, request *DropDynamicTableRequest) error
 	Show(ctx context.Context, opts *ShowDynamicTableOptions) ([]*DynamicTable, error)
 }
 
@@ -151,21 +151,6 @@ func (opts *dropDynamicTableOptions) validate() error {
 		return ErrInvalidObjectIdentifier
 	}
 	return nil
-}
-
-func (dt *dynamicTables) Drop(ctx context.Context, id AccountObjectIdentifier) error {
-	opts := &dropDynamicTableOptions{
-		name: id,
-	}
-	if err := opts.validate(); err != nil {
-		return err
-	}
-	sql, err := structToSQL(opts)
-	if err != nil {
-		return err
-	}
-	_, err = dt.client.exec(ctx, sql)
-	return err
 }
 
 // ShowDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-dynamic-tables
@@ -310,14 +295,14 @@ func (dt *dynamicTables) Show(ctx context.Context, opts *ShowDynamicTableOptions
 	return entities, nil
 }
 
-// dynamicTableDescribeOptions is based on https://docs.snowflake.com/en/sql-reference/sql/desc-dynamic-table
-type dynamicTableDescribeOptions struct {
+// describeDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/desc-dynamic-table
+type describeDynamicTableOptions struct {
 	describe     bool                    `ddl:"static" sql:"DESCRIBE"`
 	dynamicTable bool                    `ddl:"static" sql:"DYNAMIC TABLE"`
 	name         AccountObjectIdentifier `ddl:"identifier"`
 }
 
-func (opts *dynamicTableDescribeOptions) validate() error {
+func (opts *describeDynamicTableOptions) validate() error {
 	if !validObjectidentifier(opts.name) {
 		return ErrInvalidObjectIdentifier
 	}
@@ -352,56 +337,30 @@ type dynamicTableDetailsRow struct {
 	PolicyName sql.NullString `db:"policy name"`
 }
 
-func (dtdr *dynamicTableDetailsRow) toDynamicTableDetails() (*DynamicTableDetails, error) {
-	typ, err := ToDataType(dtdr.Type)
-	if err != nil {
-		return nil, err
-	}
-
+func (row dynamicTableDetailsRow) convert() *DynamicTableDetails {
+	typ, _ := ToDataType(row.Type)
 	dtd := &DynamicTableDetails{
-		Name:       dtdr.Name,
+		Name:       row.Name,
 		Type:       typ,
-		Kind:       dtdr.Kind,
-		IsNull:     dtdr.IsNull == "Y",
-		PrimaryKey: dtdr.PrimaryKey,
-		UniqueKey:  dtdr.UniqueKey,
+		Kind:       row.Kind,
+		IsNull:     row.IsNull == "Y",
+		PrimaryKey: row.PrimaryKey,
+		UniqueKey:  row.UniqueKey,
 	}
-	if dtdr.Default.Valid {
-		dtd.Default = dtdr.Default.String
+	if row.Default.Valid {
+		dtd.Default = row.Default.String
 	}
-	if dtdr.Check.Valid {
-		dtd.Check = dtdr.Check.String
+	if row.Check.Valid {
+		dtd.Check = row.Check.String
 	}
-	if dtdr.Expression.Valid {
-		dtd.Expression = dtdr.Expression.String
+	if row.Expression.Valid {
+		dtd.Expression = row.Expression.String
 	}
-	if dtdr.Comment.Valid {
-		dtd.Comment = dtdr.Comment.String
+	if row.Comment.Valid {
+		dtd.Comment = row.Comment.String
 	}
-	if dtdr.PolicyName.Valid {
-		dtd.PolicyName = dtdr.PolicyName.String
+	if row.PolicyName.Valid {
+		dtd.PolicyName = row.PolicyName.String
 	}
-	return dtd, nil
-}
-
-func (dt *dynamicTables) Describe(ctx context.Context, id AccountObjectIdentifier) (*DynamicTableDetails, error) {
-	opts := &dynamicTableDescribeOptions{
-		name: id,
-	}
-	if err := opts.validate(); err != nil {
-		return nil, err
-	}
-	sql, err := structToSQL(opts)
-	if err != nil {
-		return nil, err
-	}
-	var row dynamicTableDetailsRow
-	if err := dt.client.queryOne(ctx, &row, sql); err != nil {
-		return nil, err
-	}
-	entity, err := row.toDynamicTableDetails()
-	if err != nil {
-		return nil, err
-	}
-	return entity, nil
+	return dtd
 }

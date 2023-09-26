@@ -707,7 +707,7 @@ func createDynamicTableWithOptions(t *testing.T, client *Client, warehouse *Ware
 	require.NoError(t, err)
 	require.Equal(t, 1, len(entities))
 	return entities[0], func() {
-		require.NoError(t, client.DynamicTables.Drop(ctx, name))
+		require.NoError(t, client.DynamicTables.Drop(ctx, NewDropDynamicTableRequest(name)))
 		if tableCleanup != nil {
 			tableCleanup()
 		}

@@ -5,6 +5,7 @@ package sdk
 var (
 	_ optionsProvider[createDynamicTableOptions] = new(CreateDynamicTableRequest)
 	_ optionsProvider[alterDynamicTableOptions]  = new(AlterDynamicTableRequest)
+	_ optionsProvider[dropDynamicTableOptions]   = new(DropDynamicTableRequest)
 )
 
 type CreateDynamicTableRequest struct {
@@ -31,4 +32,12 @@ type AlterDynamicTableRequest struct {
 type DynamicTableSetRequest struct {
 	targetLag  *string
 	warehourse *AccountObjectIdentifier
+}
+
+type DropDynamicTableRequest struct {
+	name AccountObjectIdentifier // required
+}
+
+type DescribeDynamicTableRequest struct {
+	name AccountObjectIdentifier // required
 }

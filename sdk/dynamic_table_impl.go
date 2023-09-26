@@ -18,6 +18,21 @@ func (v *dynamicTables) Alter(ctx context.Context, request *AlterDynamicTableReq
 	return validateAndExec(v.client, ctx, opts)
 }
 
+func (v *dynamicTables) Drop(ctx context.Context, request *DropDynamicTableRequest) error {
+	opts := request.toOpts()
+	return validateAndExec(v.client, ctx, opts)
+}
+
+func (v *dynamicTables) Describe(ctx context.Context, request *DescribeDynamicTableRequest) (*DynamicTableDetails, error) {
+	opts := request.toOpts()
+	row, err := validateAndQueryOne[dynamicTableDetailsRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	e := convertRow[dynamicTableDetailsRow, DynamicTableDetails](*row)
+	return &e, nil
+}
+
 func (s *CreateDynamicTableRequest) toOpts() *createDynamicTableOptions {
 	return &createDynamicTableOptions{
 		OrReplace: Bool(s.orReplace),
@@ -46,4 +61,16 @@ func (s *AlterDynamicTableRequest) toOpts() *alterDynamicTableOptions {
 		opts.Set = &DynamicTableSet{s.set.targetLag, s.set.warehourse}
 	}
 	return &opts
+}
+
+func (s *DropDynamicTableRequest) toOpts() *dropDynamicTableOptions {
+	return &dropDynamicTableOptions{
+		name: s.name,
+	}
+}
+
+func (s *DescribeDynamicTableRequest) toOpts() *describeDynamicTableOptions {
+	return &describeDynamicTableOptions{
+		name: s.name,
+	}
 }

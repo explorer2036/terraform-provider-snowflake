@@ -197,7 +197,7 @@ func TestDynamicTableShow(t *testing.T) {
 
 func TestDynamicTableDescribe(t *testing.T) {
 	t.Run("only name", func(t *testing.T) {
-		opts := &dynamicTableDescribeOptions{
+		opts := &describeDynamicTableOptions{
 			name: NewAccountObjectIdentifier("dynamic-table"),
 		}
 		actual, err := structToSQL(opts)
