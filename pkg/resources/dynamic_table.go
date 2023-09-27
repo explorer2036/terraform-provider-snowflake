@@ -35,26 +35,9 @@ var dynamicTableShema = map[string]*schema.Schema{
 		Default:     false,
 	},
 	"target_lag": {
-		Type:        schema.TypeList,
+		Type:        schema.TypeString,
 		Required:    true,
-		MaxItems:    1,
 		Description: "Specifies the target lag time for the dynamic table.",
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"lagtime": {
-					Type:          schema.TypeString,
-					Optional:      true,
-					ConflictsWith: []string{"target_lag.downstream"},
-					Description:   "Specifies the target lag time for the dynamic table.",
-				},
-				"downstream": {
-					Type:          schema.TypeBool,
-					Optional:      true,
-					ConflictsWith: []string{"target_lag.lagtime"},
-					Description:   "Specifies whether the target lag time is downstream.",
-				},
-			},
-		},
 	},
 	"comment": {
 		Type:        schema.TypeString,
@@ -63,6 +46,7 @@ var dynamicTableShema = map[string]*schema.Schema{
 	},
 }
 
+// DynamicTable returns a pointer to the resource representing a dynamic table.
 func DynamicTable() *schema.Resource {
 	return &schema.Resource{
 		Create: CreateDynamicTable,
@@ -77,6 +61,7 @@ func DynamicTable() *schema.Resource {
 	}
 }
 
+// ReadDynamicTable implements schema.ReadFunc.
 func ReadDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
@@ -103,18 +88,7 @@ func ReadDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func parseTargetLag(v interface{}) *sdk.TargetLag {
-	var result sdk.TargetLag
-	tl := v.([]interface{})[0].(map[string]interface{})
-	if v, ok := tl["lagtime"]; ok {
-		result.Lagtime = sdk.String(v.(string))
-	}
-	if v, ok := tl["downstream"]; ok {
-		result.Downstream = sdk.Bool(v.(bool))
-	}
-	return &result
-}
-
+// CreateDynamicTable implements schema.CreateFunc.
 func CreateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
@@ -125,8 +99,14 @@ func CreateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	warehouse := sdk.NewAccountObjectIdentifier(warehouseName)
 	query := d.Get("query").(string)
 
-	targetLag := parseTargetLag(d.Get("target_lag"))
-	request := sdk.NewCreateDynamicTableRequest(name, warehouse, *targetLag, query)
+	var tl sdk.TargetLag
+	targetLag := d.Get("target_lag").(string)
+	if targetLag == "DOWNSTREAM" {
+		tl.Downstream = sdk.Bool(true)
+	} else {
+		tl.Lagtime = sdk.String(targetLag)
+	}
+	request := sdk.NewCreateDynamicTableRequest(name, warehouse, tl, query)
 	if v, ok := d.GetOk("comment"); ok {
 		request.WithComment(sdk.String(v.(string)))
 	}
@@ -141,6 +121,7 @@ func CreateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	return ReadDynamicTable(d, meta)
 }
 
+// UpdateDynamicTable implements schema.UpdateFunc.
 func UpdateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
@@ -164,6 +145,7 @@ func UpdateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	return ReadDynamicTable(d, meta)
 }
 
+// DeleteDynamicTable implements schema.DeleteFunc.
 func DeleteDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)

@@ -281,6 +281,7 @@ func getResources() map[string]*schema.Resource {
 		"snowflake_user_public_keys":                        resources.UserPublicKeys(),
 		"snowflake_view":                                    resources.View(),
 		"snowflake_warehouse":                               resources.Warehouse(),
+		"snowflake_dynamic_table":                           resources.DynamicTable(),
 	}
 
 	return mergeSchemas(
@@ -328,6 +329,7 @@ func getDataSources() map[string]*schema.Resource {
 		"snowflake_users":                              datasources.Users(),
 		"snowflake_views":                              datasources.Views(),
 		"snowflake_warehouses":                         datasources.Warehouses(),
+		"snowflake_dynamic_tables":                     datasources.DynamicTables(),
 	}
 
 	return dataSources
