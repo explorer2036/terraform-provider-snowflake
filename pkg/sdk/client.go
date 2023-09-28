@@ -46,6 +46,7 @@ type Client struct {
 	Users            Users
 	Schemas          Schemas
 	Warehouses       Warehouses
+	Tags             Tags
 }
 
 func NewDefaultClient() (*Client, error) {
@@ -145,6 +146,7 @@ func (c *Client) initialize() {
 	c.SystemFunctions = &systemFunctions{client: c}
 	c.Users = &users{client: c}
 	c.Warehouses = &warehouses{client: c}
+	c.Tags = &tags{client: c}
 }
 
 func (c *Client) Ping() error {
