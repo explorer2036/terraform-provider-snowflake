@@ -18,6 +18,29 @@ type CreateTagRequest struct {
 	allowedValues *AllowedValues
 }
 
+type AlterTagRequest struct {
+	name AccountObjectIdentifier // required
+
+	// One of
+	add    *TagAdd
+	drop   *TagDrop
+	set    *TagSet
+	unset  *TagUnset
+	rename *TagRename
+}
+
+type TagSetRequest struct {
+	maskingPolicies []string
+	force           *bool
+	comment         *string
+}
+
+type TagUnsetRequest struct {
+	maskingPolicies []string
+	allowedValues   *bool
+	comment         *bool
+}
+
 type ShowTagRequest struct {
 	like *Like
 	in   *In

@@ -109,12 +109,12 @@ func TestTagShow(t *testing.T) {
 func TestTagAlter(t *testing.T) {
 	t.Run("alter with rename to", func(t *testing.T) {
 		opts := &alterTagOptions{
-			name:     NewAccountObjectIdentifier("test"),
-			RenameTo: String("test2"),
+			name:   NewAccountObjectIdentifier("test"),
+			Rename: &TagRename{Name: NewAccountObjectIdentifier("test2")},
 		}
 		actual, err := structToSQL(opts)
 		require.NoError(t, err)
-		expected := `ALTER TAG "test" RENAME TO test2`
+		expected := `ALTER TAG "test" RENAME TO "test2"`
 		assert.Equal(t, expected, actual)
 	})
 
@@ -190,7 +190,7 @@ func TestTagAlter(t *testing.T) {
 		}
 		actual, err := structToSQL(opts)
 		require.NoError(t, err)
-		expected := `ALTER TAG "test" SET MASKING POLICY policy1`
+		expected := `ALTER TAG "test" SET MASKING POLICY "policy1"`
 		assert.Equal(t, expected, actual)
 	})
 
@@ -213,7 +213,7 @@ func TestTagAlter(t *testing.T) {
 		}
 		actual, err := structToSQL(opts)
 		require.NoError(t, err)
-		expected := `ALTER TAG "test" SET MASKING POLICY policy1, MASKING POLICY policy2 FORCE`
+		expected := `ALTER TAG "test" SET MASKING POLICY "policy1", MASKING POLICY "policy2" FORCE`
 		assert.Equal(t, expected, actual)
 	})
 
@@ -232,7 +232,7 @@ func TestTagAlter(t *testing.T) {
 		}
 		actual, err := structToSQL(opts)
 		require.NoError(t, err)
-		expected := `ALTER TAG "test" UNSET MASKING POLICY policy1`
+		expected := `ALTER TAG "test" UNSET MASKING POLICY "policy1"`
 		assert.Equal(t, expected, actual)
 	})
 
@@ -254,7 +254,7 @@ func TestTagAlter(t *testing.T) {
 		}
 		actual, err := structToSQL(opts)
 		require.NoError(t, err)
-		expected := `ALTER TAG "test" UNSET MASKING POLICY policy1, MASKING POLICY policy2`
+		expected := `ALTER TAG "test" UNSET MASKING POLICY "policy1", MASKING POLICY "policy2"`
 		assert.Equal(t, expected, actual)
 	})
 
