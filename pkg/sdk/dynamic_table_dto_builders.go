@@ -103,7 +103,7 @@ func (s *ShowDynamicTableRequest) WithStartsWith(startsWith *string) *ShowDynami
 	return s
 }
 
-func (s *ShowDynamicTableRequest) WithLimitFrom(limit *LimitFrom) *ShowDynamicTableRequest {
+func (s *ShowDynamicTableRequest) WithLimit(limit *LimitFrom) *ShowDynamicTableRequest {
 	s.limit = limit
 	return s
 }
