@@ -37,8 +37,8 @@ func TestInt_PasswordPoliciesShow(t *testing.T) {
 		}
 		passwordPolicies, err := client.PasswordPolicies.Show(ctx, showOptions)
 		require.NoError(t, err)
-		assert.Contains(t, passwordPolicies, passwordPolicyTest)
-		assert.Contains(t, passwordPolicies, passwordPolicy2Test)
+		assert.Contains(t, passwordPolicies, *passwordPolicyTest)
+		assert.Contains(t, passwordPolicies, *passwordPolicy2Test)
 		assert.Equal(t, 2, len(passwordPolicies))
 	})
 
@@ -53,7 +53,7 @@ func TestInt_PasswordPoliciesShow(t *testing.T) {
 		}
 		passwordPolicies, err := client.PasswordPolicies.Show(ctx, showOptions)
 		require.NoError(t, err)
-		assert.Contains(t, passwordPolicies, passwordPolicyTest)
+		assert.Contains(t, passwordPolicies, *passwordPolicyTest)
 		assert.Equal(t, 1, len(passwordPolicies))
 	})
 
@@ -191,7 +191,7 @@ func TestInt_PasswordPolicyDescribe(t *testing.T) {
 	t.Run("when password policy does not exist", func(t *testing.T) {
 		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, "does_not_exist")
 		_, err := client.PasswordPolicies.Describe(ctx, id)
-		assert.ErrorIs(t, err, ErrObjectNotExistOrAuthorized)
+		assert.ErrorIs(t, err, errObjectNotExistOrAuthorized)
 	})
 }
 
@@ -309,13 +309,13 @@ func TestInt_PasswordPolicyDrop(t *testing.T) {
 		err := client.PasswordPolicies.Drop(ctx, id, nil)
 		require.NoError(t, err)
 		_, err = client.PasswordPolicies.Describe(ctx, id)
-		assert.ErrorIs(t, err, ErrObjectNotExistOrAuthorized)
+		assert.ErrorIs(t, err, errObjectNotExistOrAuthorized)
 	})
 
 	t.Run("when password policy does not exist", func(t *testing.T) {
 		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, "does_not_exist")
 		err := client.PasswordPolicies.Drop(ctx, id, nil)
-		assert.ErrorIs(t, err, ErrObjectNotExistOrAuthorized)
+		assert.ErrorIs(t, err, errObjectNotExistOrAuthorized)
 	})
 
 	t.Run("when password policy exists and if exists is true", func(t *testing.T) {
@@ -325,6 +325,6 @@ func TestInt_PasswordPolicyDrop(t *testing.T) {
 		err := client.PasswordPolicies.Drop(ctx, id, dropOptions)
 		require.NoError(t, err)
 		_, err = client.PasswordPolicies.Describe(ctx, id)
-		assert.ErrorIs(t, err, ErrObjectNotExistOrAuthorized)
+		assert.ErrorIs(t, err, errObjectNotExistOrAuthorized)
 	})
 }
