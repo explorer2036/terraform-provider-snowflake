@@ -1,6 +1,6 @@
 package sdk
 
-func NewCreateTagRequest(name AccountObjectIdentifier) *CreateTagRequest {
+func NewCreateTagRequest(name SchemaObjectIdentifier) *CreateTagRequest {
 	s := CreateTagRequest{}
 	s.name = name
 	return &s
@@ -40,7 +40,7 @@ func createAllowedValues(values []string) *AllowedValues {
 	}
 }
 
-func NewAlterTagRequest(name AccountObjectIdentifier) *AlterTagRequest {
+func NewAlterTagRequest(name SchemaObjectIdentifier) *AlterTagRequest {
 	s := AlterTagRequest{}
 	s.name = name
 	return &s
@@ -136,7 +136,7 @@ func (s *AlterTagRequest) WithUnset(request *TagUnsetRequest) *AlterTagRequest {
 	return s
 }
 
-func (s *AlterTagRequest) WithRename(name AccountObjectIdentifier) *AlterTagRequest {
+func (s *AlterTagRequest) WithRename(name SchemaObjectIdentifier) *AlterTagRequest {
 	s.rename = &TagRename{
 		Name: name,
 	}
@@ -159,7 +159,7 @@ func (s *ShowTagRequest) WithIn(in *In) *ShowTagRequest {
 	return s
 }
 
-func NewDropTagRequest(name AccountObjectIdentifier) *DropTagRequest {
+func NewDropTagRequest(name SchemaObjectIdentifier) *DropTagRequest {
 	s := DropTagRequest{}
 	s.name = name
 	return &s
@@ -170,7 +170,7 @@ func (s *DropTagRequest) WithIfNotExists(ifNotExists bool) *DropTagRequest {
 	return s
 }
 
-func NewUndropTagRequest(name AccountObjectIdentifier) *UndropTagRequest {
+func NewUndropTagRequest(name SchemaObjectIdentifier) *UndropTagRequest {
 	s := UndropTagRequest{}
 	s.name = name
 	return &s

@@ -11,20 +11,20 @@ type Tags interface {
 	Create(ctx context.Context, request *CreateTagRequest) error
 	Alter(ctx context.Context, request *AlterTagRequest) error
 	Show(ctx context.Context, opts *ShowTagRequest) ([]Tag, error)
-	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*Tag, error)
+	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Tag, error)
 	Drop(ctx context.Context, request *DropTagRequest) error
 	Undrop(ctx context.Context, request *UndropTagRequest) error
 }
 
 // createTagOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-tag
 type createTagOptions struct {
-	create        bool                    `ddl:"static" sql:"CREATE"`
-	OrReplace     *bool                   `ddl:"keyword" sql:"OR REPLACE"`
-	tag           string                  `ddl:"static" sql:"TAG"`
-	IfNotExists   *bool                   `ddl:"keyword" sql:"IF NOT EXISTS"`
-	name          AccountObjectIdentifier `ddl:"identifier"`
-	Comment       *string                 `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	AllowedValues *AllowedValues          `ddl:"keyword" sql:"ALLOWED_VALUES"`
+	create        bool                   `ddl:"static" sql:"CREATE"`
+	OrReplace     *bool                  `ddl:"keyword" sql:"OR REPLACE"`
+	tag           string                 `ddl:"static" sql:"TAG"`
+	IfNotExists   *bool                  `ddl:"keyword" sql:"IF NOT EXISTS"`
+	name          SchemaObjectIdentifier `ddl:"identifier"`
+	Comment       *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
+	AllowedValues *AllowedValues         `ddl:"keyword" sql:"ALLOWED_VALUES"`
 }
 
 type AllowedValues struct {
@@ -126,14 +126,14 @@ type TagDrop struct {
 }
 
 type TagRename struct {
-	Name AccountObjectIdentifier `ddl:"identifier"`
+	Name SchemaObjectIdentifier `ddl:"identifier"`
 }
 
 // alterTagOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-tag
 type alterTagOptions struct {
-	alter bool                    `ddl:"static" sql:"ALTER"`
-	tag   string                  `ddl:"static" sql:"TAG"`
-	name  AccountObjectIdentifier `ddl:"identifier"`
+	alter bool                   `ddl:"static" sql:"ALTER"`
+	tag   string                 `ddl:"static" sql:"TAG"`
+	name  SchemaObjectIdentifier `ddl:"identifier"`
 
 	// One of
 	Add    *TagAdd    `ddl:"keyword" sql:"ADD"`
@@ -145,15 +145,15 @@ type alterTagOptions struct {
 
 // dropTagOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-tag
 type dropTagOptions struct {
-	drop        bool                    `ddl:"static" sql:"DROP"`
-	tag         string                  `ddl:"static" sql:"TAG"`
-	IfNotExists *bool                   `ddl:"keyword" sql:"IF NOT EXISTS"`
-	name        AccountObjectIdentifier `ddl:"identifier"`
+	drop        bool                   `ddl:"static" sql:"DROP"`
+	tag         string                 `ddl:"static" sql:"TAG"`
+	IfNotExists *bool                  `ddl:"keyword" sql:"IF NOT EXISTS"`
+	name        SchemaObjectIdentifier `ddl:"identifier"`
 }
 
 // undropTagOptions is based on https://docs.snowflake.com/en/sql-reference/sql/undrop-tag
 type undropTagOptions struct {
-	undrop bool                    `ddl:"static" sql:"UNDROP"`
-	tag    string                  `ddl:"static" sql:"TAG"`
-	name   AccountObjectIdentifier `ddl:"identifier"`
+	undrop bool                   `ddl:"static" sql:"UNDROP"`
+	tag    string                 `ddl:"static" sql:"TAG"`
+	name   SchemaObjectIdentifier `ddl:"identifier"`
 }

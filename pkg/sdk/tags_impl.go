@@ -30,7 +30,7 @@ func (v *tags) Show(ctx context.Context, request *ShowTagRequest) ([]Tag, error)
 	return result, nil
 }
 
-func (v *tags) ShowByID(ctx context.Context, id AccountObjectIdentifier) (*Tag, error) {
+func (v *tags) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Tag, error) {
 	request := NewShowTagRequest().WithLike(id.Name())
 	tags, err := v.Show(ctx, request)
 	if err != nil {

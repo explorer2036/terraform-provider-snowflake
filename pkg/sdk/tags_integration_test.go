@@ -12,69 +12,79 @@ func TestInt_TagCreate(t *testing.T) {
 
 	databaseTest, databaseCleanup := createDatabase(t, client)
 	t.Cleanup(databaseCleanup)
-	_, schemaCleanup := createSchema(t, client, databaseTest)
+	schemaTest, schemaCleanup := createSchema(t, client, databaseTest)
 	t.Cleanup(schemaCleanup)
 
 	ctx := context.Background()
 	t.Run("create with comment", func(t *testing.T) {
-		name := randomAccountObjectIdentifier(t)
+		name := randomString(t)
+		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 		comment := randomComment(t)
-		err := client.Tags.Create(ctx, NewCreateTagRequest(name).WithOrReplace(true).WithComment(&comment))
+		err := client.Tags.Create(ctx, NewCreateTagRequest(id).WithOrReplace(true).WithComment(&comment))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.Tags.Drop(ctx, NewDropTagRequest(name))
+			err = client.Tags.Drop(ctx, NewDropTagRequest(id))
 			require.NoError(t, err)
 		})
-		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(name.Name()))
+		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(id.Name()))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 
 		entity := entities[0]
-		require.Equal(t, name.Name(), entity.Name)
+		require.Equal(t, id.Name(), entity.Name)
+		require.Equal(t, id.DatabaseName(), entity.DatabaseName)
+		require.Equal(t, id.SchemaName(), entity.SchemaName)
 		require.Equal(t, comment, entity.Comment)
 	})
 
 	t.Run("create with one allowed value", func(t *testing.T) {
-		name := randomAccountObjectIdentifier(t)
+		name := randomString(t)
+		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 		values := []string{"value1"}
-		err := client.Tags.Create(ctx, NewCreateTagRequest(name).WithOrReplace(true).WithAllowedValues(values))
+		err := client.Tags.Create(ctx, NewCreateTagRequest(id).WithOrReplace(true).WithAllowedValues(values))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.Tags.Drop(ctx, NewDropTagRequest(name))
+			err = client.Tags.Drop(ctx, NewDropTagRequest(id))
 			require.NoError(t, err)
 		})
-		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(name.Name()))
+		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(id.Name()))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 
 		entity := entities[0]
-		require.Equal(t, name.Name(), entity.Name)
+		require.Equal(t, id.Name(), entity.Name)
+		require.Equal(t, id.DatabaseName(), entity.DatabaseName)
+		require.Equal(t, id.SchemaName(), entity.SchemaName)
 		require.Equal(t, values, entity.AllowedValues)
 	})
 
 	t.Run("create with two allowed values", func(t *testing.T) {
-		name := randomAccountObjectIdentifier(t)
+		name := randomString(t)
+		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 		values := []string{"value1", "value2"}
-		err := client.Tags.Create(ctx, NewCreateTagRequest(name).WithOrReplace(true).WithAllowedValues(values))
+		err := client.Tags.Create(ctx, NewCreateTagRequest(id).WithOrReplace(true).WithAllowedValues(values))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.Tags.Drop(ctx, NewDropTagRequest(name))
+			err = client.Tags.Drop(ctx, NewDropTagRequest(id))
 			require.NoError(t, err)
 		})
-		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(name.Name()))
+		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(id.Name()))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 
 		entity := entities[0]
-		require.Equal(t, name.Name(), entity.Name)
+		require.Equal(t, id.Name(), entity.Name)
+		require.Equal(t, id.DatabaseName(), entity.DatabaseName)
+		require.Equal(t, id.SchemaName(), entity.SchemaName)
 		require.Equal(t, values, entity.AllowedValues)
 	})
 
 	t.Run("create with comment and allowed values", func(t *testing.T) {
-		name := randomAccountObjectIdentifier(t)
+		name := randomString(t)
+		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 		comment := randomComment(t)
 		values := []string{"value1"}
-		err := client.Tags.Create(ctx, NewCreateTagRequest(name).WithOrReplace(true).WithComment(&comment).WithAllowedValues(values))
+		err := client.Tags.Create(ctx, NewCreateTagRequest(id).WithOrReplace(true).WithComment(&comment).WithAllowedValues(values))
 		expected := "fields [Comment AllowedValues] are incompatible and cannot be set at once"
 		require.Equal(t, expected, err.Error())
 	})
@@ -99,7 +109,7 @@ func TestInt_TagAlter(t *testing.T) {
 
 		comment := randomComment(t)
 		set := NewTagSetRequest().WithComment(comment)
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithSet(set))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithSet(set))
 		require.NoError(t, err)
 
 		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.Name))
@@ -108,7 +118,7 @@ func TestInt_TagAlter(t *testing.T) {
 		require.Equal(t, comment, entities[0].Comment)
 
 		unset := NewTagUnsetRequest().WithComment(true)
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithUnset(unset))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithUnset(unset))
 		require.NoError(t, err)
 
 		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.Name))
@@ -129,11 +139,11 @@ func TestInt_TagAlter(t *testing.T) {
 
 		policies := []string{policyTest.Name}
 		set := NewTagSetRequest().WithMaskingPolicies(policies)
-		err := client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithSet(set))
+		err := client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithSet(set))
 		require.NoError(t, err)
 
 		unset := NewTagUnsetRequest().WithMaskingPolicies(policies)
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithUnset(unset))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithUnset(unset))
 		require.NoError(t, err)
 	})
 
@@ -151,7 +161,7 @@ func TestInt_TagAlter(t *testing.T) {
 		require.Equal(t, 0, len(entities[0].AllowedValues))
 
 		values := []string{"value1"}
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithAdd(values))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithAdd(values))
 		require.NoError(t, err)
 
 		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.Name))
@@ -159,7 +169,7 @@ func TestInt_TagAlter(t *testing.T) {
 		require.Equal(t, 1, len(entities))
 		require.Equal(t, values, entities[0].AllowedValues)
 
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithDrop(values))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithDrop(values))
 		require.NoError(t, err)
 
 		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.Name))
@@ -175,20 +185,20 @@ func TestInt_TagAlter(t *testing.T) {
 		t.Cleanup(schemaCleanup)
 		tag, _ := createTag(t, client, databaseTest, schemaTest)
 
-		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.Name))
+		entities, err := client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.ID().Name()))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 		require.Equal(t, "", entities[0].Comment)
 
-		id := randomAccountObjectIdentifier(t)
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithRename(id))
+		nid := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, randomString(t))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithRename(nid))
 		require.NoError(t, err)
 		t.Cleanup(func() {
-			err = client.Tags.Drop(ctx, NewDropTagRequest(id))
+			err = client.Tags.Drop(ctx, NewDropTagRequest(nid))
 			require.NoError(t, err)
 		})
 
-		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(id.Name()))
+		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(nid.Name()))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(entities))
 	})
@@ -207,7 +217,7 @@ func TestInt_TagAlter(t *testing.T) {
 		require.Equal(t, 0, len(entities[0].AllowedValues))
 
 		values := []string{"value1", "value2"}
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithAdd(values))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithAdd(values))
 		require.NoError(t, err)
 
 		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.Name))
@@ -216,7 +226,7 @@ func TestInt_TagAlter(t *testing.T) {
 		require.Equal(t, values, entities[0].AllowedValues)
 
 		unset := NewTagUnsetRequest().WithAllowedValues(true)
-		err = client.Tags.Alter(ctx, NewAlterTagRequest(NewAccountObjectIdentifier(tag.Name)).WithUnset(unset))
+		err = client.Tags.Alter(ctx, NewAlterTagRequest(tag.ID()).WithUnset(unset))
 		require.NoError(t, err)
 
 		entities, err = client.Tags.Show(ctx, NewShowTagRequest().WithLike(tag.Name))

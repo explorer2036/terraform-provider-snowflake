@@ -11,7 +11,7 @@ type CreateTagRequest struct {
 	orReplace   bool
 	ifNotExists bool
 
-	name AccountObjectIdentifier // required
+	name SchemaObjectIdentifier // required
 
 	// One of
 	comment       *string
@@ -19,7 +19,7 @@ type CreateTagRequest struct {
 }
 
 type AlterTagRequest struct {
-	name AccountObjectIdentifier // required
+	name SchemaObjectIdentifier // required
 
 	// One of
 	add    *TagAdd
@@ -49,9 +49,9 @@ type ShowTagRequest struct {
 type DropTagRequest struct {
 	ifNotExists bool
 
-	name AccountObjectIdentifier // required
+	name SchemaObjectIdentifier // required
 }
 
 type UndropTagRequest struct {
-	name AccountObjectIdentifier // required
+	name SchemaObjectIdentifier // required
 }
