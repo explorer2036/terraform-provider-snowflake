@@ -17,6 +17,18 @@ var dynamicTableShema = map[string]*schema.Schema{
 		Description: "Specifies the identifier for the dynamic table.",
 		ForceNew:    true,
 	},
+	"database": {
+		Type:        schema.TypeString,
+		Required:    true,
+		Description: "The database in which to create the dynamic table.",
+		ForceNew:    true,
+	},
+	"schema": {
+		Type:        schema.TypeString,
+		Required:    true,
+		Description: "The schema in which to create the dynamic table.",
+		ForceNew:    true,
+	},
 	"warehouse": {
 		Type:        schema.TypeString,
 		Required:    true,
@@ -93,8 +105,11 @@ func CreateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
 
-	dynamicTableName := d.Get("name").(string)
-	name := sdk.NewAccountObjectIdentifier(dynamicTableName)
+	databaseName := d.Get("database").(string)
+	schemaName := d.Get("schema").(string)
+	name := d.Get("name").(string)
+	id := sdk.NewSchemaObjectIdentifier(databaseName, schemaName, name)
+
 	warehouseName := d.Get("warehouse").(string)
 	warehouse := sdk.NewAccountObjectIdentifier(warehouseName)
 	query := d.Get("query").(string)
@@ -106,7 +121,7 @@ func CreateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	} else {
 		tl.Lagtime = sdk.String(targetLag)
 	}
-	request := sdk.NewCreateDynamicTableRequest(name, warehouse, tl, query)
+	request := sdk.NewCreateDynamicTableRequest(id, warehouse, tl, query)
 	if v, ok := d.GetOk("comment"); ok {
 		request.WithComment(sdk.String(v.(string)))
 	}
@@ -126,7 +141,7 @@ func UpdateDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
 
-	id := helpers.DecodeSnowflakeID(d.Id()).(sdk.AccountObjectIdentifier)
+	id := helpers.DecodeSnowflakeID(d.Id()).(sdk.SchemaObjectIdentifier)
 	request := sdk.NewAlterDynamicTableRequest(id)
 	switch {
 	case d.HasChange("suspend"):
@@ -150,7 +165,7 @@ func DeleteDynamicTable(d *schema.ResourceData, meta interface{}) error {
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
 
-	id := helpers.DecodeSnowflakeID(d.Id()).(sdk.AccountObjectIdentifier)
+	id := helpers.DecodeSnowflakeID(d.Id()).(sdk.SchemaObjectIdentifier)
 	if err := client.DynamicTables.Drop(context.Background(), sdk.NewDropDynamicTableRequest(id)); err != nil {
 		return err
 	}
