@@ -85,7 +85,7 @@ func TestInt_TagCreate(t *testing.T) {
 		comment := randomComment(t)
 		values := []string{"value1"}
 		err := client.Tags.Create(ctx, NewCreateTagRequest(id).WithOrReplace(true).WithComment(&comment).WithAllowedValues(values))
-		expected := "fields [Comment AllowedValues] are incompatible and cannot be set at once"
+		expected := "Comment fields: [AllowedValues] are incompatible and cannot be set at the same time"
 		require.Equal(t, expected, err.Error())
 	})
 }

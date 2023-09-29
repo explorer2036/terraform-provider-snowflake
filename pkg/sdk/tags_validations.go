@@ -22,7 +22,7 @@ func (opts *createTagOptions) validate() error {
 	}
 	var errs []error
 	if !validObjectidentifier(opts.name) {
-		errs = append(errs, ErrInvalidObjectIdentifier)
+		errs = append(errs, errInvalidObjectIdentifier)
 	}
 	if everyValueSet(opts.OrReplace, opts.IfNotExists) && *opts.OrReplace && *opts.IfNotExists {
 		errs = append(errs, errOneOf("OrReplace", "IfNotExists"))
@@ -77,7 +77,7 @@ func (opts *alterTagOptions) validate() error {
 	}
 	var errs []error
 	if !validObjectidentifier(opts.name) {
-		errs = append(errs, ErrInvalidObjectIdentifier)
+		errs = append(errs, errInvalidObjectIdentifier)
 	}
 	if !exactlyOneValueSet(opts.Add, opts.Drop, opts.Set, opts.Unset, opts.Rename) {
 		errs = append(errs, errOneOf("Add", "Drop", "Set", "Unset", "Rename"))
@@ -104,7 +104,7 @@ func (opts *alterTagOptions) validate() error {
 	}
 	if valueSet(opts.Rename) {
 		if !validObjectidentifier(opts.Rename.Name) {
-			errs = append(errs, ErrInvalidObjectIdentifier)
+			errs = append(errs, errInvalidObjectIdentifier)
 		}
 	}
 	return errors.Join(errs...)
@@ -130,7 +130,7 @@ func (opts *dropTagOptions) validate() error {
 	}
 	var errs []error
 	if !validObjectidentifier(opts.name) {
-		errs = append(errs, ErrInvalidObjectIdentifier)
+		errs = append(errs, errInvalidObjectIdentifier)
 	}
 	return errors.Join(errs...)
 }
@@ -141,7 +141,7 @@ func (opts *undropTagOptions) validate() error {
 	}
 	var errs []error
 	if !validObjectidentifier(opts.name) {
-		errs = append(errs, ErrInvalidObjectIdentifier)
+		errs = append(errs, errInvalidObjectIdentifier)
 	}
 	return errors.Join(errs...)
 }
