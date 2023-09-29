@@ -91,7 +91,7 @@ func TestInt_DynamicTableAlter(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	t.Run("aliter with suspend or resume", func(t *testing.T) {
+	t.Run("alter with suspend or resume", func(t *testing.T) {
 		dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
 		t.Cleanup(dynamicTableCleanup)
 
@@ -117,7 +117,7 @@ func TestInt_DynamicTableAlter(t *testing.T) {
 		require.Equal(t, DynamicTableSchedulingStateRunning, entities[0].SchedulingState)
 	})
 
-	t.Run("aliter with refresh", func(t *testing.T) {
+	t.Run("alter with refresh", func(t *testing.T) {
 		dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
 		t.Cleanup(dynamicTableCleanup)
 
@@ -129,7 +129,7 @@ func TestInt_DynamicTableAlter(t *testing.T) {
 		require.Equal(t, 1, len(entities))
 	})
 
-	t.Run("aliter with suspend and resume", func(t *testing.T) {
+	t.Run("alter with suspend and resume", func(t *testing.T) {
 		dynamicTable, dynamicTableCleanup := createDynamicTable(t, client)
 		t.Cleanup(dynamicTableCleanup)
 

@@ -6,7 +6,6 @@ import (
 
 func TestDynamicTableCreate(t *testing.T) {
 	id := randomSchemaObjectIdentifier(t)
-
 	defaultOpts := func() *createDynamicTableOptions {
 		return &createDynamicTableOptions{
 			name: id,
@@ -108,7 +107,6 @@ func TestDynamicTableAlter(t *testing.T) {
 
 func TestDynamicTableDrop(t *testing.T) {
 	id := randomSchemaObjectIdentifier(t)
-
 	defaultOpts := func() *dropDynamicTableOptions {
 		return &dropDynamicTableOptions{
 			name: id,
@@ -134,16 +132,8 @@ func TestDynamicTableDrop(t *testing.T) {
 
 func TestDynamicTableShow(t *testing.T) {
 	id := randomSchemaObjectIdentifier(t)
-
 	defaultOpts := func() *showDynamicTableOptions {
-		return &showDynamicTableOptions{
-			Like: &Like{
-				Pattern: String(id.Name()),
-			},
-			In: &In{
-				Database: NewAccountObjectIdentifier("my_database"),
-			},
-		}
+		return &showDynamicTableOptions{}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
@@ -157,10 +147,12 @@ func TestDynamicTableShow(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, errPatternRequiredForLikeKeyword)
 	})
 
-	t.Run("show", func(t *testing.T) {
+	t.Run("show with in", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.Like = nil
-		assertOptsValidAndSQLEquals(t, opts, `SHOW DYNAMIC TABLES IN DATABASE "my_database"`)
+		opts.In = &In{
+			Database: NewAccountObjectIdentifier("database"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `SHOW DYNAMIC TABLES IN DATABASE "database"`)
 	})
 
 	t.Run("show with like", func(t *testing.T) {
@@ -168,13 +160,23 @@ func TestDynamicTableShow(t *testing.T) {
 		opts.Like = &Like{
 			Pattern: String(id.Name()),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `SHOW DYNAMIC TABLES LIKE '%s' IN DATABASE "my_database"`, id.Name())
+		assertOptsValidAndSQLEquals(t, opts, `SHOW DYNAMIC TABLES LIKE '%s'`, id.Name())
+	})
+
+	t.Run("show with like and in", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Like = &Like{
+			Pattern: String(id.Name()),
+		}
+		opts.In = &In{
+			Database: NewAccountObjectIdentifier("database"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `SHOW DYNAMIC TABLES LIKE '%s' IN DATABASE "database"`, id.Name())
 	})
 }
 
 func TestDynamicTableDescribe(t *testing.T) {
 	id := randomSchemaObjectIdentifier(t)
-
 	defaultOpts := func() *describeDynamicTableOptions {
 		return &describeDynamicTableOptions{
 			name: id,
