@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestInt_DynamicTableCreate(t *testing.T) {
+func TestInt_DynamicTableCreateAndDrop(t *testing.T) {
 	client := testClient(t)
 
 	warehouseTest, warehouseCleanup := createWarehouse(t, client)
@@ -22,7 +22,7 @@ func TestInt_DynamicTableCreate(t *testing.T) {
 
 	ctx := context.Background()
 	t.Run("test complete", func(t *testing.T) {
-		name := randomAccountObjectIdentifier(t)
+		name := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, randomString(t))
 		targetLag := TargetLag{
 			Lagtime: String("2 minutes"),
 		}
@@ -45,7 +45,7 @@ func TestInt_DynamicTableCreate(t *testing.T) {
 	})
 
 	t.Run("test complete with target lag", func(t *testing.T) {
-		name := randomAccountObjectIdentifier(t)
+		name := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, randomString(t))
 		targetLag := TargetLag{
 			Downstream: Bool(true),
 		}
@@ -81,7 +81,7 @@ func TestInt_DynamicTableDescribe(t *testing.T) {
 	})
 
 	t.Run("when dynamic table does not exist", func(t *testing.T) {
-		name := NewAccountObjectIdentifier("does_not_exist")
+		name := NewSchemaObjectIdentifier("my_db", "my_schema", "does_not_exist")
 		_, err := client.DynamicTables.Describe(ctx, NewDescribeDynamicTableRequest(name))
 		assert.ErrorIs(t, err, errObjectNotExistOrAuthorized)
 	})

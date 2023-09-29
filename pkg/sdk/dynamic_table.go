@@ -20,7 +20,7 @@ type createDynamicTableOptions struct {
 	create       bool                    `ddl:"static" sql:"CREATE"`
 	OrReplace    *bool                   `ddl:"keyword" sql:"OR REPLACE"`
 	dynamicTable bool                    `ddl:"static" sql:"DYNAMIC TABLE"`
-	name         AccountObjectIdentifier `ddl:"identifier"`
+	name         SchemaObjectIdentifier  `ddl:"identifier"`
 	targetLag    TargetLag               `ddl:"parameter,no_quotes" sql:"TARGET_LAG"`
 	warehouse    AccountObjectIdentifier `ddl:"identifier,equals" sql:"WAREHOUSE"`
 	Comment      *string                 `ddl:"parameter,single_quotes" sql:"COMMENT"`
@@ -39,9 +39,9 @@ type DynamicTableSet struct {
 
 // alterDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-dynamic-table
 type alterDynamicTableOptions struct {
-	alter        bool                    `ddl:"static" sql:"ALTER"`
-	dynamicTable bool                    `ddl:"static" sql:"DYNAMIC TABLE"`
-	name         AccountObjectIdentifier `ddl:"identifier"`
+	alter        bool                   `ddl:"static" sql:"ALTER"`
+	dynamicTable bool                   `ddl:"static" sql:"DYNAMIC TABLE"`
+	name         SchemaObjectIdentifier `ddl:"identifier"`
 
 	Suspend *bool            `ddl:"keyword" sql:"SUSPEND"`
 	Resume  *bool            `ddl:"keyword" sql:"RESUME"`
@@ -51,9 +51,9 @@ type alterDynamicTableOptions struct {
 
 // dropDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-dynamic-table
 type dropDynamicTableOptions struct {
-	drop         bool                    `ddl:"static" sql:"DROP"`
-	dynamicTable bool                    `ddl:"static" sql:"DYNAMIC TABLE"`
-	name         AccountObjectIdentifier `ddl:"identifier"`
+	drop         bool                   `ddl:"static" sql:"DROP"`
+	dynamicTable bool                   `ddl:"static" sql:"DYNAMIC TABLE"`
+	name         SchemaObjectIdentifier `ddl:"identifier"`
 }
 
 // showDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-dynamic-tables
@@ -63,7 +63,7 @@ type showDynamicTableOptions struct {
 	Like         *Like      `ddl:"keyword" sql:"LIKE"`
 	In           *In        `ddl:"keyword" sql:"IN"`
 	StartsWith   *string    `ddl:"parameter,single_quotes,no_equals" sql:"STARTS WITH"`
-	LimitFrom    *LimitFrom `ddl:"keyword" sql:"LIMIT"`
+	Limit        *LimitFrom `ddl:"keyword" sql:"LIMIT"`
 }
 
 type DynamicTableRefreshMode string
@@ -104,8 +104,8 @@ type DynamicTable struct {
 	DataTimestamp       time.Time
 }
 
-func (dt *DynamicTable) ID() AccountObjectIdentifier {
-	return NewAccountObjectIdentifier(dt.Name)
+func (dt *DynamicTable) ID() SchemaObjectIdentifier {
+	return NewSchemaObjectIdentifier(dt.DatabaseName, dt.SchemaName, dt.Name)
 }
 
 type dynamicTableRow struct {
@@ -165,9 +165,9 @@ func (dtr dynamicTableRow) convert() *DynamicTable {
 
 // describeDynamicTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/desc-dynamic-table
 type describeDynamicTableOptions struct {
-	describe     bool                    `ddl:"static" sql:"DESCRIBE"`
-	dynamicTable bool                    `ddl:"static" sql:"DYNAMIC TABLE"`
-	name         AccountObjectIdentifier `ddl:"identifier"`
+	describe     bool                   `ddl:"static" sql:"DESCRIBE"`
+	dynamicTable bool                   `ddl:"static" sql:"DYNAMIC TABLE"`
+	name         SchemaObjectIdentifier `ddl:"identifier"`
 }
 
 type DynamicTableDetails struct {

@@ -104,8 +104,12 @@ func (opts *dropDynamicTableOptions) validate() error {
 }
 
 func (opts *describeDynamicTableOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if opts == nil {
+		return errors.Join(errNilOptions)
 	}
-	return nil
+	var errs []error
+	if !validObjectidentifier(opts.name) {
+		errs = append(errs, errInvalidObjectIdentifier)
+	}
+	return errors.Join(errs...)
 }

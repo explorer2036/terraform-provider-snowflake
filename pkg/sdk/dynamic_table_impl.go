@@ -106,8 +106,8 @@ func (s *ShowDynamicTableRequest) toOpts() *showDynamicTableOptions {
 	if s.startsWith != nil {
 		opts.StartsWith = s.startsWith
 	}
-	if s.limitFrom != nil {
-		opts.LimitFrom = s.limitFrom
+	if s.limit != nil {
+		opts.Limit = s.limit
 	}
 	return &opts
 }

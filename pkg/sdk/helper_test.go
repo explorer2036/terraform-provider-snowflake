@@ -347,6 +347,9 @@ func createDatabaseWithOptions(t *testing.T, client *Client, id AccountObjectIde
 	require.NoError(t, err)
 	return database, func() {
 		err := client.Databases.Drop(ctx, id, nil)
+		if err == errObjectNotExistOrAuthorized {
+			return
+		}
 		require.NoError(t, err)
 	}
 }
@@ -366,6 +369,9 @@ func createSchemaWithIdentifier(t *testing.T, client *Client, database *Database
 	require.NoError(t, err)
 	return schema, func() {
 		err := client.Schemas.Drop(ctx, schemaID, nil)
+		if err == errObjectNotExistOrAuthorized {
+			return
+		}
 		require.NoError(t, err)
 	}
 }
@@ -434,7 +440,7 @@ func createPasswordPolicyWithOptions(t *testing.T, client *Client, database *Dat
 	passwordPolicyList, err := client.PasswordPolicies.Show(ctx, showOptions)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(passwordPolicyList))
-	return passwordPolicyList[0], func() {
+	return &passwordPolicyList[0], func() {
 		err := client.PasswordPolicies.Drop(ctx, id, nil)
 		require.NoError(t, err)
 		if schemaCleanup != nil {
@@ -478,7 +484,7 @@ func createMaskingPolicyWithOptions(t *testing.T, client *Client, database *Data
 	maskingPolicyList, err := client.MaskingPolicies.Show(ctx, showOptions)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(maskingPolicyList))
-	return maskingPolicyList[0], func() {
+	return &maskingPolicyList[0], func() {
 		err := client.MaskingPolicies.Drop(ctx, id)
 		require.NoError(t, err)
 		if schemaCleanup != nil {
@@ -583,7 +589,7 @@ func createAlertWithOptions(t *testing.T, client *Client, database *Database, sc
 	alertList, err := client.Alerts.Show(ctx, showOptions)
 	require.NoError(t, err)
 	require.Equal(t, 1, len(alertList))
-	return alertList[0], func() {
+	return &alertList[0], func() {
 		err := client.Alerts.Drop(ctx, id)
 		require.NoError(t, err)
 		if schemaCleanup != nil {
@@ -670,6 +676,21 @@ func createPipe(t *testing.T, client *Client, database *Database, schema *Schema
 	return createdPipe, pipeCleanup
 }
 
+func createStageWithName(t *testing.T, client *Client, name string) (*string, func()) {
+	t.Helper()
+	ctx := context.Background()
+	stageCleanup := func() {
+		_, err := client.exec(ctx, fmt.Sprintf("DROP STAGE %s", name))
+		require.NoError(t, err)
+	}
+	_, err := client.exec(ctx, fmt.Sprintf("CREATE STAGE %s", name))
+	if err != nil {
+		return nil, stageCleanup
+	}
+	require.NoError(t, err)
+	return &name, stageCleanup
+}
+
 func createStage(t *testing.T, client *Client, database *Database, schema *Schema, name string) (*Stage, func()) {
 	t.Helper()
 	require.NotNil(t, database, "database has to be created")
@@ -719,7 +740,7 @@ func createDynamicTableWithOptions(t *testing.T, client *Client, warehouse *Ware
 	if table == nil {
 		table, tableCleanup = createTable(t, client, database, schema)
 	}
-	name := randomAccountObjectIdentifier(t)
+	name := NewSchemaObjectIdentifier(schema.DatabaseName, schema.Name, randomString(t))
 	targetLag := TargetLag{
 		Lagtime: String("2 minutes"),
 	}
@@ -746,5 +767,27 @@ func createDynamicTableWithOptions(t *testing.T, client *Client, warehouse *Ware
 		if warehouseCleanup != nil {
 			warehouseCleanup()
 		}
+	}
+}
+
+func createStageWithURL(t *testing.T, client *Client, name AccountObjectIdentifier, url string) (*Stage, func()) {
+	t.Helper()
+	ctx := context.Background()
+	_, err := client.exec(ctx, fmt.Sprintf(`CREATE STAGE "%s" URL = '%s'`, name.Name(), url))
+	require.NoError(t, err)
+
+	return nil, func() {
+		_, err := client.exec(ctx, fmt.Sprintf(`DROP STAGE "%s"`, name.Name()))
+		require.NoError(t, err)
+	}
+}
+
+func createNetworkPolicy(t *testing.T, client *Client, req *CreateNetworkPolicyRequest) (error, func()) {
+	t.Helper()
+	ctx := context.Background()
+	err := client.NetworkPolicies.Create(ctx, req)
+	return err, func() {
+		err := client.NetworkPolicies.Drop(ctx, NewDropNetworkPolicyRequest(req.name))
+		require.NoError(t, err)
 	}
 }
