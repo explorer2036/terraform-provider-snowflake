@@ -11,8 +11,8 @@ func (s *CreateTagRequest) WithOrReplace(orReplace bool) *CreateTagRequest {
 	return s
 }
 
-func (s *CreateTagRequest) WithIfNotExists(ifNotExists bool) *CreateTagRequest {
-	s.ifNotExists = ifNotExists
+func (s *CreateTagRequest) WithIfExists(ifExists bool) *CreateTagRequest {
+	s.ifNotExists = ifExists
 	return s
 }
 
@@ -166,7 +166,7 @@ func NewDropTagRequest(name SchemaObjectIdentifier) *DropTagRequest {
 }
 
 func (s *DropTagRequest) WithIfNotExists(ifNotExists bool) *DropTagRequest {
-	s.ifNotExists = ifNotExists
+	s.ifExists = ifNotExists
 	return s
 }
 

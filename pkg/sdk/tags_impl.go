@@ -79,8 +79,8 @@ func (s *ShowTagRequest) toOpts() *showTagOptions {
 
 func (s *DropTagRequest) toOpts() *dropTagOptions {
 	return &dropTagOptions{
-		IfNotExists: Bool(s.ifNotExists),
-		name:        s.name,
+		IfExists: Bool(s.ifExists),
+		name:     s.name,
 	}
 }
 

@@ -47,7 +47,7 @@ type ShowTagRequest struct {
 }
 
 type DropTagRequest struct {
-	ifNotExists bool
+	ifExists bool
 
 	name SchemaObjectIdentifier // required
 }

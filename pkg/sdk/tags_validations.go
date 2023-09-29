@@ -79,8 +79,14 @@ func (opts *alterTagOptions) validate() error {
 	if !validObjectidentifier(opts.name) {
 		errs = append(errs, errInvalidObjectIdentifier)
 	}
-	if !exactlyOneValueSet(opts.Add, opts.Drop, opts.Set, opts.Unset, opts.Rename) {
-		errs = append(errs, errOneOf("Add", "Drop", "Set", "Unset", "Rename"))
+	if ok := exactlyOneValueSet(
+		opts.Add,
+		opts.Drop,
+		opts.Set,
+		opts.Unset,
+		opts.Rename,
+	); !ok {
+		errs = append(errs, errAlterNeedsExactlyOneAction)
 	}
 	if valueSet(opts.Add) && valueSet(opts.Add.AllowedValues) {
 		if err := opts.Add.AllowedValues.validate(); err != nil {
@@ -97,14 +103,20 @@ func (opts *alterTagOptions) validate() error {
 			errs = append(errs, err)
 		}
 	}
-	if valueSet(opts.Unset) {
+	if unset := opts.Unset; valueSet(opts.Unset) {
 		if err := opts.Unset.validate(); err != nil {
 			errs = append(errs, err)
+		}
+		if !anyValueSet(unset.MaskingPolicies, unset.AllowedValues, unset.Comment) {
+			errs = append(errs, errAlterNeedsAtLeastOneProperty)
 		}
 	}
 	if valueSet(opts.Rename) {
 		if !validObjectidentifier(opts.Rename.Name) {
 			errs = append(errs, errInvalidObjectIdentifier)
+		}
+		if opts.name.DatabaseName() != opts.Rename.Name.DatabaseName() {
+			errs = append(errs, errDifferentDatabase)
 		}
 	}
 	return errors.Join(errs...)

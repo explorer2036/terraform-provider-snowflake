@@ -145,10 +145,10 @@ type alterTagOptions struct {
 
 // dropTagOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-tag
 type dropTagOptions struct {
-	drop        bool                   `ddl:"static" sql:"DROP"`
-	tag         string                 `ddl:"static" sql:"TAG"`
-	IfNotExists *bool                  `ddl:"keyword" sql:"IF NOT EXISTS"`
-	name        SchemaObjectIdentifier `ddl:"identifier"`
+	drop     bool                   `ddl:"static" sql:"DROP"`
+	tag      string                 `ddl:"static" sql:"TAG"`
+	IfExists *bool                  `ddl:"keyword" sql:"IF EXISTS"`
+	name     SchemaObjectIdentifier `ddl:"identifier"`
 }
 
 // undropTagOptions is based on https://docs.snowflake.com/en/sql-reference/sql/undrop-tag
