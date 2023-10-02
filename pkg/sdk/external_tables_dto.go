@@ -222,7 +222,10 @@ type RowAccessPolicyRequest struct {
 }
 
 func (v *RowAccessPolicyRequest) toOpts() *RowAccessPolicy {
-	return nil
+	return &RowAccessPolicy{
+		Name: v.name,
+		On:   v.on,
+	}
 }
 
 type TagAssociationRequest struct {
