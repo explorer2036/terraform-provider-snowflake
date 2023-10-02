@@ -1,6 +1,10 @@
 package sdk
 
-var _ optionsProvider[createEventTableOptions] = (*CreateEventTableRequest)(nil)
+var (
+	_ optionsProvider[createEventTableOptions]   = (*CreateEventTableRequest)(nil)
+	_ optionsProvider[describeEventTableOptions] = (*DescribeEventTableRequest)(nil)
+	_ optionsProvider[showEventTableOptions]     = (*ShowEventTableRequest)(nil)
+)
 
 type CreateEventTableRequest struct {
 	orReplace   bool
@@ -17,4 +21,15 @@ type CreateEventTableRequest struct {
 	comment                    *string
 	rowAccessPolicy            *RowAccessPolicyRequest
 	tag                        []TagAssociationRequest
+}
+
+type ShowEventTableRequest struct {
+	like       *Like
+	in         *In
+	startsWith *string
+	limit      *LimitFrom
+}
+
+type DescribeEventTableRequest struct {
+	name SchemaObjectIdentifier // required
 }

@@ -12,6 +12,32 @@ func (v *eventTables) Create(ctx context.Context, request *CreateEventTableReque
 	return validateAndExec(v.client, ctx, request.toOpts())
 }
 
+func (v *eventTables) Describe(ctx context.Context, request *DescribeEventTableRequest) (*EventTableDetails, error) {
+	row, err := validateAndQueryOne[eventTableDetailsRow](v.client, ctx, request.toOpts())
+	if err != nil {
+		return nil, err
+	}
+	return row.convert(), nil
+}
+
+func (v *eventTables) Show(ctx context.Context, request *ShowEventTableRequest) ([]EventTable, error) {
+	rows, err := validateAndQuery[eventTableRow](v.client, ctx, request.toOpts())
+	if err != nil {
+		return nil, err
+	}
+	result := convertRows[eventTableRow, EventTable](rows)
+	return result, nil
+}
+
+func (v *eventTables) ShowByID(ctx context.Context, id AccountObjectIdentifier) (*EventTable, error) {
+	request := NewShowEventTableRequest().WithLike(id.Name())
+	eventTables, err := v.Show(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return findOne(eventTables, func(r EventTable) bool { return r.Name == id.Name() })
+}
+
 func (v *CreateEventTableRequest) toOpts() *createEventTableOptions {
 	opts := &createEventTableOptions{
 		OrReplace:                  Bool(v.orReplace),
@@ -36,4 +62,19 @@ func (v *CreateEventTableRequest) toOpts() *createEventTableOptions {
 		opts.Tag = tag
 	}
 	return opts
+}
+
+func (s *DescribeEventTableRequest) toOpts() *describeEventTableOptions {
+	return &describeEventTableOptions{
+		name: s.name,
+	}
+}
+
+func (s *ShowEventTableRequest) toOpts() *showEventTableOptions {
+	return &showEventTableOptions{
+		Like:       s.like,
+		In:         s.in,
+		StartsWith: s.startsWith,
+		Limit:      s.limit,
+	}
 }

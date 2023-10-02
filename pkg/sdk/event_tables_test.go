@@ -73,3 +73,73 @@ func TestEventTablesCreate(t *testing.T) {
 		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE EVENT TABLE %s CLUSTER BY (a, b) DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 2 CHANGE_TRACKING = true DEFAULT_DDL_COLLATION = 'default_ddl_collation' COPY_GRANTS COMMENT = 'comment' ROW ACCESS POLICY "access_policy_database"."access_policy_schema"."access_policy_name" ON (column1, column2) TAG ("tag_database"."tag_schema"."tag_name" = 'tag_value')`, id.FullyQualifiedName())
 	})
 }
+
+func TestEventTableShow(t *testing.T) {
+	id := randomSchemaObjectIdentifier(t)
+	defaultOpts := func() *showEventTableOptions {
+		return &showEventTableOptions{}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *showEventTableOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+	})
+
+	t.Run("validation: empty like", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Like = &Like{}
+		assertOptsInvalidJoinedErrors(t, opts, errPatternRequiredForLikeKeyword)
+	})
+
+	t.Run("show with in", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.In = &In{
+			Database: NewAccountObjectIdentifier("database"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `SHOW EVENT TABLES IN DATABASE "database"`)
+	})
+
+	t.Run("show with like", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Like = &Like{
+			Pattern: String(id.Name()),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `SHOW EVENT TABLES LIKE '%s'`, id.Name())
+	})
+
+	t.Run("show with like and in", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Like = &Like{
+			Pattern: String(id.Name()),
+		}
+		opts.In = &In{
+			Database: NewAccountObjectIdentifier("database"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `SHOW EVENT TABLES LIKE '%s' IN DATABASE "database"`, id.Name())
+	})
+}
+
+func TestEventTableDescribe(t *testing.T) {
+	id := randomSchemaObjectIdentifier(t)
+	defaultOpts := func() *describeEventTableOptions {
+		return &describeEventTableOptions{
+			name: id,
+		}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *describeEventTableOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewSchemaObjectIdentifier("", "", "")
+		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier)
+	})
+
+	t.Run("describe", func(t *testing.T) {
+		opts := defaultOpts()
+		assertOptsValidAndSQLEquals(t, opts, `DESCRIBE EVENT TABLE %s`, id.FullyQualifiedName())
+	})
+}

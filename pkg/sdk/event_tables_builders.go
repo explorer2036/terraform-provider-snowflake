@@ -55,3 +55,29 @@ func (s *CreateEventTableRequest) WithTag(value []TagAssociationRequest) *Create
 	s.tag = value
 	return s
 }
+
+func NewShowEventTableRequest() *ShowEventTableRequest {
+	return &ShowEventTableRequest{}
+}
+
+func (s *ShowEventTableRequest) WithLike(value string) *ShowEventTableRequest {
+	s.like = &Like{
+		Pattern: String(value),
+	}
+	return s
+}
+
+func (s *ShowEventTableRequest) WithIn(in *In) *ShowEventTableRequest {
+	s.in = in
+	return s
+}
+
+func (s *ShowEventTableRequest) WithStartsWith(value string) *ShowEventTableRequest {
+	s.startsWith = &value
+	return s
+}
+
+func (s *ShowEventTableRequest) WithLimit(limit *LimitFrom) *ShowEventTableRequest {
+	s.limit = limit
+	return s
+}
