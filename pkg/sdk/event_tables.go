@@ -8,6 +8,7 @@ import (
 
 type EventTables interface {
 	Create(ctx context.Context, request *CreateEventTableRequest) error
+	Alter(ctx context.Context, request *AlterEventTableRequest) error
 	Describe(ctx context.Context, request *DescribeEventTableRequest) (*EventTableDetails, error)
 	Show(ctx context.Context, opts *ShowEventTableRequest) ([]EventTable, error)
 	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*EventTable, error)
@@ -30,6 +31,79 @@ type createEventTableOptions struct {
 	Comment                    *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
 	RowAccessPolicy            *RowAccessPolicy       `ddl:"keyword"`
 	Tag                        []TagAssociation       `ddl:"keyword,parentheses" sql:"TAG"`
+}
+
+type EventTableAddRowAccessPolicy struct {
+	RowAccessPolicy *RowAccessPolicy `ddl:"keyword"`
+}
+
+type EventTableDropRowAccessPolicy struct {
+	rowAccessPolicy bool                   `ddl:"static" sql:"ROW ACCESS POLICY"`
+	Name            SchemaObjectIdentifier `ddl:"identifier"`
+}
+
+type EventTableSetProperties struct {
+	DataRetentionTimeInDays    *uint   `ddl:"parameter" sql:"DATA_RETENTION_TIME_IN_DAYS"`
+	MaxDataExtensionTimeInDays *uint   `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
+	ChangeTracking             *bool   `ddl:"parameter" sql:"CHANGE_TRACKING"`
+	Comment                    *string `ddl:"parameter,single_quotes" sql:"COMMENT"`
+}
+
+type EventTableSet struct {
+	Properties *EventTableSetProperties `ddl:"keyword"`
+	Tag        *[]TagAssociation        `ddl:"keyword,parentheses" sql:"TAG"`
+}
+
+type EventTableUnset struct {
+	DataRetentionTimeInDays    *bool `ddl:"keyword" sql:"DATA_RETENTION_TIME_IN_DAYS"`
+	MaxDataExtensionTimeInDays *bool `ddl:"keyword" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
+	ChangeTracking             *bool `ddl:"keyword" sql:"CHANGE_TRACKING"`
+	Comment                    *bool `ddl:"keyword" sql:"COMMENT"`
+
+	Tag *[]TagAssociation `ddl:"keyword,parentheses" sql:"TAG"`
+}
+
+type EventTableRename struct {
+	Name SchemaObjectIdentifier `ddl:"identifier"`
+}
+
+type ClusteringAction struct {
+	ClusterBy *[]string `ddl:"keyword,parentheses" sql:"CLUSTER BY"`
+	Suspend   *bool     `ddl:"keyword" sql:"SUSPEND RECLUSTER"`
+	Resume    *bool     `ddl:"keyword" sql:"RESUME RECLUSTER"`
+	Drop      *bool     `ddl:"keyword" sql:"DROP CLUSTERING KEY"`
+}
+
+type AddSearchOptimization struct {
+	add bool     `ddl:"static" sql:"ADD SEARCH OPTIMIZATION"`
+	On  []string `ddl:"keyword,parentheses" sql:"ON"`
+}
+
+type DropSearchOptimization struct {
+	drop bool     `ddl:"static" sql:"DROP SEARCH OPTIMIZATION"`
+	On   []string `ddl:"keyword,parentheses" sql:"ON"`
+}
+
+type SearchOptimizationAction struct {
+	Add  *AddSearchOptimization  `ddl:"keyword"`
+	Drop *DropSearchOptimization `ddl:"keyword"`
+}
+
+// alterEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-table-event-table
+type alterEventTableOptions struct {
+	alter      bool                   `ddl:"static" sql:"ALTER"`
+	eventTable string                 `ddl:"static" sql:"EVENT TABLE"`
+	name       SchemaObjectIdentifier `ddl:"identifier"`
+
+	// One of
+	ClusteringAction         *ClusteringAction              `ddl:"keyword"`
+	SearchOptimizationAction *SearchOptimizationAction      `ddl:"keyword"`
+	AddRowAccessPolicy       *EventTableAddRowAccessPolicy  `ddl:"keyword" sql:"ADD"`
+	DropRowAccessPolicy      *EventTableDropRowAccessPolicy `ddl:"keyword" sql:"DROP"`
+	DropAllRowAccessPolicies *bool                          `ddl:"keyword" sql:"DROP ALL ROW ACCESS POLICIES"`
+	Set                      *EventTableSet                 `ddl:"keyword" sql:"SET"`
+	Unset                    *EventTableUnset               `ddl:"keyword" sql:"UNSET"`
+	Rename                   *EventTableRename              `ddl:"keyword" sql:"RENAME TO"`
 }
 
 type EventTable struct {

@@ -12,6 +12,10 @@ func (v *eventTables) Create(ctx context.Context, request *CreateEventTableReque
 	return validateAndExec(v.client, ctx, request.toOpts())
 }
 
+func (v *eventTables) Alter(ctx context.Context, request *AlterEventTableRequest) error {
+	return validateAndExec(v.client, ctx, request.toOpts())
+}
+
 func (v *eventTables) Describe(ctx context.Context, request *DescribeEventTableRequest) (*EventTableDetails, error) {
 	row, err := validateAndQueryOne[eventTableDetailsRow](v.client, ctx, request.toOpts())
 	if err != nil {
@@ -60,6 +64,37 @@ func (v *CreateEventTableRequest) toOpts() *createEventTableOptions {
 			tag[i] = item.toOpts()
 		}
 		opts.Tag = tag
+	}
+	return opts
+}
+
+func (s *AlterEventTableRequest) toOpts() *alterEventTableOptions {
+	opts := &alterEventTableOptions{
+		name: s.name,
+	}
+	if s.clusteringAction != nil {
+		opts.ClusteringAction = s.clusteringAction.toOpts()
+	}
+	if s.searchOptimizationAction != nil {
+		opts.SearchOptimizationAction = s.searchOptimizationAction.toOpts()
+	}
+	if s.addRowAccessPolicy != nil {
+		opts.AddRowAccessPolicy = s.addRowAccessPolicy
+	}
+	if s.dropRowAccessPolicy != nil {
+		opts.DropRowAccessPolicy = s.dropRowAccessPolicy
+	}
+	if s.dropAllRowAccessPolicies != nil {
+		opts.DropAllRowAccessPolicies = s.dropAllRowAccessPolicies
+	}
+	if s.set != nil {
+		opts.Set = s.set.toOpts()
+	}
+	if s.unset != nil {
+		opts.Unset = s.unset.toOpts()
+	}
+	if s.rename != nil {
+		opts.Rename = s.rename
 	}
 	return opts
 }
