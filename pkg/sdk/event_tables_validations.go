@@ -28,6 +28,9 @@ func (opts *createEventTableOptions) validate() error {
 	if everyValueSet(opts.OrReplace, opts.IfNotExists) && *opts.OrReplace && *opts.IfNotExists {
 		errs = append(errs, errOneOf("OrReplace", "IfNotExists"))
 	}
+	if valueSet(opts.CopyGrants) && !valueSet(opts.OrReplace) {
+		errs = append(errs, errors.New("CopyGrants requires OrReplace"))
+	}
 	return errors.Join(errs...)
 }
 

@@ -11,7 +11,7 @@ type EventTables interface {
 	Alter(ctx context.Context, request *AlterEventTableRequest) error
 	Describe(ctx context.Context, request *DescribeEventTableRequest) (*EventTableDetails, error)
 	Show(ctx context.Context, opts *ShowEventTableRequest) ([]EventTable, error)
-	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*EventTable, error)
+	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*EventTable, error)
 }
 
 // createEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-event-table
@@ -27,7 +27,7 @@ type createEventTableOptions struct {
 	MaxDataExtensionTimeInDays *uint                  `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
 	ChangeTracking             *bool                  `ddl:"parameter" sql:"CHANGE_TRACKING"`
 	DefaultDDLCollation        *string                `ddl:"parameter,single_quotes" sql:"DEFAULT_DDL_COLLATION"`
-	CopyGrants                 *bool                  `ddl:"keyword" sql:"COPY_GRANTS"`
+	CopyGrants                 *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
 	Comment                    *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
 	RowAccessPolicy            *RowAccessPolicy       `ddl:"keyword"`
 	Tag                        []TagAssociation       `ddl:"keyword,parentheses" sql:"TAG"`
@@ -125,7 +125,7 @@ type eventTableRow struct {
 	ClusterBy      string    `db:"cluster_by"`
 	Owner          string    `db:"owner"`
 	Comment        string    `db:"comment"`
-	ChangeTracking bool      `db:"change_tracking"`
+	ChangeTracking string    `db:"change_tracking"`
 }
 
 func (r eventTableRow) convert() *EventTable {
@@ -137,7 +137,7 @@ func (r eventTableRow) convert() *EventTable {
 		ClusterBy:      r.ClusterBy,
 		Owner:          r.Owner,
 		Comment:        r.Comment,
-		ChangeTracking: r.ChangeTracking,
+		ChangeTracking: r.ChangeTracking == "ON",
 	}
 }
 

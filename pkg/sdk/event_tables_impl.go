@@ -33,7 +33,7 @@ func (v *eventTables) Show(ctx context.Context, request *ShowEventTableRequest) 
 	return result, nil
 }
 
-func (v *eventTables) ShowByID(ctx context.Context, id AccountObjectIdentifier) (*EventTable, error) {
+func (v *eventTables) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*EventTable, error) {
 	request := NewShowEventTableRequest().WithLike(id.Name())
 	eventTables, err := v.Show(ctx, request)
 	if err != nil {

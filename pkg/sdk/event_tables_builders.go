@@ -21,6 +21,11 @@ func (s *CreateEventTableRequest) WithClusterBy(value []string) *CreateEventTabl
 	return s
 }
 
+func (s *CreateEventTableRequest) WithCopyGrants(value bool) *CreateEventTableRequest {
+	s.copyGrants = &value
+	return s
+}
+
 func (s *CreateEventTableRequest) WithDataRetentionTimeInDays(value uint) *CreateEventTableRequest {
 	s.dataRetentionTimeInDays = &value
 	return s
