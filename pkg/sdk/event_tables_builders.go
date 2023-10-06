@@ -74,6 +74,16 @@ func (s *AlterEventTableRequest) WithRename(name SchemaObjectIdentifier) *AlterE
 	return s
 }
 
+func (s *AlterEventTableRequest) WithSet(value *EventTableSetRequest) *AlterEventTableRequest {
+	s.set = value
+	return s
+}
+
+func (s *AlterEventTableRequest) WithUnset(value *EventTableUnsetRequest) *AlterEventTableRequest {
+	s.unset = value
+	return s
+}
+
 func (s *AlterEventTableRequest) WithDropAllRowAccessPolicies(value bool) *AlterEventTableRequest {
 	s.dropAllRowAccessPolicies = &value
 	return s

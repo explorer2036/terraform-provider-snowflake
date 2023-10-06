@@ -166,7 +166,7 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("rename to", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Rename = &EventTableRename{Name: NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), randomStringN(t, 12))}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s RENAME TO %s`, id.FullyQualifiedName(), opts.Rename.Name.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s RENAME TO %s`, id.FullyQualifiedName(), opts.Rename.Name.FullyQualifiedName())
 	})
 
 	t.Run("add row access policy", func(t *testing.T) {
@@ -177,7 +177,7 @@ func TestEventTablesAlter(t *testing.T) {
 				On:   []string{"column1", "column2"},
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s ADD ROW ACCESS POLICY %s ON (column1, column2)`,
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s ADD ROW ACCESS POLICY %s ON (column1, column2)`,
 			id.FullyQualifiedName(),
 			opts.AddRowAccessPolicy.RowAccessPolicy.Name.FullyQualifiedName(),
 		)
@@ -188,7 +188,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.DropRowAccessPolicy = &EventTableDropRowAccessPolicy{
 			Name: NewSchemaObjectIdentifier(randomStringN(t, 8), randomStringN(t, 8), randomStringN(t, 8)),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s DROP ROW ACCESS POLICY %s`,
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s DROP ROW ACCESS POLICY %s`,
 			id.FullyQualifiedName(),
 			opts.DropRowAccessPolicy.Name.FullyQualifiedName(),
 		)
@@ -197,7 +197,7 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("drop all row access policies", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.DropAllRowAccessPolicies = Bool(true)
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s DROP ALL ROW ACCESS POLICIES`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s DROP ALL ROW ACCESS POLICIES`, id.FullyQualifiedName())
 	})
 
 	t.Run("clustering action with cluster by", func(t *testing.T) {
@@ -206,7 +206,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.ClusteringAction = &ClusteringAction{
 			ClusterBy: &clusterBy,
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s CLUSTER BY (column1, column2)`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s CLUSTER BY (column1, column2)`, id.FullyQualifiedName())
 	})
 
 	t.Run("clustering action with suspend", func(t *testing.T) {
@@ -214,7 +214,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.ClusteringAction = &ClusteringAction{
 			Suspend: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s SUSPEND RECLUSTER`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s SUSPEND RECLUSTER`, id.FullyQualifiedName())
 	})
 
 	t.Run("clustering action with resume", func(t *testing.T) {
@@ -222,7 +222,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.ClusteringAction = &ClusteringAction{
 			Resume: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s RESUME RECLUSTER`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s RESUME RECLUSTER`, id.FullyQualifiedName())
 	})
 
 	t.Run("clustering action with drop", func(t *testing.T) {
@@ -230,7 +230,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.ClusteringAction = &ClusteringAction{
 			Drop: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s DROP CLUSTERING KEY`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s DROP CLUSTERING KEY`, id.FullyQualifiedName())
 	})
 
 	t.Run("search optimization action with add", func(t *testing.T) {
@@ -240,7 +240,7 @@ func TestEventTablesAlter(t *testing.T) {
 				On: []string{"column1", "column2"},
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s ADD SEARCH OPTIMIZATION ON (column1, column2)`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s ADD SEARCH OPTIMIZATION ON (column1, column2)`, id.FullyQualifiedName())
 	})
 
 	t.Run("search optimization action with drop", func(t *testing.T) {
@@ -250,7 +250,7 @@ func TestEventTablesAlter(t *testing.T) {
 				On: []string{"column1", "column2"},
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s DROP SEARCH OPTIMIZATION ON (column1, column2)`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s DROP SEARCH OPTIMIZATION ON (column1, column2)`, id.FullyQualifiedName())
 	})
 
 	t.Run("set properties", func(t *testing.T) {
@@ -263,7 +263,7 @@ func TestEventTablesAlter(t *testing.T) {
 				Comment:                    String("comment"),
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s SET DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 2 CHANGE_TRACKING = true COMMENT = 'comment'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s SET DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 2 CHANGE_TRACKING = true COMMENT = 'comment'`, id.FullyQualifiedName())
 	})
 
 	t.Run("set tag", func(t *testing.T) {
@@ -272,7 +272,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Set = &EventTableSet{
 			Tag: defaultTag(name),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s SET TAG (%s = 'tag_value')`, id.FullyQualifiedName(), name.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s SET TAG (%s = 'tag_value')`, id.FullyQualifiedName(), name.FullyQualifiedName())
 	})
 
 	t.Run("unset data retention time in days", func(t *testing.T) {
@@ -280,7 +280,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Unset = &EventTableUnset{
 			DataRetentionTimeInDays: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s UNSET DATA_RETENTION_TIME_IN_DAYS`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s UNSET DATA_RETENTION_TIME_IN_DAYS`, id.FullyQualifiedName())
 	})
 
 	t.Run("unset max data extension time in days", func(t *testing.T) {
@@ -288,7 +288,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Unset = &EventTableUnset{
 			MaxDataExtensionTimeInDays: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s UNSET MAX_DATA_EXTENSION_TIME_IN_DAYS`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s UNSET MAX_DATA_EXTENSION_TIME_IN_DAYS`, id.FullyQualifiedName())
 	})
 
 	t.Run("unset change tracking", func(t *testing.T) {
@@ -296,7 +296,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Unset = &EventTableUnset{
 			ChangeTracking: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s UNSET CHANGE_TRACKING`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s UNSET CHANGE_TRACKING`, id.FullyQualifiedName())
 	})
 
 	t.Run("unset comment", func(t *testing.T) {
@@ -304,7 +304,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Unset = &EventTableUnset{
 			Comment: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s UNSET COMMENT`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s UNSET COMMENT`, id.FullyQualifiedName())
 	})
 
 	t.Run("unset tag", func(t *testing.T) {
@@ -313,7 +313,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Unset = &EventTableUnset{
 			Tag: defaultTag(name),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER EVENT TABLE %s UNSET TAG (%s = 'tag_value')`, id.FullyQualifiedName(), name.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s UNSET TAG (%s = 'tag_value')`, id.FullyQualifiedName(), name.FullyQualifiedName())
 	})
 
 	t.Run("validation: nil options", func(t *testing.T) {

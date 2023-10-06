@@ -69,4 +69,51 @@ func TestInt_EventTables(t *testing.T) {
 		_, err = client.EventTables.ShowByID(ctx, id)
 		require.NoError(t, err)
 	})
+
+	t.Run("create event table: tag", func(t *testing.T) {
+		name := randomString(t)
+		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+
+		tag, tagCleanup := createTag(t, client, databaseTest, schemaTest)
+		t.Cleanup(tagCleanup)
+
+		request := NewCreateEventTableRequest(id).
+			WithTag([]TagAssociationRequest{
+				{
+					name:  tag.ID(),
+					value: "value1",
+				},
+			})
+		err := client.EventTables.Create(ctx, request)
+		require.NoError(t, err)
+	})
+
+	t.Run("create event table: no optionals", func(t *testing.T) {
+		name := randomString(t)
+		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+
+		err := client.EventTables.Create(ctx, NewCreateEventTableRequest(id))
+		require.NoError(t, err)
+
+		tag, err := client.EventTables.ShowByID(ctx, id)
+		require.NoError(t, err)
+		assertEventTableHandle(t, tag, name, "", nil)
+	})
+
+	t.Run("alter event table: set and unset comment", func(t *testing.T) {
+		name := randomString(t)
+		id := NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+
+		err := client.EventTables.Create(ctx, NewCreateEventTableRequest(id))
+		require.NoError(t, err)
+
+		comment := randomComment(t)
+		set := NewEventTableSetRequest().WithComment(comment)
+		err = client.EventTables.Alter(ctx, NewAlterEventTableRequest(id).WithSet(set))
+		require.NoError(t, err)
+
+		et, err := client.EventTables.ShowByID(ctx, id)
+		require.NoError(t, err)
+		assertEventTableHandle(t, et, name, comment, nil)
+	})
 }

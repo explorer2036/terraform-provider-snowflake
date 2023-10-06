@@ -92,7 +92,7 @@ type SearchOptimizationAction struct {
 // alterEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-table-event-table
 type alterEventTableOptions struct {
 	alter      bool                   `ddl:"static" sql:"ALTER"`
-	eventTable string                 `ddl:"static" sql:"EVENT TABLE"`
+	eventTable string                 `ddl:"static" sql:"TABLE"`
 	name       SchemaObjectIdentifier `ddl:"identifier"`
 
 	// One of
