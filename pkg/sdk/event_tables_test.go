@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -72,7 +73,7 @@ func TestEventTablesCreate(t *testing.T) {
 				Value: "tag_value",
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE EVENT TABLE %s CLUSTER BY (a, b) DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 2 CHANGE_TRACKING = true DEFAULT_DDL_COLLATION = 'default_ddl_collation' COPY_GRANTS COMMENT = 'comment' ROW ACCESS POLICY %s ON (column1, column2) TAG (%s = 'tag_value')`, id.FullyQualifiedName(), policyName.FullyQualifiedName(), tagName.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE EVENT TABLE %s CLUSTER BY (a, b) DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 2 CHANGE_TRACKING = true DEFAULT_DDL_COLLATION = 'default_ddl_collation' COPY GRANTS COMMENT = 'comment' ROW ACCESS POLICY %s ON (column1, column2) TAG (%s = 'tag_value')`, id.FullyQualifiedName(), policyName.FullyQualifiedName(), tagName.FullyQualifiedName())
 	})
 }
 
@@ -272,7 +273,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Set = &EventTableSet{
 			Tag: defaultTag(name),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s SET TAG (%s = 'tag_value')`, id.FullyQualifiedName(), name.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s SET TAG %s = 'tag_value'`, id.FullyQualifiedName(), name.FullyQualifiedName())
 	})
 
 	t.Run("unset data retention time in days", func(t *testing.T) {
@@ -310,10 +311,11 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("unset tag", func(t *testing.T) {
 		opts := defaultOpts()
 		name := NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))
+		tagNames := []string{name.FullyQualifiedName()}
 		opts.Unset = &EventTableUnset{
-			Tag: defaultTag(name),
+			TagNames: &tagNames,
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s UNSET TAG (%s = 'tag_value')`, id.FullyQualifiedName(), name.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s UNSET TAG %s`, id.FullyQualifiedName(), name.FullyQualifiedName())
 	})
 
 	t.Run("validation: nil options", func(t *testing.T) {
@@ -329,7 +331,7 @@ func TestEventTablesAlter(t *testing.T) {
 
 	t.Run("validation: no alter action", func(t *testing.T) {
 		opts := defaultOpts()
-		assertOptsInvalidJoinedErrors(t, opts, errAlterNeedsExactlyOneAction)
+		assertOptsInvalidJoinedErrors(t, opts, errors.New("exactly one action of alterEventTableOptions must be set"))
 	})
 
 	t.Run("validation: multiple alter actions", func(t *testing.T) {
@@ -337,10 +339,12 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Set = &EventTableSet{
 			Tag: defaultTag(NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))),
 		}
+		name := NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))
+		tagNames := []string{name.FullyQualifiedName()}
 		opts.Unset = &EventTableUnset{
-			Tag: defaultTag(NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))),
+			TagNames: &tagNames,
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errAlterNeedsExactlyOneAction)
+		assertOptsInvalidJoinedErrors(t, opts, errors.New("exactly one action of alterEventTableOptions must be set"))
 	})
 
 	t.Run("validation: invalid new name", func(t *testing.T) {
@@ -401,13 +405,13 @@ func TestEventTablesAlter(t *testing.T) {
 				On: []string{"column1", "column2"},
 			},
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errAlterNeedsExactlyOneAction)
+		assertOptsInvalidJoinedErrors(t, opts, errors.New("exactly one action of SearchOptimizationAction must be set"))
 	})
 
 	t.Run("validation: search optimization action without property", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.SearchOptimizationAction = &SearchOptimizationAction{}
-		assertOptsInvalidJoinedErrors(t, opts, errAlterNeedsExactlyOneAction)
+		assertOptsInvalidJoinedErrors(t, opts, errors.New("exactly one action of SearchOptimizationAction must be set"))
 	})
 
 	t.Run("validation: clustering action with both resume and suspend", func(t *testing.T) {
@@ -416,12 +420,12 @@ func TestEventTablesAlter(t *testing.T) {
 			Resume:  Bool(true),
 			Suspend: Bool(true),
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errAlterNeedsExactlyOneAction)
+		assertOptsInvalidJoinedErrors(t, opts, errors.New("exactly one action of ClusteringAction must be set"))
 	})
 
 	t.Run("validation: clustering action without property", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.ClusteringAction = &ClusteringAction{}
-		assertOptsInvalidJoinedErrors(t, opts, errAlterNeedsExactlyOneAction)
+		assertOptsInvalidJoinedErrors(t, opts, errors.New("exactly one action of ClusteringAction must be set"))
 	})
 }

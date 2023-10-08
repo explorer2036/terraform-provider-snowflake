@@ -113,7 +113,7 @@ type EventTableUnsetRequest struct {
 	MaxDataExtensionTimeInDays *bool
 	ChangeTracking             *bool
 	Comment                    *bool
-	tag                        []TagAssociationRequest
+	TagNames                   *[]string
 }
 
 func (s *EventTableUnsetRequest) toOpts() *EventTableUnset {
@@ -122,13 +122,7 @@ func (s *EventTableUnsetRequest) toOpts() *EventTableUnset {
 		MaxDataExtensionTimeInDays: s.MaxDataExtensionTimeInDays,
 		ChangeTracking:             s.ChangeTracking,
 		Comment:                    s.Comment,
-	}
-	if len(s.tag) > 0 {
-		tag := make([]TagAssociation, len(s.tag))
-		for i, item := range s.tag {
-			tag[i] = item.toOpts()
-		}
-		opts.Tag = &tag
+		TagNames:                   s.TagNames,
 	}
 	return opts
 }

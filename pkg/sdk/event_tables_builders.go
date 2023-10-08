@@ -103,6 +103,16 @@ func (s *AlterEventTableRequest) WithAddRowAccessPolicy(policy *RowAccessPolicyR
 	return s
 }
 
+func (s *AlterEventTableRequest) WithClusteringAction(value *ClusteringActionRequest) *AlterEventTableRequest {
+	s.clusteringAction = value
+	return s
+}
+
+func (s *AlterEventTableRequest) WithSearchOptimizationAction(value *SearchOptimizationActionRequest) *AlterEventTableRequest {
+	s.searchOptimizationAction = value
+	return s
+}
+
 func NewClusteringActionRequest() *ClusteringActionRequest {
 	return &ClusteringActionRequest{}
 }
@@ -204,8 +214,10 @@ func (s *EventTableUnsetRequest) WithComment(value bool) *EventTableUnsetRequest
 	return s
 }
 
-func (s *EventTableUnsetRequest) WithTag(value []TagAssociationRequest) *EventTableUnsetRequest {
-	s.tag = value
+func (s *EventTableUnsetRequest) WithTag(value []string) *EventTableUnsetRequest {
+	if len(value) > 0 {
+		s.TagNames = &value
+	}
 	return s
 }
 
@@ -233,4 +245,10 @@ func (s *ShowEventTableRequest) WithStartsWith(value string) *ShowEventTableRequ
 func (s *ShowEventTableRequest) WithLimit(limit *LimitFrom) *ShowEventTableRequest {
 	s.limit = limit
 	return s
+}
+
+func NewDescribeEventTableRequest(name SchemaObjectIdentifier) *DescribeEventTableRequest {
+	return &DescribeEventTableRequest{
+		name: name,
+	}
 }

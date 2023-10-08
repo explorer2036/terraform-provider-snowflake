@@ -42,7 +42,7 @@ func (v *ClusteringAction) validate() error {
 		v.Resume,
 		v.Drop,
 	); !ok {
-		errs = append(errs, errAlterNeedsExactlyOneAction)
+		errs = append(errs, errors.New("exactly one action of ClusteringAction must be set"))
 	}
 	if ok := anyValueSet(
 		v.ClusterBy,
@@ -61,7 +61,7 @@ func (v *SearchOptimizationAction) validate() error {
 		v.Add,
 		v.Drop,
 	); !ok {
-		errs = append(errs, errAlterNeedsExactlyOneAction)
+		errs = append(errs, errors.New("exactly one action of SearchOptimizationAction must be set"))
 	}
 	if ok := anyValueSet(
 		v.Add,
@@ -96,7 +96,7 @@ func (v *EventTableSet) validate() error {
 		v.Properties,
 		v.Tag,
 	); !ok {
-		errs = append(errs, errAlterNeedsExactlyOneAction)
+		errs = append(errs, errors.New("exactly one action of EventTableSet must be set"))
 	}
 	if ok := anyValueSet(
 		v.Properties,
@@ -114,16 +114,16 @@ func (v *EventTableUnset) validate() error {
 		v.MaxDataExtensionTimeInDays,
 		v.ChangeTracking,
 		v.Comment,
-		v.Tag,
+		v.TagNames,
 	); !ok {
-		errs = append(errs, errAlterNeedsExactlyOneAction)
+		errs = append(errs, errors.New("exactly one action of EventTableUnset must be set"))
 	}
 	if ok := anyValueSet(
 		v.DataRetentionTimeInDays,
 		v.MaxDataExtensionTimeInDays,
 		v.ChangeTracking,
 		v.Comment,
-		v.Tag,
+		v.TagNames,
 	); !ok {
 		errs = append(errs, errAlterNeedsAtLeastOneProperty)
 	}
@@ -148,7 +148,7 @@ func (opts *alterEventTableOptions) validate() error {
 		opts.Unset,
 		opts.Rename,
 	); !ok {
-		errs = append(errs, errAlterNeedsExactlyOneAction)
+		errs = append(errs, errors.New("exactly one action of alterEventTableOptions must be set"))
 	}
 	if ok := anyValueSet(
 		opts.ClusteringAction,

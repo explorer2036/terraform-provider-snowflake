@@ -51,16 +51,15 @@ type EventTableSetProperties struct {
 
 type EventTableSet struct {
 	Properties *EventTableSetProperties `ddl:"keyword"`
-	Tag        *[]TagAssociation        `ddl:"keyword,parentheses" sql:"TAG"`
+	Tag        *[]TagAssociation        `ddl:"keyword" sql:"TAG"`
 }
 
 type EventTableUnset struct {
-	DataRetentionTimeInDays    *bool `ddl:"keyword" sql:"DATA_RETENTION_TIME_IN_DAYS"`
-	MaxDataExtensionTimeInDays *bool `ddl:"keyword" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
-	ChangeTracking             *bool `ddl:"keyword" sql:"CHANGE_TRACKING"`
-	Comment                    *bool `ddl:"keyword" sql:"COMMENT"`
-
-	Tag *[]TagAssociation `ddl:"keyword,parentheses" sql:"TAG"`
+	DataRetentionTimeInDays    *bool     `ddl:"keyword" sql:"DATA_RETENTION_TIME_IN_DAYS"`
+	MaxDataExtensionTimeInDays *bool     `ddl:"keyword" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
+	ChangeTracking             *bool     `ddl:"keyword" sql:"CHANGE_TRACKING"`
+	Comment                    *bool     `ddl:"keyword" sql:"COMMENT"`
+	TagNames                   *[]string `ddl:"keyword" sql:"TAG"`
 }
 
 type EventTableRename struct {
