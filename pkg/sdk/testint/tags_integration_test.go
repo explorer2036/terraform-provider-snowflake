@@ -2,6 +2,7 @@ package testint
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
@@ -29,7 +30,7 @@ func TestInt_Tags(t *testing.T) {
 	cleanupTagHandle := func(id sdk.SchemaObjectIdentifier) func() {
 		return func() {
 			err := client.Tags.Drop(ctx, sdk.NewDropTagRequest(id))
-			if err == sdk.ErrObjectNotExistOrAuthorized {
+			if errors.Is(err, sdk.ErrObjectNotExistOrAuthorized) {
 				return
 			}
 			require.NoError(t, err)
