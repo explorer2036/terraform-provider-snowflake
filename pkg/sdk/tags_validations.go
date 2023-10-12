@@ -40,7 +40,7 @@ func (opts *createTagOptions) validate() error {
 
 func (v *AllowedValues) validate() error {
 	if ok := validateIntInRange(len(v.Values), 1, 50); !ok {
-		return fmt.Errorf("Number of the AllowedValues must be between 1 and 50")
+		return fmt.Errorf("number of the AllowedValues must be between 1 and 50")
 	}
 	return nil
 }
@@ -52,7 +52,7 @@ func (v *TagSet) validate() error {
 	}
 	if valueSet(v.MaskingPolicies) {
 		if ok := validateIntGreaterThanOrEqual(len(v.MaskingPolicies.MaskingPolicies), 1); !ok {
-			errs = append(errs, fmt.Errorf("Number of the MaskingPolicies must be greater than zero"))
+			errs = append(errs, fmt.Errorf("number of the MaskingPolicies must be greater than zero"))
 		}
 	}
 	return errors.Join(errs...)
@@ -65,7 +65,7 @@ func (v *TagUnset) validate() error {
 	}
 	if valueSet(v.MaskingPolicies) {
 		if ok := validateIntGreaterThanOrEqual(len(v.MaskingPolicies.MaskingPolicies), 1); !ok {
-			errs = append(errs, fmt.Errorf("Number of the MaskingPolicies must be greater than zero"))
+			errs = append(errs, fmt.Errorf("number of the MaskingPolicies must be greater than zero"))
 		}
 	}
 	return errors.Join(errs...)
@@ -103,20 +103,17 @@ func (opts *alterTagOptions) validate() error {
 			errs = append(errs, err)
 		}
 	}
-	if unset := opts.Unset; valueSet(opts.Unset) {
+	if valueSet(opts.Unset) {
 		if err := opts.Unset.validate(); err != nil {
 			errs = append(errs, err)
 		}
-		if !anyValueSet(unset.MaskingPolicies, unset.AllowedValues, unset.Comment) {
+		if !anyValueSet(opts.Unset.MaskingPolicies, opts.Unset.AllowedValues, opts.Unset.Comment) {
 			errs = append(errs, errAlterNeedsAtLeastOneProperty)
 		}
 	}
 	if valueSet(opts.Rename) {
 		if !validObjectidentifier(opts.Rename.Name) {
 			errs = append(errs, errInvalidObjectIdentifier)
-		}
-		if opts.name.DatabaseName() != opts.Rename.Name.DatabaseName() {
-			errs = append(errs, errDifferentDatabase)
 		}
 	}
 	return errors.Join(errs...)

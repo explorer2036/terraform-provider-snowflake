@@ -154,6 +154,15 @@ func TestTagShow(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, errPatternRequiredForLikeKeyword)
 	})
 
+<<<<<<< HEAD
+=======
+	t.Run("validation: empty in", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.In = &In{}
+		assertOptsInvalidJoinedErrors(t, opts, errScopeRequiredForInKeyword)
+	})
+
+>>>>>>> upstream/tag-sdk
 	t.Run("show with empty options", func(t *testing.T) {
 		opts := defaultOpts()
 		assertOptsValidAndSQLEquals(t, opts, `SHOW TAGS`)
@@ -164,6 +173,17 @@ func TestTagShow(t *testing.T) {
 		opts.Like = &Like{Pattern: String("test")}
 		assertOptsValidAndSQLEquals(t, opts, `SHOW TAGS LIKE 'test'`)
 	})
+<<<<<<< HEAD
+=======
+
+	t.Run("show with in", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.In = &In{
+			Account: Bool(true),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `SHOW TAGS IN ACCOUNT`)
+	})
+>>>>>>> upstream/tag-sdk
 }
 
 func TestTagAlter(t *testing.T) {
@@ -185,6 +205,7 @@ func TestTagAlter(t *testing.T) {
 			},
 		}
 	}
+<<<<<<< HEAD
 	defaultMaskingPolicies := func() []TagMaskingPolicy {
 		return []TagMaskingPolicy{
 			{
@@ -192,6 +213,17 @@ func TestTagAlter(t *testing.T) {
 			},
 			{
 				Name: "policy2",
+=======
+	mp1ID := NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), "policy1")
+	mp2ID := NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), "policy2")
+	defaultMaskingPolicies := func() []TagMaskingPolicy {
+		return []TagMaskingPolicy{
+			{
+				Name: mp1ID,
+			},
+			{
+				Name: mp2ID,
+>>>>>>> upstream/tag-sdk
 			},
 		}
 	}
@@ -228,7 +260,11 @@ func TestTagAlter(t *testing.T) {
 				Force:           Bool(true),
 			},
 		}
+<<<<<<< HEAD
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TAG %s SET MASKING POLICY "policy1", MASKING POLICY "policy2" FORCE`, id.FullyQualifiedName())
+=======
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TAG %s SET MASKING POLICY %s, MASKING POLICY %s FORCE`, id.FullyQualifiedName(), mp1ID.FullyQualifiedName(), mp2ID.FullyQualifiedName())
+>>>>>>> upstream/tag-sdk
 	})
 
 	t.Run("alter with unset masking policies", func(t *testing.T) {
@@ -238,7 +274,11 @@ func TestTagAlter(t *testing.T) {
 				MaskingPolicies: defaultMaskingPolicies(),
 			},
 		}
+<<<<<<< HEAD
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TAG %s UNSET MASKING POLICY "policy1", MASKING POLICY "policy2"`, id.FullyQualifiedName())
+=======
+		assertOptsValidAndSQLEquals(t, opts, `ALTER TAG %s UNSET MASKING POLICY %s, MASKING POLICY %s`, id.FullyQualifiedName(), mp1ID.FullyQualifiedName(), mp2ID.FullyQualifiedName())
+>>>>>>> upstream/tag-sdk
 	})
 
 	t.Run("alter with set comment", func(t *testing.T) {
@@ -295,7 +335,11 @@ func TestTagAlter(t *testing.T) {
 		opts.Rename = &TagRename{
 			Name: newId,
 		}
+<<<<<<< HEAD
 		assertOptsInvalidJoinedErrors(t, opts, errDifferentDatabase)
+=======
+		assertOptsValid(t, opts)
+>>>>>>> upstream/tag-sdk
 	})
 
 	t.Run("validation: no property to unset", func(t *testing.T) {

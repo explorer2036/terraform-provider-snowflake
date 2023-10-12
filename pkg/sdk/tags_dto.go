@@ -2,6 +2,7 @@ package sdk
 
 var (
 	_ optionsProvider[createTagOptions] = new(CreateTagRequest)
+	_ optionsProvider[alterTagOptions]  = new(AlterTagRequest)
 	_ optionsProvider[showTagOptions]   = new(ShowTagRequest)
 	_ optionsProvider[dropTagOptions]   = new(DropTagRequest)
 	_ optionsProvider[undropTagOptions] = new(UndropTagRequest)
@@ -30,13 +31,13 @@ type AlterTagRequest struct {
 }
 
 type TagSetRequest struct {
-	maskingPolicies []string
+	maskingPolicies []SchemaObjectIdentifier
 	force           *bool
 	comment         *string
 }
 
 type TagUnsetRequest struct {
-	maskingPolicies []string
+	maskingPolicies []SchemaObjectIdentifier
 	allowedValues   *bool
 	comment         *bool
 }
