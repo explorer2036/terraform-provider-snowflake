@@ -1,6 +1,10 @@
 package sdk
 
-import "context"
+import (
+	"context"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
+)
 
 var _ EventTables = (*eventTables)(nil)
 
@@ -39,7 +43,7 @@ func (v *eventTables) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (
 	if err != nil {
 		return nil, err
 	}
-	return findOne(eventTables, func(r EventTable) bool { return r.Name == id.Name() })
+	return collections.FindOne(eventTables, func(r EventTable) bool { return r.Name == id.Name() })
 }
 
 func (v *CreateEventTableRequest) toOpts() *createEventTableOptions {

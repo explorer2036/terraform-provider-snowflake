@@ -3,7 +3,7 @@ package example
 import "testing"
 
 func TestDatabaseRoles_Create(t *testing.T) {
-	id := randomDatabaseObjectIdentifier(t)
+	id := RandomDatabaseObjectIdentifier(t)
 
 	// Minimal valid CreateDatabaseRoleOptions
 	defaultOpts := func() *CreateDatabaseRoleOptions {
@@ -14,7 +14,7 @@ func TestDatabaseRoles_Create(t *testing.T) {
 
 	t.Run("validation: nil options", func(t *testing.T) {
 		var opts *CreateDatabaseRoleOptions = nil
-		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: valid identifier for [opts.name]", func(t *testing.T) {
@@ -43,7 +43,7 @@ func TestDatabaseRoles_Create(t *testing.T) {
 }
 
 func TestDatabaseRoles_Alter(t *testing.T) {
-	id := randomDatabaseObjectIdentifier(t)
+	id := RandomDatabaseObjectIdentifier(t)
 
 	// Minimal valid AlterDatabaseRoleOptions
 	defaultOpts := func() *AlterDatabaseRoleOptions {
@@ -54,7 +54,7 @@ func TestDatabaseRoles_Alter(t *testing.T) {
 
 	t.Run("validation: nil options", func(t *testing.T) {
 		var opts *AlterDatabaseRoleOptions = nil
-		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: valid identifier for [opts.name]", func(t *testing.T) {

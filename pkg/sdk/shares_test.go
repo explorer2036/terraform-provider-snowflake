@@ -3,6 +3,7 @@ package sdk
 import (
 	"testing"
 
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -19,7 +20,7 @@ func TestSharesCreate(t *testing.T) {
 	})
 
 	t.Run("with complete options", func(t *testing.T) {
-		comment := randomComment(t)
+		comment := random.Comment()
 		opts := &CreateShareOptions{
 			OrReplace: Bool(true),
 			name:      NewAccountObjectIdentifier("complete_share"),
@@ -76,7 +77,7 @@ func TestShareAlter(t *testing.T) {
 
 	t.Run("with set", func(t *testing.T) {
 		accounts := []AccountIdentifier{NewAccountIdentifier("my-org", "myaccount")}
-		comment := randomComment(t)
+		comment := random.Comment()
 		opts := &AlterShareOptions{
 			IfExists: Bool(true),
 			name:     NewAccountObjectIdentifier("myshare"),
@@ -162,7 +163,7 @@ func TestShareShow(t *testing.T) {
 
 func TestShareDrop(t *testing.T) {
 	t.Run("only name", func(t *testing.T) {
-		opts := &shareDropOptions{
+		opts := &dropShareOptions{
 			name: NewAccountObjectIdentifier("myshare"),
 		}
 		actual, err := structToSQL(opts)
@@ -174,7 +175,7 @@ func TestShareDrop(t *testing.T) {
 
 func TestShareDescribe(t *testing.T) {
 	t.Run("describe provider", func(t *testing.T) {
-		opts := &shareDescribeOptions{
+		opts := &describeShareOptions{
 			name: NewAccountObjectIdentifier("myprovider"),
 		}
 		actual, err := structToSQL(opts)
@@ -183,7 +184,7 @@ func TestShareDescribe(t *testing.T) {
 		assert.Equal(t, expected, actual)
 	})
 	t.Run("describe consumer", func(t *testing.T) {
-		opts := &shareDescribeOptions{
+		opts := &describeShareOptions{
 			name: NewAccountObjectIdentifier("myconsumer"),
 		}
 		actual, err := structToSQL(opts)

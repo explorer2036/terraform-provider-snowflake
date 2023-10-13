@@ -3,10 +3,12 @@ package sdk
 import (
 	"errors"
 	"testing"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
 )
 
 func TestEventTablesCreate(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 	defaultOpts := func() *createEventTableOptions {
 		return &createEventTableOptions{
 			name: id,
@@ -15,13 +17,13 @@ func TestEventTablesCreate(t *testing.T) {
 
 	t.Run("validation: nil options", func(t *testing.T) {
 		var opts *createEventTableOptions = nil
-		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewSchemaObjectIdentifier("", "", "")
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("validation: both ifNotExists and orReplace present", func(t *testing.T) {
@@ -36,7 +38,7 @@ func TestEventTablesCreate(t *testing.T) {
 		opts.name = NewSchemaObjectIdentifier("", "", "")
 		opts.IfNotExists = Bool(true)
 		opts.OrReplace = Bool(true)
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier, errOneOf("OrReplace", "IfNotExists"))
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier, errOneOf("OrReplace", "IfNotExists"))
 	})
 
 	t.Run("basic", func(t *testing.T) {
@@ -55,18 +57,18 @@ func TestEventTablesCreate(t *testing.T) {
 		opts := defaultOpts()
 		opts.OrReplace = Bool(true)
 		opts.ClusterBy = []string{"a", "b"}
-		opts.DataRetentionTimeInDays = Uint(1)
-		opts.MaxDataExtensionTimeInDays = Uint(2)
+		opts.DataRetentionTimeInDays = Int(1)
+		opts.MaxDataExtensionTimeInDays = Int(2)
 		opts.ChangeTracking = Bool(true)
 		opts.DefaultDDLCollation = String("default_ddl_collation")
 		opts.CopyGrants = Bool(true)
 		opts.Comment = String("comment")
-		policyName := NewSchemaObjectIdentifier(randomStringN(t, 8), randomStringN(t, 8), randomStringN(t, 8))
+		policyName := NewSchemaObjectIdentifier(random.StringN(8), random.StringN(8), random.StringN(8))
 		opts.RowAccessPolicy = &RowAccessPolicy{
 			Name: policyName,
 			On:   []string{"column1", "column2"},
 		}
-		tagName := NewSchemaObjectIdentifier(randomStringN(t, 8), randomStringN(t, 8), randomStringN(t, 8))
+		tagName := NewSchemaObjectIdentifier(random.StringN(8), random.StringN(8), random.StringN(8))
 		opts.Tag = []TagAssociation{
 			{
 				Name:  tagName,
@@ -78,20 +80,20 @@ func TestEventTablesCreate(t *testing.T) {
 }
 
 func TestEventTablesShow(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 	defaultOpts := func() *showEventTableOptions {
 		return &showEventTableOptions{}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
 		var opts *showEventTableOptions = nil
-		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: empty like", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Like = &Like{}
-		assertOptsInvalidJoinedErrors(t, opts, errPatternRequiredForLikeKeyword)
+		assertOptsInvalidJoinedErrors(t, opts, ErrPatternRequiredForLikeKeyword)
 	})
 
 	t.Run("show with in", func(t *testing.T) {
@@ -123,7 +125,7 @@ func TestEventTablesShow(t *testing.T) {
 }
 
 func TestEventTablesDescribe(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 	defaultOpts := func() *describeEventTableOptions {
 		return &describeEventTableOptions{
 			name: id,
@@ -132,13 +134,13 @@ func TestEventTablesDescribe(t *testing.T) {
 
 	t.Run("validation: nil options", func(t *testing.T) {
 		var opts *describeEventTableOptions = nil
-		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewSchemaObjectIdentifier("", "", "")
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("describe", func(t *testing.T) {
@@ -148,7 +150,7 @@ func TestEventTablesDescribe(t *testing.T) {
 }
 
 func TestEventTablesAlter(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 	defaultOpts := func() *alterEventTableOptions {
 		return &alterEventTableOptions{
 			name: id,
@@ -166,7 +168,7 @@ func TestEventTablesAlter(t *testing.T) {
 
 	t.Run("rename to", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.Rename = &EventTableRename{Name: NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), randomStringN(t, 12))}
+		opts.Rename = &EventTableRename{Name: NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), random.StringN(12))}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s RENAME TO %s`, id.FullyQualifiedName(), opts.Rename.Name.FullyQualifiedName())
 	})
 
@@ -174,7 +176,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts := defaultOpts()
 		opts.AddRowAccessPolicy = &EventTableAddRowAccessPolicy{
 			RowAccessPolicy: &RowAccessPolicy{
-				Name: NewSchemaObjectIdentifier(randomStringN(t, 8), randomStringN(t, 8), randomStringN(t, 8)),
+				Name: NewSchemaObjectIdentifier(random.StringN(8), random.StringN(8), random.StringN(8)),
 				On:   []string{"column1", "column2"},
 			},
 		}
@@ -187,7 +189,7 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("drop row access policy", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.DropRowAccessPolicy = &EventTableDropRowAccessPolicy{
-			Name: NewSchemaObjectIdentifier(randomStringN(t, 8), randomStringN(t, 8), randomStringN(t, 8)),
+			Name: NewSchemaObjectIdentifier(random.StringN(8), random.StringN(8), random.StringN(8)),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s DROP ROW ACCESS POLICY %s`,
 			id.FullyQualifiedName(),
@@ -258,8 +260,8 @@ func TestEventTablesAlter(t *testing.T) {
 		opts := defaultOpts()
 		opts.Set = &EventTableSet{
 			Properties: &EventTableSetProperties{
-				DataRetentionTimeInDays:    Uint(1),
-				MaxDataExtensionTimeInDays: Uint(2),
+				DataRetentionTimeInDays:    Int(1),
+				MaxDataExtensionTimeInDays: Int(2),
 				ChangeTracking:             Bool(true),
 				Comment:                    String("comment"),
 			},
@@ -269,7 +271,7 @@ func TestEventTablesAlter(t *testing.T) {
 
 	t.Run("set tag", func(t *testing.T) {
 		opts := defaultOpts()
-		name := NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))
+		name := NewSchemaObjectIdentifier(random.String(), random.String(), random.String())
 		opts.Set = &EventTableSet{
 			Tag: defaultTag(name),
 		}
@@ -310,7 +312,7 @@ func TestEventTablesAlter(t *testing.T) {
 
 	t.Run("unset tag", func(t *testing.T) {
 		opts := defaultOpts()
-		name := NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))
+		name := NewSchemaObjectIdentifier(random.String(), random.String(), random.String())
 		tagNames := []string{name.FullyQualifiedName()}
 		opts.Unset = &EventTableUnset{
 			TagNames: &tagNames,
@@ -320,13 +322,13 @@ func TestEventTablesAlter(t *testing.T) {
 
 	t.Run("validation: nil options", func(t *testing.T) {
 		var opts *alterEventTableOptions = nil
-		assertOptsInvalidJoinedErrors(t, opts, errNilOptions)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewSchemaObjectIdentifier("", "", "")
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("validation: no alter action", func(t *testing.T) {
@@ -337,9 +339,9 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("validation: multiple alter actions", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Set = &EventTableSet{
-			Tag: defaultTag(NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))),
+			Tag: defaultTag(NewSchemaObjectIdentifier(random.String(), random.String(), random.String())),
 		}
-		name := NewSchemaObjectIdentifier(randomString(t), randomString(t), randomString(t))
+		name := NewSchemaObjectIdentifier(random.String(), random.String(), random.String())
 		tagNames := []string{name.FullyQualifiedName()}
 		opts.Unset = &EventTableUnset{
 			TagNames: &tagNames,
@@ -352,17 +354,17 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.Rename = &EventTableRename{
 			Name: NewSchemaObjectIdentifier("", "", ""),
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("validation: new name from different db", func(t *testing.T) {
-		newId := NewSchemaObjectIdentifier(id.DatabaseName()+randomStringN(t, 1), randomStringN(t, 12), randomStringN(t, 12))
+		newId := NewSchemaObjectIdentifier(id.DatabaseName()+random.StringN(1), random.StringN(12), random.StringN(12))
 
 		opts := defaultOpts()
 		opts.Rename = &EventTableRename{
 			Name: newId,
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errDifferentDatabase)
+		assertOptsInvalidJoinedErrors(t, opts, ErrDifferentDatabase)
 	})
 
 	t.Run("validation: no property to unset", func(t *testing.T) {
@@ -384,7 +386,7 @@ func TestEventTablesAlter(t *testing.T) {
 				Name: NewSchemaObjectIdentifier("", "", ""),
 			},
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("validation: invalid drop row access policy name", func(t *testing.T) {
@@ -392,7 +394,7 @@ func TestEventTablesAlter(t *testing.T) {
 		opts.DropRowAccessPolicy = &EventTableDropRowAccessPolicy{
 			Name: NewSchemaObjectIdentifier("", "", ""),
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("validation: search optimization action with both add and drop", func(t *testing.T) {

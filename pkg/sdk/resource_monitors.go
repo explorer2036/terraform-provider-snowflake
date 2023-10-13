@@ -17,15 +17,10 @@ var (
 )
 
 type ResourceMonitors interface {
-	// Create creates a resource monitor.
 	Create(ctx context.Context, id AccountObjectIdentifier, opts *CreateResourceMonitorOptions) error
-	// Alter modifies an existing resource monitor
 	Alter(ctx context.Context, id AccountObjectIdentifier, opts *AlterResourceMonitorOptions) error
-	// Drop removes a resource monitor.
 	Drop(ctx context.Context, id AccountObjectIdentifier) error
-	// Show returns a list of resource monitor.
 	Show(ctx context.Context, opts *ShowResourceMonitorOptions) ([]ResourceMonitor, error)
-	// ShowByID returns a resource monitor by ID
 	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*ResourceMonitor, error)
 }
 
@@ -182,7 +177,7 @@ func (v *ResourceMonitor) ObjectType() ObjectType {
 	return ObjectTypeResourceMonitor
 }
 
-// CreateResourceMonitorOptions contains options for creating a resource monitor.
+// CreateResourceMonitorOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-resource-monitor.
 type CreateResourceMonitorOptions struct {
 	create          bool                    `ddl:"static" sql:"CREATE"`
 	OrReplace       *bool                   `ddl:"keyword" sql:"OR REPLACE"`
@@ -201,8 +196,8 @@ type ResourceMonitorWith struct {
 }
 
 func (opts *CreateResourceMonitorOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
@@ -274,7 +269,7 @@ const (
 	FrequencyNever   Frequency = "NEVER"
 )
 
-// AlterResourceMonitorOptions contains options for altering a resource monitor.
+// AlterResourceMonitorOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-resource-monitor.
 type AlterResourceMonitorOptions struct {
 	alter           bool                    `ddl:"static" sql:"ALTER"`
 	resourceMonitor bool                    `ddl:"static" sql:"RESOURCE MONITOR"`
@@ -286,8 +281,8 @@ type AlterResourceMonitorOptions struct {
 }
 
 func (opts *AlterResourceMonitorOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	if opts.Set == nil {
 		return nil
@@ -324,7 +319,7 @@ type ResourceMonitorSet struct {
 	EndTimestamp   *string    `ddl:"parameter,equals,single_quotes" sql:"END_TIMESTAMP"`
 }
 
-// resourceMonitorDropOptions contains options for dropping a resource monitor.
+// dropResourceMonitorOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-resource-monitor.
 type dropResourceMonitorOptions struct {
 	drop            bool                    `ddl:"static" sql:"DROP"`
 	resourceMonitor bool                    `ddl:"static" sql:"RESOURCE MONITOR"`
@@ -332,8 +327,8 @@ type dropResourceMonitorOptions struct {
 }
 
 func (opts *dropResourceMonitorOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
@@ -353,7 +348,7 @@ func (v *resourceMonitors) Drop(ctx context.Context, id AccountObjectIdentifier)
 	return err
 }
 
-// ShowResourceMonitorOptions contains options for listing resource monitors.
+// ShowResourceMonitorOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-resource-monitors.
 type ShowResourceMonitorOptions struct {
 	show             bool  `ddl:"static" sql:"SHOW"`
 	resourceMonitors bool  `ddl:"static" sql:"RESOURCE MONITORS"`
@@ -403,5 +398,5 @@ func (v *resourceMonitors) ShowByID(ctx context.Context, id AccountObjectIdentif
 			return &resourceMonitor, nil
 		}
 	}
-	return nil, errObjectNotExistOrAuthorized
+	return nil, ErrObjectNotExistOrAuthorized
 }

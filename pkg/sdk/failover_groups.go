@@ -10,7 +10,6 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// Compile-time proof of interface implementation.
 var _ FailoverGroups = (*failoverGroups)(nil)
 
 var (
@@ -26,26 +25,15 @@ var (
 	_ validatable = new(describeDatabaseOptions)
 )
 
-// FailoverGroups describes all the failover group related methods that the
-// Snowflake API supports.
 type FailoverGroups interface {
-	// Create creates a new failover group.
 	Create(ctx context.Context, id AccountObjectIdentifier, objectTypes []PluralObjectType, allowedAccounts []AccountIdentifier, opts *CreateFailoverGroupOptions) error
-	// CreateSecondaryReplicationGroup creates a new secondary replication group.
 	CreateSecondaryReplicationGroup(ctx context.Context, id AccountObjectIdentifier, primaryFailoverGroupID ExternalObjectIdentifier, opts *CreateSecondaryReplicationGroupOptions) error
-	// Alter modifies an existing failover group in a source acount.
 	AlterSource(ctx context.Context, id AccountObjectIdentifier, opts *AlterSourceFailoverGroupOptions) error
-	// AlterTarget modifies an existing failover group in a target acount.
 	AlterTarget(ctx context.Context, id AccountObjectIdentifier, opts *AlterTargetFailoverGroupOptions) error
-	// Drop removes a failover group.
 	Drop(ctx context.Context, id AccountObjectIdentifier, opts *DropFailoverGroupOptions) error
-	// Show returns a list of failover groups.
 	Show(ctx context.Context, opts *ShowFailoverGroupOptions) ([]FailoverGroup, error)
-	// ShowByID returns a failover group by ID
 	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*FailoverGroup, error)
-	// ShowDatabases returns a list of databases in a failover group.
 	ShowDatabases(ctx context.Context, id AccountObjectIdentifier) ([]AccountObjectIdentifier, error)
-	// ShowShares returns a list of shares in a failover group.
 	ShowShares(ctx context.Context, id AccountObjectIdentifier) ([]AccountObjectIdentifier, error)
 }
 
@@ -63,6 +51,7 @@ const (
 	IntegrationTypeNotificationIntegrations IntegrationType = "NOTIFICATION INTEGRATIONS"
 )
 
+// CreateFailoverGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-failover-group.
 type CreateFailoverGroupOptions struct {
 	create        bool                    `ddl:"static" sql:"CREATE"`
 	failoverGroup bool                    `ddl:"static" sql:"FAILOVER GROUP"`
@@ -79,8 +68,8 @@ type CreateFailoverGroupOptions struct {
 }
 
 func (opts *CreateFailoverGroupOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
@@ -103,6 +92,7 @@ func (v *failoverGroups) Create(ctx context.Context, id AccountObjectIdentifier,
 	return err
 }
 
+// CreateSecondaryReplicationGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-failover-group.
 type CreateSecondaryReplicationGroupOptions struct {
 	create               bool                     `ddl:"static" sql:"CREATE"`
 	failoverGroup        bool                     `ddl:"static" sql:"FAILOVER GROUP"`
@@ -112,11 +102,11 @@ type CreateSecondaryReplicationGroupOptions struct {
 }
 
 func (opts *CreateSecondaryReplicationGroupOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
-	if !validObjectidentifier(opts.primaryFailoverGroup) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.primaryFailoverGroup) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
@@ -138,6 +128,7 @@ func (v *failoverGroups) CreateSecondaryReplicationGroup(ctx context.Context, id
 	return err
 }
 
+// AlterSourceFailoverGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-failover-group.
 type AlterSourceFailoverGroupOptions struct {
 	alter         bool                    `ddl:"static" sql:"ALTER"`
 	failoverGroup bool                    `ddl:"static" sql:"FAILOVER GROUP"`
@@ -151,8 +142,8 @@ type AlterSourceFailoverGroupOptions struct {
 }
 
 func (opts *AlterSourceFailoverGroupOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	if !exactlyOneValueSet(opts.Set, opts.Add, opts.Move, opts.Remove, opts.NewName) {
 		return errors.New("exactly one of SET, ADD, MOVE, REMOVE, or NewName must be specified")
@@ -244,6 +235,7 @@ func (v *failoverGroups) AlterSource(ctx context.Context, id AccountObjectIdenti
 	return err
 }
 
+// AlterTargetFailoverGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-failover-group.
 type AlterTargetFailoverGroupOptions struct {
 	alter         bool                    `ddl:"static" sql:"ALTER"`
 	failoverGroup bool                    `ddl:"static" sql:"FAILOVER GROUP"`
@@ -256,8 +248,8 @@ type AlterTargetFailoverGroupOptions struct {
 }
 
 func (opts *AlterTargetFailoverGroupOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	if !exactlyOneValueSet(opts.Refresh, opts.Primary, opts.Suspend, opts.Resume) {
 		return errors.New("must set one of [Refresh, Primary, Suspend, Resume]")
@@ -281,6 +273,7 @@ func (v *failoverGroups) AlterTarget(ctx context.Context, id AccountObjectIdenti
 	return err
 }
 
+// DropFailoverGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-failover-group.
 type DropFailoverGroupOptions struct {
 	drop          bool                    `ddl:"static" sql:"DROP"`
 	failoverGroup bool                    `ddl:"static" sql:"FAILOVER GROUP"`
@@ -289,8 +282,8 @@ type DropFailoverGroupOptions struct {
 }
 
 func (opts *DropFailoverGroupOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
@@ -314,7 +307,7 @@ func (v *failoverGroups) Drop(ctx context.Context, id AccountObjectIdentifier, o
 	return err
 }
 
-// ShowFailoverGroupOptions represents the options for listing failover groups.
+// ShowFailoverGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-failover-groups.
 type ShowFailoverGroupOptions struct {
 	show           bool              `ddl:"static" sql:"SHOW"`
 	failoverGroups bool              `ddl:"static" sql:"FAILOVER GROUPS"`
@@ -482,9 +475,10 @@ func (v *failoverGroups) ShowByID(ctx context.Context, id AccountObjectIdentifie
 			return &failoverGroup, nil
 		}
 	}
-	return nil, errObjectNotExistOrAuthorized
+	return nil, ErrObjectNotExistOrAuthorized
 }
 
+// showFailoverGroupDatabasesOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-databases-in-failover-group.
 type showFailoverGroupDatabasesOptions struct {
 	show      bool                    `ddl:"static" sql:"SHOW"`
 	databases bool                    `ddl:"static" sql:"DATABASES"`
@@ -492,8 +486,8 @@ type showFailoverGroupDatabasesOptions struct {
 }
 
 func (opts *showFailoverGroupDatabasesOptions) validate() error {
-	if !validObjectidentifier(opts.in) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.in) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
@@ -523,6 +517,7 @@ func (v *failoverGroups) ShowDatabases(ctx context.Context, id AccountObjectIden
 	return resultList, nil
 }
 
+// showFailoverGroupSharesOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-shares-in-failover-group.
 type showFailoverGroupSharesOptions struct {
 	show      bool                    `ddl:"static" sql:"SHOW"`
 	databases bool                    `ddl:"static" sql:"SHARES"`
@@ -530,8 +525,8 @@ type showFailoverGroupSharesOptions struct {
 }
 
 func (opts *showFailoverGroupSharesOptions) validate() error {
-	if !validObjectidentifier(opts.in) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.in) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }

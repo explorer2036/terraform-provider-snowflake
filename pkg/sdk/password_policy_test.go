@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
 	"github.com/stretchr/testify/assert"
-
 	"github.com/stretchr/testify/require"
 )
 
 func TestPasswordPolicyCreate(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
 	t.Run("empty options", func(t *testing.T) {
 		opts := &CreatePasswordPolicyOptions{}
@@ -54,7 +54,7 @@ func TestPasswordPolicyCreate(t *testing.T) {
 }
 
 func TestPasswordPolicyAlter(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
 	t.Run("empty options", func(t *testing.T) {
 		opts := &AlterPasswordPolicyOptions{}
@@ -103,7 +103,7 @@ func TestPasswordPolicyAlter(t *testing.T) {
 	})
 
 	t.Run("rename", func(t *testing.T) {
-		newID := NewSchemaObjectIdentifier(id.databaseName, id.schemaName, randomUUID(t))
+		newID := NewSchemaObjectIdentifier(id.databaseName, id.schemaName, random.UUID())
 		opts := &AlterPasswordPolicyOptions{
 			name:    id,
 			NewName: newID,
@@ -116,7 +116,7 @@ func TestPasswordPolicyAlter(t *testing.T) {
 }
 
 func TestPasswordPolicyDrop(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
 	t.Run("empty options", func(t *testing.T) {
 		opts := &DropPasswordPolicyOptions{}
@@ -149,10 +149,10 @@ func TestPasswordPolicyDrop(t *testing.T) {
 }
 
 func TestPasswordPolicyShow(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
 	t.Run("empty options", func(t *testing.T) {
-		opts := &PasswordPolicyShowOptions{}
+		opts := &ShowPasswordPolicyOptions{}
 		actual, err := structToSQL(opts)
 		require.NoError(t, err)
 		expected := "SHOW PASSWORD POLICIES"
@@ -160,7 +160,7 @@ func TestPasswordPolicyShow(t *testing.T) {
 	})
 
 	t.Run("with like", func(t *testing.T) {
-		opts := &PasswordPolicyShowOptions{
+		opts := &ShowPasswordPolicyOptions{
 			Like: &Like{
 				Pattern: String(id.Name()),
 			},
@@ -172,7 +172,7 @@ func TestPasswordPolicyShow(t *testing.T) {
 	})
 
 	t.Run("with like and in account", func(t *testing.T) {
-		opts := &PasswordPolicyShowOptions{
+		opts := &ShowPasswordPolicyOptions{
 			Like: &Like{
 				Pattern: String(id.Name()),
 			},
@@ -188,7 +188,7 @@ func TestPasswordPolicyShow(t *testing.T) {
 
 	t.Run("with like and in database", func(t *testing.T) {
 		databaseIdentifier := NewAccountObjectIdentifier(id.DatabaseName())
-		opts := &PasswordPolicyShowOptions{
+		opts := &ShowPasswordPolicyOptions{
 			Like: &Like{
 				Pattern: String(id.Name()),
 			},
@@ -204,7 +204,7 @@ func TestPasswordPolicyShow(t *testing.T) {
 
 	t.Run("with like and in schema", func(t *testing.T) {
 		schemaIdentifier := NewDatabaseObjectIdentifier(id.DatabaseName(), id.SchemaName())
-		opts := &PasswordPolicyShowOptions{
+		opts := &ShowPasswordPolicyOptions{
 			Like: &Like{
 				Pattern: String(id.Name()),
 			},
@@ -219,7 +219,7 @@ func TestPasswordPolicyShow(t *testing.T) {
 	})
 
 	t.Run("with limit", func(t *testing.T) {
-		opts := &PasswordPolicyShowOptions{
+		opts := &ShowPasswordPolicyOptions{
 			Limit: Int(10),
 		}
 		actual, err := structToSQL(opts)
@@ -230,7 +230,7 @@ func TestPasswordPolicyShow(t *testing.T) {
 }
 
 func TestPasswordPolicyDescribe(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
 	t.Run("empty options", func(t *testing.T) {
 		opts := &describePasswordPolicyOptions{}

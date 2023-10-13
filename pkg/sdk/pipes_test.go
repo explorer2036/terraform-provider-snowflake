@@ -5,24 +5,24 @@ import (
 )
 
 func TestPipesCreate(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *PipeCreateOptions {
-		return &PipeCreateOptions{
+	defaultOpts := func() *CreatePipeOptions {
+		return &CreatePipeOptions{
 			name:          id,
 			copyStatement: "<copy_statement>",
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *PipeCreateOptions = nil
-		assertOptsInvalid(t, opts, errNilOptions)
+		var opts *CreatePipeOptions = nil
+		assertOptsInvalid(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewSchemaObjectIdentifier("", "", "")
-		assertOptsInvalid(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalid(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("validation: copy statement required", func(t *testing.T) {
@@ -49,23 +49,23 @@ func TestPipesCreate(t *testing.T) {
 }
 
 func TestPipesAlter(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *PipeAlterOptions {
-		return &PipeAlterOptions{
+	defaultOpts := func() *AlterPipeOptions {
+		return &AlterPipeOptions{
 			name: id,
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *PipeAlterOptions = nil
-		assertOptsInvalid(t, opts, errNilOptions)
+		var opts *AlterPipeOptions = nil
+		assertOptsInvalid(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewSchemaObjectIdentifier("", "", "")
-		assertOptsInvalid(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalid(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("validation: no alter action", func(t *testing.T) {
@@ -202,23 +202,23 @@ func TestPipesAlter(t *testing.T) {
 }
 
 func TestPipesDrop(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *PipeDropOptions {
-		return &PipeDropOptions{
+	defaultOpts := func() *DropPipeOptions {
+		return &DropPipeOptions{
 			name: id,
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *PipeDropOptions = nil
-		assertOptsInvalid(t, opts, errNilOptions)
+		var opts *DropPipeOptions = nil
+		assertOptsInvalid(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewSchemaObjectIdentifier("", "", "")
-		assertOptsInvalid(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalid(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("empty options", func(t *testing.T) {
@@ -234,23 +234,23 @@ func TestPipesDrop(t *testing.T) {
 }
 
 func TestPipesShow(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 	databaseIdentifier := NewAccountObjectIdentifier(id.DatabaseName())
 	schemaIdentifier := NewDatabaseObjectIdentifier(id.DatabaseName(), id.SchemaName())
 
-	defaultOpts := func() *PipeShowOptions {
-		return &PipeShowOptions{}
+	defaultOpts := func() *ShowPipeOptions {
+		return &ShowPipeOptions{}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *PipeShowOptions = nil
-		assertOptsInvalid(t, opts, errNilOptions)
+		var opts *ShowPipeOptions = nil
+		assertOptsInvalid(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: empty like", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Like = &Like{}
-		assertOptsInvalid(t, opts, errPatternRequiredForLikeKeyword)
+		assertOptsInvalid(t, opts, ErrPatternRequiredForLikeKeyword)
 	})
 
 	t.Run("validation: empty in", func(t *testing.T) {
@@ -340,7 +340,7 @@ func TestPipesShow(t *testing.T) {
 }
 
 func TestPipesDescribe(t *testing.T) {
-	id := randomSchemaObjectIdentifier(t)
+	id := RandomSchemaObjectIdentifier()
 
 	defaultOpts := func() *describePipeOptions {
 		return &describePipeOptions{
@@ -350,13 +350,13 @@ func TestPipesDescribe(t *testing.T) {
 
 	t.Run("validation: nil options", func(t *testing.T) {
 		var opts *describePipeOptions = nil
-		assertOptsInvalid(t, opts, errNilOptions)
+		assertOptsInvalid(t, opts, ErrNilOptions)
 	})
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewSchemaObjectIdentifier("", "", "")
-		assertOptsInvalid(t, opts, errInvalidObjectIdentifier)
+		assertOptsInvalid(t, opts, ErrInvalidObjectIdentifier)
 	})
 
 	t.Run("with name", func(t *testing.T) {

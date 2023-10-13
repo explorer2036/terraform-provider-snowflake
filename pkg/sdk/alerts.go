@@ -18,25 +18,19 @@ var (
 )
 
 type Alerts interface {
-	// Create creates a new alert.
 	Create(ctx context.Context, id SchemaObjectIdentifier, warehouse AccountObjectIdentifier, schedule string, condition string, action string, opts *CreateAlertOptions) error
-	// Alter modifies an existing alert.
 	Alter(ctx context.Context, id SchemaObjectIdentifier, opts *AlterAlertOptions) error
-	// Drop removes an alert.
 	Drop(ctx context.Context, id SchemaObjectIdentifier) error
-	// Show returns a list of alerts
 	Show(ctx context.Context, opts *ShowAlertOptions) ([]Alert, error)
-	// ShowByID returns an alert by ID
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Alert, error)
-	// Describe returns the details of an alert.
 	Describe(ctx context.Context, id SchemaObjectIdentifier) (*AlertDetails, error)
 }
 
-// alerts implements Alerts
 type alerts struct {
 	client *Client
 }
 
+// CreateAlertOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-alert.
 type CreateAlertOptions struct {
 	create      bool                   `ddl:"static" sql:"CREATE"`
 	OrReplace   *bool                  `ddl:"keyword" sql:"OR REPLACE"`
@@ -61,7 +55,7 @@ type AlertCondition struct {
 }
 
 func (opts *CreateAlertOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
+	if !ValidObjectIdentifier(opts.name) {
 		return errors.New("invalid object identifier")
 	}
 
@@ -105,6 +99,7 @@ var (
 	AlertStateSuspended AlertState = "suspended"
 )
 
+// AlterAlertOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-alert.
 type AlterAlertOptions struct {
 	alter    bool                   `ddl:"static" sql:"ALTER"`
 	alert    bool                   `ddl:"static" sql:"ALERT"`
@@ -120,7 +115,7 @@ type AlterAlertOptions struct {
 }
 
 func (opts *AlterAlertOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
+	if !ValidObjectIdentifier(opts.name) {
 		return errors.New("invalid object identifier")
 	}
 
@@ -172,6 +167,7 @@ func (v *alerts) Alter(ctx context.Context, id SchemaObjectIdentifier, opts *Alt
 	return err
 }
 
+// DropAlertOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-alert.
 type dropAlertOptions struct {
 	drop  bool                   `ddl:"static" sql:"DROP"`
 	alert bool                   `ddl:"static" sql:"ALERT"`
@@ -179,8 +175,8 @@ type dropAlertOptions struct {
 }
 
 func (opts *dropAlertOptions) validate() error {
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
@@ -204,6 +200,7 @@ func (v *alerts) Drop(ctx context.Context, id SchemaObjectIdentifier) error {
 	return err
 }
 
+// ShowAlertOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-alerts.
 type ShowAlertOptions struct {
 	show   bool  `ddl:"static" sql:"SHOW"`
 	Terse  *bool `ddl:"keyword" sql:"TERSE"`
@@ -300,9 +297,10 @@ func (v *alerts) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Aler
 			return &alert, nil
 		}
 	}
-	return nil, errObjectNotExistOrAuthorized
+	return nil, ErrObjectNotExistOrAuthorized
 }
 
+// describeAlertOptions is based on https://docs.snowflake.com/en/sql-reference/sql/desc-alert.
 type describeAlertOptions struct {
 	describe bool                   `ddl:"static" sql:"DESCRIBE"`
 	alert    bool                   `ddl:"static" sql:"ALERT"`
@@ -310,8 +308,8 @@ type describeAlertOptions struct {
 }
 
 func (v *describeAlertOptions) validate() error {
-	if !validObjectidentifier(v.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(v.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }

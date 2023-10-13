@@ -26,12 +26,12 @@ func (s *CreateEventTableRequest) WithCopyGrants(value bool) *CreateEventTableRe
 	return s
 }
 
-func (s *CreateEventTableRequest) WithDataRetentionTimeInDays(value uint) *CreateEventTableRequest {
+func (s *CreateEventTableRequest) WithDataRetentionTimeInDays(value int) *CreateEventTableRequest {
 	s.dataRetentionTimeInDays = &value
 	return s
 }
 
-func (s *CreateEventTableRequest) WithMaxDataExtensionTimeInDays(value uint) *CreateEventTableRequest {
+func (s *CreateEventTableRequest) WithMaxDataExtensionTimeInDays(value int) *CreateEventTableRequest {
 	s.maxDataExtensionTimeInDays = &value
 	return s
 }
@@ -56,7 +56,7 @@ func (s *CreateEventTableRequest) WithRowAccessPolicy(value *RowAccessPolicyRequ
 	return s
 }
 
-func (s *CreateEventTableRequest) WithTag(value []TagAssociationRequest) *CreateEventTableRequest {
+func (s *CreateEventTableRequest) WithTag(value []*TagAssociationRequest) *CreateEventTableRequest {
 	s.tag = value
 	return s
 }
@@ -165,12 +165,12 @@ func NewEventTableSetRequest() *EventTableSetRequest {
 	return &EventTableSetRequest{}
 }
 
-func (s *EventTableSetRequest) WithDataRetentionTimeInDays(value uint) *EventTableSetRequest {
+func (s *EventTableSetRequest) WithDataRetentionTimeInDays(value int) *EventTableSetRequest {
 	s.dataRetentionTimeInDays = &value
 	return s
 }
 
-func (s *EventTableSetRequest) WithMaxDataExtensionTimeInDays(value uint) *EventTableSetRequest {
+func (s *EventTableSetRequest) WithMaxDataExtensionTimeInDays(value int) *EventTableSetRequest {
 	s.maxDataExtensionTimeInDays = &value
 	return s
 }
@@ -185,7 +185,7 @@ func (s *EventTableSetRequest) WithComment(value string) *EventTableSetRequest {
 	return s
 }
 
-func (s *EventTableSetRequest) WithTag(value []TagAssociationRequest) *EventTableSetRequest {
+func (s *EventTableSetRequest) WithTag(value []*TagAssociationRequest) *EventTableSetRequest {
 	s.tag = value
 	return s
 }

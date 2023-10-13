@@ -5,19 +5,19 @@ import (
 )
 
 var (
-	_ validatable = new(PipeCreateOptions)
-	_ validatable = new(PipeAlterOptions)
-	_ validatable = new(PipeDropOptions)
-	_ validatable = new(PipeShowOptions)
+	_ validatable = new(CreatePipeOptions)
+	_ validatable = new(AlterPipeOptions)
+	_ validatable = new(DropPipeOptions)
+	_ validatable = new(ShowPipeOptions)
 	_ validatable = new(describePipeOptions)
 )
 
-func (opts *PipeCreateOptions) validate() error {
+func (opts *CreatePipeOptions) validate() error {
 	if opts == nil {
-		return errNilOptions
+		return ErrNilOptions
 	}
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	if opts.copyStatement == "" {
 		return errCopyStatementRequired
@@ -25,12 +25,12 @@ func (opts *PipeCreateOptions) validate() error {
 	return nil
 }
 
-func (opts *PipeAlterOptions) validate() error {
+func (opts *AlterPipeOptions) validate() error {
 	if opts == nil {
-		return errNilOptions
+		return ErrNilOptions
 	}
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	if ok := exactlyOneValueSet(
 		opts.Set,
@@ -64,22 +64,22 @@ func (opts *PipeAlterOptions) validate() error {
 	return nil
 }
 
-func (opts *PipeDropOptions) validate() error {
+func (opts *DropPipeOptions) validate() error {
 	if opts == nil {
-		return errNilOptions
+		return ErrNilOptions
 	}
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }
 
-func (opts *PipeShowOptions) validate() error {
+func (opts *ShowPipeOptions) validate() error {
 	if opts == nil {
-		return errNilOptions
+		return ErrNilOptions
 	}
 	if valueSet(opts.Like) && !valueSet(opts.Like.Pattern) {
-		return errPatternRequiredForLikeKeyword
+		return ErrPatternRequiredForLikeKeyword
 	}
 	if valueSet(opts.In) && !exactlyOneValueSet(opts.In.Account, opts.In.Database, opts.In.Schema) {
 		return errScopeRequiredForInKeyword
@@ -89,10 +89,10 @@ func (opts *PipeShowOptions) validate() error {
 
 func (opts *describePipeOptions) validate() error {
 	if opts == nil {
-		return errNilOptions
+		return ErrNilOptions
 	}
-	if !validObjectidentifier(opts.name) {
-		return errInvalidObjectIdentifier
+	if !ValidObjectIdentifier(opts.name) {
+		return ErrInvalidObjectIdentifier
 	}
 	return nil
 }

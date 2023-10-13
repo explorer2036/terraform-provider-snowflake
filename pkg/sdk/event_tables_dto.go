@@ -2,6 +2,7 @@ package sdk
 
 var (
 	_ optionsProvider[createEventTableOptions]   = (*CreateEventTableRequest)(nil)
+	_ optionsProvider[alterEventTableOptions]    = (*AlterEventTableRequest)(nil)
 	_ optionsProvider[describeEventTableOptions] = (*DescribeEventTableRequest)(nil)
 	_ optionsProvider[showEventTableOptions]     = (*ShowEventTableRequest)(nil)
 )
@@ -13,14 +14,14 @@ type CreateEventTableRequest struct {
 	name SchemaObjectIdentifier // required
 
 	clusterBy                  []string
-	dataRetentionTimeInDays    *uint
-	maxDataExtensionTimeInDays *uint
+	dataRetentionTimeInDays    *int
+	maxDataExtensionTimeInDays *int
 	changeTracking             *bool
 	defaultDDLCollation        *string
 	copyGrants                 *bool
 	comment                    *string
 	rowAccessPolicy            *RowAccessPolicyRequest
-	tag                        []TagAssociationRequest
+	tag                        []*TagAssociationRequest
 }
 
 type AlterEventTableRequest struct {
@@ -74,11 +75,11 @@ func (s *SearchOptimizationActionRequest) toOpts() *SearchOptimizationAction {
 }
 
 type EventTableSetRequest struct {
-	dataRetentionTimeInDays    *uint
-	maxDataExtensionTimeInDays *uint
+	dataRetentionTimeInDays    *int
+	maxDataExtensionTimeInDays *int
 	changeTracking             *bool
 	comment                    *string
-	tag                        []TagAssociationRequest
+	tag                        []*TagAssociationRequest
 }
 
 func (s *EventTableSetRequest) toOpts() *EventTableSet {

@@ -23,8 +23,8 @@ type createEventTableOptions struct {
 
 	name                       SchemaObjectIdentifier `ddl:"identifier"`
 	ClusterBy                  []string               `ddl:"keyword,parentheses" sql:"CLUSTER BY"`
-	DataRetentionTimeInDays    *uint                  `ddl:"parameter" sql:"DATA_RETENTION_TIME_IN_DAYS"`
-	MaxDataExtensionTimeInDays *uint                  `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
+	DataRetentionTimeInDays    *int                   `ddl:"parameter" sql:"DATA_RETENTION_TIME_IN_DAYS"`
+	MaxDataExtensionTimeInDays *int                   `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
 	ChangeTracking             *bool                  `ddl:"parameter" sql:"CHANGE_TRACKING"`
 	DefaultDDLCollation        *string                `ddl:"parameter,single_quotes" sql:"DEFAULT_DDL_COLLATION"`
 	CopyGrants                 *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
@@ -43,8 +43,8 @@ type EventTableDropRowAccessPolicy struct {
 }
 
 type EventTableSetProperties struct {
-	DataRetentionTimeInDays    *uint   `ddl:"parameter" sql:"DATA_RETENTION_TIME_IN_DAYS"`
-	MaxDataExtensionTimeInDays *uint   `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
+	DataRetentionTimeInDays    *int    `ddl:"parameter" sql:"DATA_RETENTION_TIME_IN_DAYS"`
+	MaxDataExtensionTimeInDays *int    `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
 	ChangeTracking             *bool   `ddl:"parameter" sql:"CHANGE_TRACKING"`
 	Comment                    *string `ddl:"parameter,single_quotes" sql:"COMMENT"`
 }
