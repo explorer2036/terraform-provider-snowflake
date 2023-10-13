@@ -25,7 +25,8 @@ type CreateEventTableRequest struct {
 }
 
 type AlterEventTableRequest struct {
-	name SchemaObjectIdentifier // required
+	ifExists bool
+	name     SchemaObjectIdentifier // required
 
 	// One of
 	clusteringAction         *ClusteringActionRequest
@@ -35,22 +36,22 @@ type AlterEventTableRequest struct {
 	dropAllRowAccessPolicies *bool
 	set                      *EventTableSetRequest
 	unset                    *EventTableUnsetRequest
-	rename                   *EventTableRename
+	rename                   *RenameSchemaObjectIdentifier
 }
 
 type ClusteringActionRequest struct {
-	clusterBy *[]string
-	suspend   *bool
-	resume    *bool
-	drop      *bool
+	clusterBy         *[]string
+	suspendRecluster  *bool
+	resumeRecluster   *bool
+	dropClusteringKey *bool
 }
 
 func (s *ClusteringActionRequest) toOpts() *ClusteringAction {
 	return &ClusteringAction{
-		ClusterBy: s.clusterBy,
-		Suspend:   s.suspend,
-		Resume:    s.resume,
-		Drop:      s.drop,
+		ClusterBy:         s.clusterBy,
+		SuspendRecluster:  s.suspendRecluster,
+		ResumeRecluster:   s.resumeRecluster,
+		DropClusteringKey: s.dropClusteringKey,
 	}
 }
 
@@ -84,20 +85,17 @@ type EventTableSetRequest struct {
 
 func (s *EventTableSetRequest) toOpts() *EventTableSet {
 	opts := &EventTableSet{}
-	if s.dataRetentionTimeInDays != nil || s.maxDataExtensionTimeInDays != nil || s.changeTracking != nil || s.comment != nil {
-		opts.Properties = &EventTableSetProperties{}
-		if s.dataRetentionTimeInDays != nil {
-			opts.Properties.DataRetentionTimeInDays = s.dataRetentionTimeInDays
-		}
-		if s.maxDataExtensionTimeInDays != nil {
-			opts.Properties.MaxDataExtensionTimeInDays = s.maxDataExtensionTimeInDays
-		}
-		if s.changeTracking != nil {
-			opts.Properties.ChangeTracking = s.changeTracking
-		}
-		if s.comment != nil {
-			opts.Properties.Comment = s.comment
-		}
+	if s.dataRetentionTimeInDays != nil {
+		opts.DataRetentionTimeInDays = s.dataRetentionTimeInDays
+	}
+	if s.maxDataExtensionTimeInDays != nil {
+		opts.MaxDataExtensionTimeInDays = s.maxDataExtensionTimeInDays
+	}
+	if s.changeTracking != nil {
+		opts.ChangeTracking = s.changeTracking
+	}
+	if s.comment != nil {
+		opts.Comment = s.comment
 	}
 	if len(s.tag) > 0 {
 		tag := make([]TagAssociation, len(s.tag))

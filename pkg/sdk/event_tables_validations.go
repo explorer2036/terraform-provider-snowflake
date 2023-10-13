@@ -31,6 +31,16 @@ func (opts *createEventTableOptions) validate() error {
 	if valueSet(opts.CopyGrants) && !valueSet(opts.OrReplace) {
 		errs = append(errs, errors.New("CopyGrants requires OrReplace"))
 	}
+	if valueSet(opts.DataRetentionTimeInDays) {
+		if !validateIntGreaterThanOrEqual(*opts.DataRetentionTimeInDays, 0) {
+			errs = append(errs, errors.New("DataRetentionTimeInDays must be greater than or equal to 0"))
+		}
+	}
+	if valueSet(opts.MaxDataExtensionTimeInDays) {
+		if !validateIntInRange(*opts.MaxDataExtensionTimeInDays, 0, 90) {
+			errs = append(errs, errors.New("MaxDataExtensionTimeInDays must be between 0 and 90"))
+		}
+	}
 	return errors.Join(errs...)
 }
 
@@ -38,17 +48,17 @@ func (v *ClusteringAction) validate() error {
 	var errs []error
 	if ok := exactlyOneValueSet(
 		v.ClusterBy,
-		v.Suspend,
-		v.Resume,
-		v.Drop,
+		v.SuspendRecluster,
+		v.ResumeRecluster,
+		v.DropClusteringKey,
 	); !ok {
 		errs = append(errs, errors.New("exactly one action of ClusteringAction must be set"))
 	}
 	if ok := anyValueSet(
 		v.ClusterBy,
-		v.Suspend,
-		v.Resume,
-		v.Drop,
+		v.SuspendRecluster,
+		v.ResumeRecluster,
+		v.DropClusteringKey,
 	); !ok {
 		errs = append(errs, errAlterNeedsAtLeastOneProperty)
 	}
@@ -92,17 +102,24 @@ func (v *EventTableDropRowAccessPolicy) validate() error {
 
 func (v *EventTableSet) validate() error {
 	var errs []error
-	if ok := exactlyOneValueSet(
-		v.Properties,
-		v.Tag,
-	); !ok {
-		errs = append(errs, errors.New("exactly one action of EventTableSet must be set"))
-	}
 	if ok := anyValueSet(
-		v.Properties,
+		v.DataRetentionTimeInDays,
+		v.MaxDataExtensionTimeInDays,
+		v.ChangeTracking,
+		v.Comment,
 		v.Tag,
 	); !ok {
 		errs = append(errs, errAlterNeedsAtLeastOneProperty)
+	}
+	if valueSet(v.Tag) {
+		if ok := anyValueSet(
+			v.DataRetentionTimeInDays,
+			v.MaxDataExtensionTimeInDays,
+			v.ChangeTracking,
+			v.Comment,
+		); ok {
+			errs = append(errs, errors.New("Tag cannot be set with any other property"))
+		}
 	}
 	return errors.Join(errs...)
 }

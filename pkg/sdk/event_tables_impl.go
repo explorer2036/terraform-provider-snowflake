@@ -74,7 +74,8 @@ func (v *CreateEventTableRequest) toOpts() *createEventTableOptions {
 
 func (s *AlterEventTableRequest) toOpts() *alterEventTableOptions {
 	opts := &alterEventTableOptions{
-		name: s.name,
+		IfExists: Bool(s.ifExists),
+		name:     s.name,
 	}
 	if s.clusteringAction != nil {
 		opts.ClusteringAction = s.clusteringAction.toOpts()

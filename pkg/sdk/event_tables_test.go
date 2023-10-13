@@ -168,7 +168,7 @@ func TestEventTablesAlter(t *testing.T) {
 
 	t.Run("rename to", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.Rename = &EventTableRename{Name: NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), random.StringN(12))}
+		opts.Rename = &RenameSchemaObjectIdentifier{Name: NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), random.StringN(12))}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s RENAME TO %s`, id.FullyQualifiedName(), opts.Rename.Name.FullyQualifiedName())
 	})
 
@@ -215,7 +215,7 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("clustering action with suspend", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.ClusteringAction = &ClusteringAction{
-			Suspend: Bool(true),
+			SuspendRecluster: Bool(true),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s SUSPEND RECLUSTER`, id.FullyQualifiedName())
 	})
@@ -223,7 +223,7 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("clustering action with resume", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.ClusteringAction = &ClusteringAction{
-			Resume: Bool(true),
+			ResumeRecluster: Bool(true),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s RESUME RECLUSTER`, id.FullyQualifiedName())
 	})
@@ -231,7 +231,7 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("clustering action with drop", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.ClusteringAction = &ClusteringAction{
-			Drop: Bool(true),
+			DropClusteringKey: Bool(true),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s DROP CLUSTERING KEY`, id.FullyQualifiedName())
 	})
@@ -259,12 +259,10 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("set properties", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Set = &EventTableSet{
-			Properties: &EventTableSetProperties{
-				DataRetentionTimeInDays:    Int(1),
-				MaxDataExtensionTimeInDays: Int(2),
-				ChangeTracking:             Bool(true),
-				Comment:                    String("comment"),
-			},
+			DataRetentionTimeInDays:    Int(1),
+			MaxDataExtensionTimeInDays: Int(2),
+			ChangeTracking:             Bool(true),
+			Comment:                    String("comment"),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER TABLE %s SET DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 2 CHANGE_TRACKING = true COMMENT = 'comment'`, id.FullyQualifiedName())
 	})
@@ -351,20 +349,10 @@ func TestEventTablesAlter(t *testing.T) {
 
 	t.Run("validation: invalid new name", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.Rename = &EventTableRename{
+		opts.Rename = &RenameSchemaObjectIdentifier{
 			Name: NewSchemaObjectIdentifier("", "", ""),
 		}
 		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
-	})
-
-	t.Run("validation: new name from different db", func(t *testing.T) {
-		newId := NewSchemaObjectIdentifier(id.DatabaseName()+random.StringN(1), random.StringN(12), random.StringN(12))
-
-		opts := defaultOpts()
-		opts.Rename = &EventTableRename{
-			Name: newId,
-		}
-		assertOptsInvalidJoinedErrors(t, opts, ErrDifferentDatabase)
 	})
 
 	t.Run("validation: no property to unset", func(t *testing.T) {
@@ -419,8 +407,8 @@ func TestEventTablesAlter(t *testing.T) {
 	t.Run("validation: clustering action with both resume and suspend", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.ClusteringAction = &ClusteringAction{
-			Resume:  Bool(true),
-			Suspend: Bool(true),
+			ResumeRecluster:  Bool(true),
+			SuspendRecluster: Bool(true),
 		}
 		assertOptsInvalidJoinedErrors(t, opts, errors.New("exactly one action of ClusteringAction must be set"))
 	})

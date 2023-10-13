@@ -207,3 +207,7 @@ func (row *propertyRow) toBoolProperty() *BoolProperty {
 		Description:  row.Description,
 	}
 }
+
+type RenameSchemaObjectIdentifier struct {
+	Name SchemaObjectIdentifier `ddl:"identifier"`
+}

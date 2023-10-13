@@ -67,8 +67,13 @@ func NewAlterEventTableRequest(name SchemaObjectIdentifier) *AlterEventTableRequ
 	}
 }
 
+func (s *AlterEventTableRequest) WithIfExists(ifExists bool) *AlterEventTableRequest {
+	s.ifExists = ifExists
+	return s
+}
+
 func (s *AlterEventTableRequest) WithRename(name SchemaObjectIdentifier) *AlterEventTableRequest {
-	s.rename = &EventTableRename{
+	s.rename = &RenameSchemaObjectIdentifier{
 		Name: name,
 	}
 	return s
@@ -124,18 +129,18 @@ func (s *ClusteringActionRequest) WithClusterBy(value []string) *ClusteringActio
 	return s
 }
 
-func (s *ClusteringActionRequest) WithSuspend(value bool) *ClusteringActionRequest {
-	s.suspend = &value
+func (s *ClusteringActionRequest) WithSuspendRecluster(value bool) *ClusteringActionRequest {
+	s.suspendRecluster = &value
 	return s
 }
 
-func (s *ClusteringActionRequest) WithResume(value bool) *ClusteringActionRequest {
-	s.resume = &value
+func (s *ClusteringActionRequest) WithResumeRecluster(value bool) *ClusteringActionRequest {
+	s.resumeRecluster = &value
 	return s
 }
 
-func (s *ClusteringActionRequest) WithDrop(value bool) *ClusteringActionRequest {
-	s.drop = &value
+func (s *ClusteringActionRequest) WithDropClusteringKey(value bool) *ClusteringActionRequest {
+	s.dropClusteringKey = &value
 	return s
 }
 

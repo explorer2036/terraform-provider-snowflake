@@ -42,16 +42,12 @@ type EventTableDropRowAccessPolicy struct {
 	Name            SchemaObjectIdentifier `ddl:"identifier"`
 }
 
-type EventTableSetProperties struct {
-	DataRetentionTimeInDays    *int    `ddl:"parameter" sql:"DATA_RETENTION_TIME_IN_DAYS"`
-	MaxDataExtensionTimeInDays *int    `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
-	ChangeTracking             *bool   `ddl:"parameter" sql:"CHANGE_TRACKING"`
-	Comment                    *string `ddl:"parameter,single_quotes" sql:"COMMENT"`
-}
-
 type EventTableSet struct {
-	Properties *EventTableSetProperties `ddl:"keyword"`
-	Tag        *[]TagAssociation        `ddl:"keyword" sql:"TAG"`
+	DataRetentionTimeInDays    *int              `ddl:"parameter" sql:"DATA_RETENTION_TIME_IN_DAYS"`
+	MaxDataExtensionTimeInDays *int              `ddl:"parameter" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
+	ChangeTracking             *bool             `ddl:"parameter" sql:"CHANGE_TRACKING"`
+	Comment                    *string           `ddl:"parameter,single_quotes" sql:"COMMENT"`
+	Tag                        *[]TagAssociation `ddl:"keyword" sql:"TAG"`
 }
 
 type EventTableUnset struct {
@@ -62,15 +58,11 @@ type EventTableUnset struct {
 	TagNames                   *[]string `ddl:"keyword" sql:"TAG"`
 }
 
-type EventTableRename struct {
-	Name SchemaObjectIdentifier `ddl:"identifier"`
-}
-
 type ClusteringAction struct {
-	ClusterBy *[]string `ddl:"keyword,parentheses" sql:"CLUSTER BY"`
-	Suspend   *bool     `ddl:"keyword" sql:"SUSPEND RECLUSTER"`
-	Resume    *bool     `ddl:"keyword" sql:"RESUME RECLUSTER"`
-	Drop      *bool     `ddl:"keyword" sql:"DROP CLUSTERING KEY"`
+	ClusterBy         *[]string `ddl:"keyword,parentheses" sql:"CLUSTER BY"`
+	SuspendRecluster  *bool     `ddl:"keyword" sql:"SUSPEND RECLUSTER"`
+	ResumeRecluster   *bool     `ddl:"keyword" sql:"RESUME RECLUSTER"`
+	DropClusteringKey *bool     `ddl:"keyword" sql:"DROP CLUSTERING KEY"`
 }
 
 type AddSearchOptimization struct {
@@ -92,6 +84,7 @@ type SearchOptimizationAction struct {
 type alterEventTableOptions struct {
 	alter      bool                   `ddl:"static" sql:"ALTER"`
 	eventTable string                 `ddl:"static" sql:"TABLE"`
+	IfExists   *bool                  `ddl:"keyword" sql:"IF EXISTS"`
 	name       SchemaObjectIdentifier `ddl:"identifier"`
 
 	// One of
@@ -102,7 +95,7 @@ type alterEventTableOptions struct {
 	DropAllRowAccessPolicies *bool                          `ddl:"keyword" sql:"DROP ALL ROW ACCESS POLICIES"`
 	Set                      *EventTableSet                 `ddl:"keyword" sql:"SET"`
 	Unset                    *EventTableUnset               `ddl:"keyword" sql:"UNSET"`
-	Rename                   *EventTableRename              `ddl:"keyword" sql:"RENAME TO"`
+	Rename                   *RenameSchemaObjectIdentifier  `ddl:"keyword" sql:"RENAME TO"`
 }
 
 type EventTable struct {

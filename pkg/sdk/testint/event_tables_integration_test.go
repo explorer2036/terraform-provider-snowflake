@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -32,6 +33,23 @@ func TestInt_EventTables(t *testing.T) {
 		return func() {
 			_, err := client.ExecForTests(ctx, fmt.Sprintf("DROP TABLE \"%s\".\"%s\".\"%s\"", id.DatabaseName(), id.SchemaName(), id.Name()))
 			require.NoError(t, err)
+		}
+	}
+
+	createTagHandle := func(t *testing.T, client *sdk.Client, database *sdk.Database, schema *sdk.Schema) *sdk.Tag {
+		t.Helper()
+
+		name := random.String()
+		_, err := client.ExecForTests(context.Background(), fmt.Sprintf("CREATE TAG \"%s\".\"%s\".\"%s\"", database.Name, schema.Name, name))
+		require.NoError(t, err)
+		t.Cleanup(func() {
+			_, err := client.ExecForTests(ctx, fmt.Sprintf("DROP TAG \"%s\".\"%s\".\"%s\"", database.Name, schema.Name, name))
+			require.NoError(t, err)
+		})
+		return &sdk.Tag{
+			Name:         name,
+			DatabaseName: database.Name,
+			SchemaName:   schema.Name,
 		}
 	}
 
@@ -100,9 +118,7 @@ func TestInt_EventTables(t *testing.T) {
 		name := random.String()
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		tag, tagCleanup := createTag(t, client, databaseTest, schemaTest)
-		t.Cleanup(tagCleanup)
-
+		tag := createTagHandle(t, client, databaseTest, schemaTest)
 		request := sdk.NewCreateEventTableRequest(id).WithTag([]*sdk.TagAssociationRequest{sdk.NewTagAssociationRequest(tag.ID(), "tag-value")})
 		err := client.EventTables.Create(ctx, request)
 		require.NoError(t, err)
@@ -177,9 +193,7 @@ func TestInt_EventTables(t *testing.T) {
 		name := random.String()
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		tag, tagCleanup := createTag(t, client, databaseTest, schemaTest)
-		t.Cleanup(tagCleanup)
-
+		tag := createTagHandle(t, client, databaseTest, schemaTest)
 		err := client.EventTables.Create(ctx, sdk.NewCreateEventTableRequest(id))
 		require.NoError(t, err)
 		t.Cleanup(cleanupTableHandle(t, id))
@@ -211,7 +225,7 @@ func TestInt_EventTables(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = client.EventTables.ShowByID(ctx, id)
-		assert.ErrorIs(t, err, sdk.ErrObjectNotExistOrAuthorized)
+		assert.ErrorIs(t, err, collections.ErrObjectNotFound)
 
 		_, err = client.EventTables.ShowByID(ctx, nid)
 		require.NoError(t, err)
@@ -225,7 +239,7 @@ func TestInt_EventTables(t *testing.T) {
 		require.NoError(t, err)
 		t.Cleanup(cleanupTableHandle(t, id))
 
-		action := sdk.NewClusteringActionRequest().WithDrop(true)
+		action := sdk.NewClusteringActionRequest().WithDropClusteringKey(true)
 		err = client.EventTables.Alter(ctx, sdk.NewAlterEventTableRequest(id).WithClusteringAction(action))
 		require.NoError(t, err)
 	})
