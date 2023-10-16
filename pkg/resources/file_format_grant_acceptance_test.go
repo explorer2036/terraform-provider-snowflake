@@ -63,8 +63,6 @@ func TestAcc_FileFormatGrant_onAll(t *testing.T) {
 			{
 				Config: fileFormatGrantConfig(name, onAll, "USAGE"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_file_format_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_file_format_grant.test", "schema_name", name),
 					resource.TestCheckNoResourceAttr("snowflake_file_format_grant.test", "file_format_name"),
 					resource.TestCheckResourceAttr("snowflake_file_format_grant.test", "with_grant_option", "false"),
 					resource.TestCheckResourceAttr("snowflake_file_format_grant.test", "on_all", "true"),
@@ -129,23 +127,14 @@ func fileFormatGrantConfig(name string, grantType grantType, privilege string) s
 
 	return fmt.Sprintf(`
 
-resource snowflake_database test {
-	name = "%s"
-}
-
-resource snowflake_schema test {
-	name = "%s"
-	database = snowflake_database.test.name
-}
-
 resource snowflake_role test {
   name = "%s"
 }
 
 resource snowflake_file_format test {
   name        = "%s"
-  database    = snowflake_database.test.name
-  schema      = snowflake_schema.test.name
+  database    = terraform_test_database
+  schema      = terraform_test_schema
   format_type = "PARQUET"
 
   compression = "AUTO"
@@ -153,13 +142,13 @@ resource snowflake_file_format test {
 
 resource snowflake_file_format_grant test {
     %s
-	database_name = snowflake_database.test.name
-	schema_name = snowflake_schema.test.name
+	database_name = terraform_test_database
+	schema_name = terraform_test_schema
 	privilege = "%s"
 	roles = [
 		snowflake_role.test.name
 	]
 }
 
-`, name, name, name, name, fileFormatNameConfig, privilege)
+`, name, name, fileFormatNameConfig, privilege)
 }
