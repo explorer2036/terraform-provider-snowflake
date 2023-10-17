@@ -83,13 +83,9 @@ func schemaGrantConfig(name string, grantType grantType) string {
 	}
 
 	return fmt.Sprintf(`
-resource "snowflake_database" "test" {
-  name = "%v"
-}
-
 resource "snowflake_schema" "test" {
   name      = "%v"
-  database  = snowflake_database.test.name
+  database  = "terraform_test_database"
   comment   = "Terraform acceptance test"
 }
 
@@ -102,14 +98,14 @@ resource "snowflake_share" "test" {
 }
 
 resource "snowflake_database_grant" "test" {
-  database_name = snowflake_schema.test.database
+  database_name = "terraform_test_database"
   shares        = [snowflake_share.test.name]
 }
 
 resource "snowflake_schema_grant" "test" {
-  database_name = snowflake_schema.test.database
+  database_name = "terraform_test_database"
   %v
   roles         = [snowflake_role.test.name]
 }
-`, name, name, name, name, schemaNameConfig)
+`, name, name, name, schemaNameConfig)
 }

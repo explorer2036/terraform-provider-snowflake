@@ -21,8 +21,8 @@ func TestAcc_TaskGrant(t *testing.T) {
 			{
 				Config: taskGrantConfig(name, 8, normal, "OPERATE"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", name),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "task_name", name),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "with_grant_option", "false"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "privilege", "OPERATE"),
@@ -34,8 +34,8 @@ func TestAcc_TaskGrant(t *testing.T) {
 			{
 				Config: taskGrantConfig(name, 10, normal, "OPERATE"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", name),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "task_name", name),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "with_grant_option", "false"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "privilege", "OPERATE"),
@@ -47,8 +47,8 @@ func TestAcc_TaskGrant(t *testing.T) {
 			{
 				Config: taskGrantConfig(name, 10, normal, "ALL PRIVILEGES"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", name),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "task_name", name),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "privilege", "ALL PRIVILEGES"),
 				),
@@ -77,8 +77,8 @@ func TestAcc_TaskGrant_onAll(t *testing.T) {
 			{
 				Config: taskGrantConfig(name, 8, onAll, "OPERATE"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", name),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", acc.TestSchemaName),
 					resource.TestCheckNoResourceAttr("snowflake_task_grant.test", "task_name"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "on_all", "true"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "with_grant_option", "false"),
@@ -111,8 +111,8 @@ func TestAcc_TaskGrant_onFuture(t *testing.T) {
 			{
 				Config: taskGrantConfig(name, 8, onFuture, "OPERATE"),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", name),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", acc.TestSchemaName),
 					resource.TestCheckNoResourceAttr("snowflake_task_grant.test", "task_name"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "on_future", "true"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "with_grant_option", "false"),
@@ -146,33 +146,15 @@ func taskGrantConfig(name string, concurrency int32, grantType grantType, privil
 	}
 
 	s := `
-resource "snowflake_database" "test" {
-  name = "%v"
-  comment = "Terraform acceptance test"
-}
-
-resource "snowflake_schema" "test" {
-  name = snowflake_database.test.name
-  database = snowflake_database.test.name
-  comment = "Terraform acceptance test"
-}
-
 resource "snowflake_role" "test" {
   name = "%v"
 }
 
-resource "snowflake_warehouse" "test" {
-  name                         = snowflake_database.test.name
-  max_concurrency_level        = %d
-  statement_timeout_in_seconds = 86400
-  query_acceleration_max_scale_factor = 0
-}
-
 resource "snowflake_task" "test" {
-  name     	    = snowflake_schema.test.name
-  database  	= snowflake_database.test.name
-  schema   	  	= snowflake_schema.test.name
-  warehouse 	= snowflake_warehouse.test.name
+  name     	    = "%s"
+  database  	= "terraform_test_database"
+  schema   	  	= "terraform_test_schema"
+  warehouse 	= "terraform_test_warehouse"
   sql_statement = "SHOW FUNCTIONS"
   enabled  	  	= true
   schedule 	  	= "15 MINUTES"
@@ -183,13 +165,13 @@ resource "snowflake_task" "test" {
 
 resource "snowflake_task_grant" "test" {
   %s
-  database_name = snowflake_database.test.name
+  database_name = "terraform_test_database"
   roles         = [snowflake_role.test.name]
-  schema_name   = snowflake_schema.test.name
+  schema_name   = "terraform_test_schema"
   privilege 	= "%s"
 }
 `
-	return fmt.Sprintf(s, name, name, concurrency, taskNameConfig, privilege)
+	return fmt.Sprintf(s, name, name, taskNameConfig, privilege)
 }
 
 func TestAcc_TaskOwnershipGrant_onFuture(t *testing.T) {
@@ -205,8 +187,8 @@ func TestAcc_TaskOwnershipGrant_onFuture(t *testing.T) {
 			{
 				Config: taskOwnershipGrantConfig(name, onFuture, "OWNERSHIP", name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", name),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "on_future", "true"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "with_grant_option", "false"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "privilege", "OWNERSHIP"),
@@ -217,8 +199,8 @@ func TestAcc_TaskOwnershipGrant_onFuture(t *testing.T) {
 			{
 				Config: taskOwnershipGrantConfig(name, onFuture, "OWNERSHIP", new_name),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", name),
-					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", name),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "database_name", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr("snowflake_task_grant.test", "schema_name", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "on_future", "true"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "with_grant_option", "false"),
 					resource.TestCheckResourceAttr("snowflake_task_grant.test", "privilege", "OWNERSHIP"),
@@ -250,17 +232,6 @@ func taskOwnershipGrantConfig(name string, grantType grantType, privilege string
 	}
 
 	s := `
-resource "snowflake_database" "test" {
-  name = "%v"
-  comment = "Terraform acceptance test"
-}
-
-resource "snowflake_schema" "test" {
-  name = snowflake_database.test.name
-  database = snowflake_database.test.name
-  comment = "Terraform acceptance test"
-}
-
 resource "snowflake_role" "test" {
   name = "%v"
 }
@@ -271,12 +242,12 @@ resource "snowflake_role" "test_new" {
 
 resource "snowflake_task_grant" "test" {
   %s
-  database_name = snowflake_database.test.name
+  database_name 	= "terraform_test_database"
   roles             = [ "%s" ]
-  schema_name       = snowflake_schema.test.name
+  schema_name       = "terraform_test_schema"
   privilege 	    = "%s"
   with_grant_option = false
 }
 `
-	return fmt.Sprintf(s, name, name, name, taskNameConfig, rolename, privilege)
+	return fmt.Sprintf(s, name, name, taskNameConfig, rolename, privilege)
 }
