@@ -147,31 +147,38 @@ func taskGrantConfig(name string, concurrency int32, grantType grantType, privil
 
 	s := `
 resource "snowflake_role" "test" {
-  name = "%v"
+  	name = "%v"
+}
+
+resource "snowflake_warehouse" "test" {
+	name                         = "%s"
+	max_concurrency_level        = %d
+	statement_timeout_in_seconds = 86400
+	query_acceleration_max_scale_factor = 0
 }
 
 resource "snowflake_task" "test" {
-  name     	    = "%s"
-  database  	= "terraform_test_database"
-  schema   	  	= "terraform_test_schema"
-  warehouse 	= "terraform_test_warehouse"
-  sql_statement = "SHOW FUNCTIONS"
-  enabled  	  	= true
-  schedule 	  	= "15 MINUTES"
-  lifecycle {
-    ignore_changes = [session_parameters]
-  }
+	name     	    = "%s"
+	database  		= "terraform_test_database"
+	schema   		= "terraform_test_schema"
+	warehouse 		= snowflake_warehouse.test.name
+	sql_statement = "SHOW FUNCTIONS"
+	enabled  	  	= true
+	schedule 	  	= "15 MINUTES"
+	lifecycle {
+		ignore_changes = [session_parameters]
+	}
 }
 
 resource "snowflake_task_grant" "test" {
-  %s
-  database_name = "terraform_test_database"
-  roles         = [snowflake_role.test.name]
-  schema_name   = "terraform_test_schema"
-  privilege 	= "%s"
+	%s
+	database_name = "terraform_test_database"
+	roles         = [snowflake_role.test.name]
+	schema_name   = "terraform_test_schema"
+	privilege 	= "%s"
 }
 `
-	return fmt.Sprintf(s, name, name, taskNameConfig, privilege)
+	return fmt.Sprintf(s, name, name, concurrency, name, taskNameConfig, privilege)
 }
 
 func TestAcc_TaskOwnershipGrant_onFuture(t *testing.T) {

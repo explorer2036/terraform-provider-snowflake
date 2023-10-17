@@ -204,13 +204,13 @@ func ReadTagMaskingPolicyAssociation(d *schema.ResourceData, meta interface{}) e
 		d.SetId("")
 		return nil
 	}
-
 	if err != nil {
 		return err
 	}
 
+	databaseName := strings.Trim(t.RefDB.String, "\"")
 	tagID := TagID{
-		DatabaseName: t.RefDB.String,
+		DatabaseName: databaseName,
 		SchemaName:   t.RefSchema.String,
 		TagName:      t.RefEntity.String,
 	}

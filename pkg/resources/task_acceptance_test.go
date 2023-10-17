@@ -561,7 +561,6 @@ resource "snowflake_task" "test_task" {
 	enabled  	  = true
 	schedule      = "5 MINUTE"
 }
-
 `
 	return fmt.Sprintf(s, taskRootName, name)
 }
