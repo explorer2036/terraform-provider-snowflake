@@ -52,7 +52,7 @@ func TestAcc_StreamCreateOnStage(t *testing.T) {
 }
 
 func TestAcc_Stream(t *testing.T) {
-	if _, ok := os.LookupEnv("SKIP_EXTERNAL_TABLE_TESTS"); ok {
+	if _, ok := os.LookupEnv("ENABLE_STREAM_TESTS"); !ok {
 		t.Skip("Skipping TestAccStream")
 	}
 	accName := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
