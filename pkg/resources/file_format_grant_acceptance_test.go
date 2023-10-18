@@ -13,7 +13,7 @@ import (
 func TestAcc_FileFormatGrant_defaults(t *testing.T) {
 	name := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
 
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		Providers:    acc.TestAccProviders(),
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
@@ -128,7 +128,6 @@ func fileFormatGrantConfig(name string, grantType grantType, privilege string) s
 	}
 
 	return fmt.Sprintf(`
-
 resource snowflake_role test {
   name = "%s"
 }
@@ -151,6 +150,5 @@ resource snowflake_file_format_grant test {
 		snowflake_role.test.name
 	]
 }
-
 `, name, name, fileFormatNameConfig, privilege)
 }

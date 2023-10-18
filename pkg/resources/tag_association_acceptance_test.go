@@ -96,25 +96,35 @@ resource "snowflake_tag_association" "test" {
 
 func tagAssociationConfigSchema(n string) string {
 	return fmt.Sprintf(`
-resource "snowflake_tag" "tag1" {
-	database = "terraform_test_database"
-	name     = "EXAMPLE_TAG"
-	schema   = "PUBLIC"
+resource "snowflake_database" "db" {
+	name = "test_db"
+}
 
-	allowed_values = []
+resource "snowflake_schema" "sch" {
+	database = snowflake_database.db.name
+	name = "test_sch"
+	comment = "%v"
+}
+
+resource "snowflake_tag" "tag1" {
+ database = snowflake_database.db.name
+ name     = "EXAMPLE_TAG"
+ schema   = "PUBLIC"
+
+ allowed_values = []
 }
 
 resource "snowflake_tag_association" "schema" {
-	object_identifier {
-		database = "terraform_test_database"
-		name     = "terraform_test_schema"
-	}
+  object_identifier {
+    database = snowflake_database.db.name
+    name     = snowflake_schema.sch.name
+  }
 
-	object_type = "SCHEMA"
-	tag_id      = snowflake_tag.tag1.id
-	tag_value   = "TAG_VALUE"
+  object_type = "SCHEMA"
+  tag_id      = snowflake_tag.tag1.id
+  tag_value   = "TAG_VALUE"
 }
-`)
+`, n)
 }
 
 func tagAssociationConfigColumn(n1, n2 string) string {

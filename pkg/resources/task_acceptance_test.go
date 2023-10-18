@@ -45,7 +45,7 @@ var (
 
 		RootTask: &TaskSettings{
 			Name:              rootname,
-			Schema:            "PUBLIC",
+			Schema:            acc.TestSchemaName,
 			SQL:               "SHOW FUNCTIONS",
 			Enabled:           true,
 			Schedule:          "5 MINUTE",
@@ -61,7 +61,7 @@ var (
 
 		SoloTask: &TaskSettings{
 			Name:    soloname,
-			Schema:  "PUBLIC",
+			Schema:  acc.TestSchemaName,
 			SQL:     "SELECT 1",
 			When:    "TRUE",
 			Enabled: false,
@@ -74,7 +74,7 @@ var (
 
 		RootTask: &TaskSettings{
 			Name:              rootname,
-			Schema:            "PUBLIC",
+			Schema:            acc.TestSchemaName,
 			SQL:               "SHOW FUNCTIONS",
 			Enabled:           true,
 			Schedule:          "5 MINUTE",
@@ -90,7 +90,7 @@ var (
 
 		SoloTask: &TaskSettings{
 			Name:    soloname,
-			Schema:  "PUBLIC",
+			Schema:  acc.TestSchemaName,
 			SQL:     "SELECT *",
 			When:    "TRUE",
 			Enabled: true,
@@ -108,7 +108,7 @@ var (
 
 		RootTask: &TaskSettings{
 			Name:              rootname,
-			Schema:            "PUBLIC",
+			Schema:            acc.TestSchemaName,
 			SQL:               "SHOW TABLES",
 			Enabled:           true,
 			Schedule:          "15 MINUTE",
@@ -124,7 +124,7 @@ var (
 
 		SoloTask: &TaskSettings{
 			Name:              soloname,
-			Schema:            "PUBLIC",
+			Schema:            acc.TestSchemaName,
 			SQL:               "SELECT *",
 			When:              "FALSE",
 			Enabled:           true,
@@ -138,7 +138,7 @@ var (
 
 		RootTask: &TaskSettings{
 			Name:              rootname,
-			Schema:            "PUBLIC",
+			Schema:            acc.TestSchemaName,
 			SQL:               "SHOW FUNCTIONS",
 			Enabled:           false,
 			Schedule:          "5 MINUTE",
@@ -154,7 +154,7 @@ var (
 
 		SoloTask: &TaskSettings{
 			Name:    soloname,
-			Schema:  "PUBLIC",
+			Schema:  acc.TestSchemaName,
 			SQL:     "SELECT 1",
 			When:    "TRUE",
 			Enabled: true,
@@ -168,7 +168,7 @@ var (
 )
 
 func TestAcc_Task(t *testing.T) {
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		Providers:    acc.TestAccProviders(),
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
@@ -182,8 +182,8 @@ func TestAcc_Task(t *testing.T) {
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "name", childname),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "database", acc.TestDatabaseName),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "database", acc.TestDatabaseName),
-					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", "PUBLIC"),
-					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", "PUBLIC"),
+					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", acc.TestSchemaName),
+					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "sql_statement", initialState.RootTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "sql_statement", initialState.ChildTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "after.0", rootname),
@@ -203,8 +203,8 @@ func TestAcc_Task(t *testing.T) {
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "name", childname),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "database", acc.TestDatabaseName),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "database", acc.TestDatabaseName),
-					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", "PUBLIC"),
-					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", "PUBLIC"),
+					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", acc.TestSchemaName),
+					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "sql_statement", stepOne.RootTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "sql_statement", stepOne.ChildTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "comment", stepOne.ChildTask.Comment),
@@ -223,8 +223,8 @@ func TestAcc_Task(t *testing.T) {
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "name", childname),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "database", acc.TestDatabaseName),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "database", acc.TestDatabaseName),
-					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", "PUBLIC"),
-					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", "PUBLIC"),
+					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", acc.TestSchemaName),
+					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "sql_statement", stepTwo.RootTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "sql_statement", stepTwo.ChildTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "comment", stepTwo.ChildTask.Comment),
@@ -243,8 +243,8 @@ func TestAcc_Task(t *testing.T) {
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "name", childname),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "database", acc.TestDatabaseName),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "database", acc.TestDatabaseName),
-					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", "PUBLIC"),
-					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", "PUBLIC"),
+					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", acc.TestSchemaName),
+					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "sql_statement", stepThree.RootTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "sql_statement", stepThree.ChildTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "comment", stepThree.ChildTask.Comment),
@@ -263,8 +263,8 @@ func TestAcc_Task(t *testing.T) {
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "name", childname),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "database", acc.TestDatabaseName),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "database", acc.TestDatabaseName),
-					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", "PUBLIC"),
-					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", "PUBLIC"),
+					resource.TestCheckResourceAttr("snowflake_task.root_task", "schema", acc.TestSchemaName),
+					resource.TestCheckResourceAttr("snowflake_task.child_task", "schema", acc.TestSchemaName),
 					resource.TestCheckResourceAttr("snowflake_task.root_task", "sql_statement", initialState.RootTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "sql_statement", initialState.ChildTask.SQL),
 					resource.TestCheckResourceAttr("snowflake_task.child_task", "comment", initialState.ChildTask.Comment),
@@ -368,7 +368,7 @@ resource "snowflake_task" "solo_task" {
 func TestAcc_Task_Managed(t *testing.T) {
 	accName := "tst-terraform-" + strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
 	whName := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
-	resource.ParallelTest(t, resource.TestCase{
+	resource.Test(t, resource.TestCase{
 		Providers:    acc.TestAccProviders(),
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,

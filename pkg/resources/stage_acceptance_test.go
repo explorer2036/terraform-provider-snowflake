@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestAccAlterStageWhenBothURLAndStorageIntegrationChange(t *testing.T) {
+func TestAcc_StageAlterWhenBothURLAndStorageIntegrationChange(t *testing.T) {
 	name := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
 	resource.ParallelTest(t, resource.TestCase{
