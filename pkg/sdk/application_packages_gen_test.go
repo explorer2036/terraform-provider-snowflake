@@ -28,6 +28,12 @@ func TestApplicationPackages_Create(t *testing.T) {
 		assertOptsValidAndSQLEquals(t, opts, `CREATE APPLICATION PACKAGE %s`, id.FullyQualifiedName())
 	})
 
+	t.Run("distribution", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Distribution = String("INTERNAL")
+		assertOptsValidAndSQLEquals(t, opts, `CREATE APPLICATION PACKAGE %s DISTRIBUTION = INTERNAL`, id.FullyQualifiedName())
+	})
+
 	t.Run("all options", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.IfNotExists = Bool(true)

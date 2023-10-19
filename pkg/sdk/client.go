@@ -26,31 +26,32 @@ type Client struct {
 	ReplicationFunctions ReplicationFunctions
 
 	// DDL Commands
-	Accounts         Accounts
-	Alerts           Alerts
-	Comments         Comments
-	DatabaseRoles    DatabaseRoles
-	Databases        Databases
-	DynamicTables    DynamicTables
-	ExternalTables   ExternalTables
-	FailoverGroups   FailoverGroups
-	FileFormats      FileFormats
-	Grants           Grants
-	MaskingPolicies  MaskingPolicies
-	NetworkPolicies  NetworkPolicies
-	Parameters       Parameters
-	PasswordPolicies PasswordPolicies
-	Pipes            Pipes
-	ResourceMonitors ResourceMonitors
-	Roles            Roles
-	Schemas          Schemas
-	SessionPolicies  SessionPolicies
-	Sessions         Sessions
-	Shares           Shares
-	Tags             Tags
-	Tasks            Tasks
-	Users            Users
-	Warehouses       Warehouses
+	Accounts            Accounts
+	Alerts              Alerts
+	Comments            Comments
+	DatabaseRoles       DatabaseRoles
+	Databases           Databases
+	DynamicTables       DynamicTables
+	ExternalTables      ExternalTables
+	FailoverGroups      FailoverGroups
+	FileFormats         FileFormats
+	Grants              Grants
+	MaskingPolicies     MaskingPolicies
+	NetworkPolicies     NetworkPolicies
+	Parameters          Parameters
+	PasswordPolicies    PasswordPolicies
+	Pipes               Pipes
+	ResourceMonitors    ResourceMonitors
+	Roles               Roles
+	Schemas             Schemas
+	SessionPolicies     SessionPolicies
+	Sessions            Sessions
+	Shares              Shares
+	Tags                Tags
+	Tasks               Tasks
+	Users               Users
+	Warehouses          Warehouses
+	ApplicationPackages ApplicationPackages
 }
 
 func (c *Client) GetAccountLocator() string {
@@ -163,6 +164,7 @@ func (c *Client) initialize() {
 	c.Tasks = &tasks{client: c}
 	c.Users = &users{client: c}
 	c.Warehouses = &warehouses{client: c}
+	c.ApplicationPackages = &applicationPackages{client: c}
 }
 
 func (c *Client) Ping() error {

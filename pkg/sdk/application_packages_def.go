@@ -19,8 +19,8 @@ var ApplicationPackagesDef = g.NewInterface(
 		OptionalNumberAssignment("MAX_DATA_EXTENSION_TIME_IN_DAYS", g.ParameterOptions().NoQuotes()).
 		OptionalTextAssignment("DEFAULT_DDL_COLLATION", g.ParameterOptions().SingleQuotes()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		WithTags().
 		OptionalTextAssignment("DISTRIBUTION", g.ParameterOptions().NoQuotes()).
+		WithTags().
 		WithValidation(g.ValidIdentifier, "name"),
 ).AlterOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-application-package",

@@ -7,6 +7,7 @@ type ApplicationPackages interface {
 	Alter(ctx context.Context, request *AlterApplicationPackageRequest) error
 	Drop(ctx context.Context, request *DropApplicationPackageRequest) error
 	Show(ctx context.Context, request *ShowApplicationPackageRequest) ([]ApplicationPackage, error)
+	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*ApplicationPackage, error)
 }
 
 // CreateApplicationPackageOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-application-package.
@@ -19,8 +20,8 @@ type CreateApplicationPackageOptions struct {
 	MaxDataExtensionTimeInDays *int                    `ddl:"parameter,no_quotes" sql:"MAX_DATA_EXTENSION_TIME_IN_DAYS"`
 	DefaultDdlCollation        *string                 `ddl:"parameter,single_quotes" sql:"DEFAULT_DDL_COLLATION"`
 	Comment                    *string                 `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	Tag                        []TagAssociation        `ddl:"keyword,parentheses" sql:"TAG"`
 	Distribution               *string                 `ddl:"parameter,no_quotes" sql:"DISTRIBUTION"`
+	Tag                        []TagAssociation        `ddl:"keyword,parentheses" sql:"TAG"`
 }
 
 // AlterApplicationPackageOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-application-package.

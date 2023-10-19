@@ -2,6 +2,8 @@ package sdk
 
 import (
 	"context"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
 
 var _ ApplicationPackages = (*applicationPackages)(nil)
@@ -33,6 +35,15 @@ func (v *applicationPackages) Show(ctx context.Context, request *ShowApplication
 	}
 	resultList := convertRows[applicationPackageRow, ApplicationPackage](dbRows)
 	return resultList, nil
+}
+
+func (v *applicationPackages) ShowByID(ctx context.Context, id AccountObjectIdentifier) (*ApplicationPackage, error) {
+	request := NewShowApplicationPackageRequest().WithLike(id.Name())
+	packages, err := v.Show(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return collections.FindOne(packages, func(r ApplicationPackage) bool { return r.Name == id.Name() })
 }
 
 func (r *CreateApplicationPackageRequest) toOpts() *CreateApplicationPackageOptions {
@@ -92,6 +103,12 @@ func (r *ShowApplicationPackageRequest) toOpts() *ShowApplicationPackageOptions 
 }
 
 func (r applicationPackageRow) convert() *ApplicationPackage {
-	// TODO: Mapping
-	return &ApplicationPackage{}
+	return &ApplicationPackage{
+		CreatedOn:    r.CreatedOn,
+		Name:         r.Name,
+		Distribution: r.Distribution,
+		Owner:        r.Owner,
+		Comment:      r.Comment,
+		Options:      r.Options,
+	}
 }
