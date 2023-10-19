@@ -76,7 +76,6 @@ var ApplicationPackagesDef = g.NewInterface(
 		Show().
 		SQL("APPLICATION PACKAGES").
 		OptionalLike().
-		OptionalIn().
 		OptionalStartsWith().
 		OptionalLimit(),
 )
