@@ -25,14 +25,14 @@ func TestInt_ApplicationPackages(t *testing.T) {
 		}
 	}
 
-	// createTagHandle := func(t *testing.T, client *sdk.Client) *sdk.Tag {
-	// 	t.Helper()
-	// 	schema, schemaCleanup := createSchema(t, client, testDb(t))
-	// 	t.Cleanup(schemaCleanup)
-	// 	tag, tagCleanup := createTag(t, client, testDb(t), schema)
-	// 	t.Cleanup(tagCleanup)
-	// 	return tag
-	// }
+	createTagHandle := func(t *testing.T, client *sdk.Client) *sdk.Tag {
+		t.Helper()
+		schema, schemaCleanup := createSchema(t, client, testDb(t))
+		t.Cleanup(schemaCleanup)
+		tag, tagCleanup := createTag(t, client, testDb(t), schema)
+		t.Cleanup(tagCleanup)
+		return tag
+	}
 
 	createApplicationPackageHandle := func(t *testing.T, client *sdk.Client) *sdk.ApplicationPackage {
 		t.Helper()
@@ -47,41 +47,41 @@ func TestInt_ApplicationPackages(t *testing.T) {
 		return e
 	}
 
-	// t.Run("create application package", func(t *testing.T) {
-	// 	tag := createTagHandle(t, client)
+	t.Run("create application package", func(t *testing.T) {
+		tag := createTagHandle(t, client)
 
-	// 	name := random.String()
-	// 	id := sdk.NewAccountObjectIdentifier(name)
-	// 	comment := random.String()
-	// 	request := sdk.NewCreateApplicationPackageRequest(id).
-	// 		WithComment(&comment).
-	// 		WithTag([]sdk.TagAssociation{
-	// 			{
-	// 				Name:  tag.ID(),
-	// 				Value: "abc",
-	// 			},
-	// 		}).
-	// 		WithDistribution(sdk.String("INTERNAL"))
-	// 	err := client.ApplicationPackages.Create(ctx, request)
-	// 	require.NoError(t, err)
-	// 	t.Cleanup(cleanupApplicationPackageHandle(id))
+		name := random.String()
+		id := sdk.NewAccountObjectIdentifier(name)
+		comment := random.String()
+		request := sdk.NewCreateApplicationPackageRequest(id).
+			WithComment(&comment).
+			WithTag([]sdk.TagAssociation{
+				{
+					Name:  tag.ID(),
+					Value: "abc",
+				},
+			}).
+			WithDistribution(sdk.String("INTERNAL"))
+		err := client.ApplicationPackages.Create(ctx, request)
+		require.NoError(t, err)
+		t.Cleanup(cleanupApplicationPackageHandle(id))
 
-	// 	e, err := client.ApplicationPackages.ShowByID(ctx, id)
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, comment, e.Comment)
-	// })
+		e, err := client.ApplicationPackages.ShowByID(ctx, id)
+		require.NoError(t, err)
+		require.Equal(t, comment, e.Comment)
+	})
 
-	// t.Run("create application package: no optionals", func(t *testing.T) {
-	// 	name := random.String()
-	// 	id := sdk.NewAccountObjectIdentifier(name)
-	// 	err := client.ApplicationPackages.Create(ctx, sdk.NewCreateApplicationPackageRequest(id))
-	// 	require.NoError(t, err)
-	// 	t.Cleanup(cleanupApplicationPackageHandle(id))
+	t.Run("create application package: no optionals", func(t *testing.T) {
+		name := random.String()
+		id := sdk.NewAccountObjectIdentifier(name)
+		err := client.ApplicationPackages.Create(ctx, sdk.NewCreateApplicationPackageRequest(id))
+		require.NoError(t, err)
+		t.Cleanup(cleanupApplicationPackageHandle(id))
 
-	// 	e, err := client.ApplicationPackages.ShowByID(ctx, id)
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, "", e.Comment)
-	// })
+		e, err := client.ApplicationPackages.ShowByID(ctx, id)
+		require.NoError(t, err)
+		require.Equal(t, "", e.Comment)
+	})
 
 	t.Run("drop application package: existing", func(t *testing.T) {
 		e := createApplicationPackageHandle(t, client)
@@ -91,47 +91,47 @@ func TestInt_ApplicationPackages(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	// t.Run("drop application package: no-existing", func(t *testing.T) {
-	// 	id := sdk.NewAccountObjectIdentifier(random.String())
-	// 	err := client.ApplicationPackages.Drop(ctx, sdk.NewDropApplicationPackageRequest(id))
-	// 	assert.ErrorIs(t, err, sdk.ErrObjectNotExistOrAuthorized)
-	// })
+	t.Run("drop application package: no-existing", func(t *testing.T) {
+		id := sdk.NewAccountObjectIdentifier(random.String())
+		err := client.ApplicationPackages.Drop(ctx, sdk.NewDropApplicationPackageRequest(id))
+		assert.ErrorIs(t, err, sdk.ErrObjectNotExistOrAuthorized)
+	})
 
-	// t.Run("alter application package: set and unset comment", func(t *testing.T) {
-	// 	e := createApplicationPackageHandle(t, client)
-	// 	id := sdk.NewAccountObjectIdentifier(e.Name)
+	t.Run("alter application package: set and unset comment", func(t *testing.T) {
+		e := createApplicationPackageHandle(t, client)
+		id := sdk.NewAccountObjectIdentifier(e.Name)
 
-	// 	comment := random.Comment()
-	// 	set := sdk.NewApplicationPackageSetRequest().WithComment(&comment)
-	// 	err := client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithSet(set))
-	// 	require.NoError(t, err)
+		comment := random.Comment()
+		set := sdk.NewApplicationPackageSetRequest().WithComment(&comment)
+		err := client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithSet(set))
+		require.NoError(t, err)
 
-	// 	res, err := client.ApplicationPackages.ShowByID(ctx, id)
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, comment, res.Comment)
+		res, err := client.ApplicationPackages.ShowByID(ctx, id)
+		require.NoError(t, err)
+		require.Equal(t, comment, res.Comment)
 
-	// 	unset := sdk.NewApplicationPackageUnsetRequest().WithComment(sdk.Bool(true))
-	// 	err = client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithUnset(unset))
-	// 	require.NoError(t, err)
+		unset := sdk.NewApplicationPackageUnsetRequest().WithComment(sdk.Bool(true))
+		err = client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithUnset(unset))
+		require.NoError(t, err)
 
-	// 	res, err = client.ApplicationPackages.ShowByID(ctx, id)
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, "", res.Comment)
-	// })
+		res, err = client.ApplicationPackages.ShowByID(ctx, id)
+		require.NoError(t, err)
+		require.Equal(t, "", res.Comment)
+	})
 
-	// t.Run("alter application package: set distribution", func(t *testing.T) {
-	// 	e := createApplicationPackageHandle(t, client)
-	// 	id := sdk.NewAccountObjectIdentifier(e.Name)
+	t.Run("alter application package: set distribution", func(t *testing.T) {
+		e := createApplicationPackageHandle(t, client)
+		id := sdk.NewAccountObjectIdentifier(e.Name)
 
-	// 	distribution := "EXTERNAL"
-	// 	set := sdk.NewApplicationPackageSetRequest().WithDistribution(&distribution)
-	// 	err := client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithSet(set))
-	// 	require.NoError(t, err)
+		distribution := "EXTERNAL"
+		set := sdk.NewApplicationPackageSetRequest().WithDistribution(&distribution)
+		err := client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithSet(set))
+		require.NoError(t, err)
 
-	// 	res, err := client.ApplicationPackages.ShowByID(ctx, id)
-	// 	require.NoError(t, err)
-	// 	require.Equal(t, distribution, res.Distribution)
-	// })
+		res, err := client.ApplicationPackages.ShowByID(ctx, id)
+		require.NoError(t, err)
+		require.Equal(t, distribution, res.Distribution)
+	})
 
 	t.Run("show application package: without like", func(t *testing.T) {
 		e := createApplicationPackageHandle(t, client)
