@@ -69,7 +69,7 @@ password='%s'
 		})
 		require.NoError(t, err)
 		encoded := base64.StdEncoding.EncodeToString(publicKey)
-		options := sdk.AlterUserOptions{
+		setOptions := sdk.AlterUserOptions{
 			Set: &sdk.UserSet{
 				ObjectProperties: &sdk.UserObjectProperties{
 					RSAPublicKey: sdk.String(encoded),
@@ -77,7 +77,7 @@ password='%s'
 			},
 		}
 		id := sdk.NewAccountObjectIdentifier(user)
-		err = c1.Users.Alter(context.Background(), id, &options)
+		err = c1.Users.Alter(context.Background(), id, &setOptions)
 		require.NoError(t, err)
 
 		u, err := c1.Users.Describe(context.Background(), id)
@@ -92,5 +92,19 @@ password='%s'
 		})
 		require.NoError(t, err)
 		require.NoError(t, c2.Ping())
+
+		unsetOptions := sdk.AlterUserOptions{
+			Unset: &sdk.UserUnset{
+				ObjectProperties: &sdk.UserObjectPropertiesUnset{
+					RSAPublicKey: sdk.Bool(true),
+				},
+			},
+		}
+		err = c1.Users.Alter(context.Background(), id, &unsetOptions)
+		require.NoError(t, err)
+
+		u, err = c1.Users.Describe(context.Background(), id)
+		require.NoError(t, err)
+		require.Equal(t, "", u.RsaPublicKey.Value)
 	})
 }
