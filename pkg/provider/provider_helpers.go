@@ -99,7 +99,7 @@ type GetRefreshTokenResponseBody struct {
 }
 
 func GetAccessTokenWithRefreshToken(
-	tokenURL string,
+	tokenEndpoint string,
 	clientID string,
 	clientSecret string,
 	refreshToken string,
@@ -107,7 +107,7 @@ func GetAccessTokenWithRefreshToken(
 	v := url.Values{}
 	v.Set("grant_type", "refresh_token")
 	v.Set("refresh_token", refreshToken)
-	req, err := http.NewRequest("POST", tokenURL, strings.NewReader(v.Encode()))
+	req, err := http.NewRequest("POST", tokenEndpoint, strings.NewReader(v.Encode()))
 	if err != nil {
 		return "", fmt.Errorf("new http request: %w", err)
 	}
