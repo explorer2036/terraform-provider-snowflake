@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"net/url"
 	"os"
@@ -94,47 +95,63 @@ func parsePrivateKey(privateKeyBytes []byte, passhrase []byte) (*rsa.PrivateKey,
 type GetRefreshTokenResponseBody struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
+	ExpiresIn   int64  `json:"expires_in"`
 }
 
 func GetAccessTokenWithRefreshToken(
-	tokenEndPoint string,
+	tokenURL string,
 	clientID string,
 	clientSecret string,
 	refreshToken string,
-	redirectURI string,
 ) (string, error) {
-	client := &http.Client{}
+	v := url.Values{}
+	v.Set("grant_type", "refresh_token")
+	v.Set("refresh_token", refreshToken)
+	req, err := http.NewRequest("POST", tokenURL, strings.NewReader(v.Encode()))
+	if err != nil {
+		return "", fmt.Errorf("new http request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(url.QueryEscape(clientID), url.QueryEscape(clientSecret))
 
-	data := url.Values{}
-	data.Set("grant_type", "refresh_token")
-	data.Set("refresh_token", refreshToken)
-	data.Set("redirect_uri", redirectURI)
-	body := strings.NewReader(data.Encode())
-
-	request, err := http.NewRequest("POST", tokenEndPoint, body)
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("request to the endpoint could not be completed %w", err)
+		return "", fmt.Errorf("do http request: %w", err)
 	}
-	request.SetBasicAuth(clientID, clientSecret)
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-
-	response, err := client.Do(request)
+	defer res.Body.Close()
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", fmt.Errorf("response status returned an err = %w", err)
+		return "", fmt.Errorf("read response body: %w", err)
 	}
-	if response.StatusCode != 200 {
-		return "", fmt.Errorf("response status code: %s: %s err = %w", strconv.Itoa(response.StatusCode), http.StatusText(response.StatusCode), err)
+	if res.StatusCode != 200 {
+		return "", fmt.Errorf("http response error: %s, %s", res.Status, body)
 	}
-	defer response.Body.Close()
-	dat, err := io.ReadAll(response.Body)
+	contentType, _, err := mime.ParseMediaType(res.Header.Get("Content-Type"))
 	if err != nil {
-		return "", fmt.Errorf("response body was not able to be parsed err = %w", err)
+		return "", fmt.Errorf("parse content type: %w", err)
 	}
-	var result GetRefreshTokenResponseBody
-	err = json.Unmarshal(dat, &result)
-	if err != nil {
-		return "", fmt.Errorf("error parsing JSON from Snowflake err = %w", err)
+	var token GetRefreshTokenResponseBody
+	switch contentType {
+	case "application/x-www-form-urlencoded", "text/plain":
+		vals, err := url.ParseQuery(string(body))
+		if err != nil {
+			return "", fmt.Errorf("parse query: %w", err)
+		}
+		token.AccessToken = vals.Get("access_token")
+		token.TokenType = vals.Get("token_type")
+		if e := vals.Get("expires_in"); e != "" {
+			expires, _ := strconv.ParseInt(e, 10, 64)
+			if expires != 0 {
+				token.ExpiresIn = expires
+			}
+		}
+	default:
+		if err := json.Unmarshal(body, &token); err != nil {
+			return "", fmt.Errorf("unmarshal json: %w", err)
+		}
 	}
-	return result.AccessToken, nil
+	if token.AccessToken == "" {
+		return "", fmt.Errorf("oauth2: server response missing access_token")
+	}
+	return token.AccessToken, nil
 }

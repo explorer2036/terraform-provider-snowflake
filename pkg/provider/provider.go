@@ -690,8 +690,7 @@ func ConfigureProvider(s *schema.ResourceData) (interface{}, error) {
 			refreshToken := tokenAccessor["refresh_token"].(string)
 			clientID := tokenAccessor["client_id"].(string)
 			clientSecret := tokenAccessor["client_secret"].(string)
-			redirectURI := tokenAccessor["redirect_uri"].(string)
-			accessToken, err := GetAccessTokenWithRefreshToken(tokenEndpoint, clientID, clientSecret, refreshToken, redirectURI)
+			accessToken, err := GetAccessTokenWithRefreshToken(tokenEndpoint, clientID, clientSecret, refreshToken)
 			if err != nil {
 				return nil, fmt.Errorf("could not retrieve access token from refresh token")
 			}
