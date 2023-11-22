@@ -79,7 +79,7 @@ var TasksDef = g.NewInterface(
 			OptionalSQL("COPY GRANTS").
 			OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
 			ListAssignment("AFTER", "SchemaObjectIdentifier", g.ParameterOptions().NoEquals()).
-			WithTags().
+			OptionalTags().
 			OptionalTextAssignment("WHEN", g.ParameterOptions().NoQuotes().NoEquals()).
 			SQL("AS").
 			Text("sql", g.KeywordOptions().NoQuotes().Required()).
@@ -143,8 +143,8 @@ var TasksDef = g.NewInterface(
 					WithValidation(g.AtLeastOneValueSet, "Warehouse", "Schedule", "Config", "AllowOverlappingExecution", "UserTaskTimeoutMs", "SuspendTaskAfterNumFailures", "ErrorIntegration", "Comment", "SessionParametersUnset"),
 				g.KeywordOptions().SQL("UNSET"),
 			).
-			SetTags().
-			UnsetTags().
+			OptionalSetTags().
+			OptionalUnsetTags().
 			OptionalTextAssignment("MODIFY AS", g.ParameterOptions().NoQuotes().NoEquals()).
 			OptionalTextAssignment("MODIFY WHEN", g.ParameterOptions().NoQuotes().NoEquals()).
 			WithValidation(g.ValidIdentifier, "name").

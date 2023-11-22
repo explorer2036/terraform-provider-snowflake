@@ -22,6 +22,8 @@ var definitionMapping = map[string]*generator.Interface{
 	"tasks_def.go":             sdk.TasksDef,
 	"streams_def.go":           sdk.StreamsDef,
 	"application_roles_def.go": sdk.ApplicationRolesDef,
+	"views_def.go":             sdk.ViewsDef,
+	"stages_def.go":            sdk.StagesDef,
 }
 
 func main() {
