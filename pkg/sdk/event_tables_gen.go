@@ -5,6 +5,7 @@ import "context"
 type EventTables interface {
 	Create(ctx context.Context, request *CreateEventTableRequest) error
 	Show(ctx context.Context, request *ShowEventTableRequest) ([]EventTable, error)
+	Describe(ctx context.Context, id SchemaObjectIdentifier) (*EventTableDetails, error)
 }
 
 // CreateEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-event-table.
@@ -54,4 +55,23 @@ type EventTable struct {
 	Owner         string
 	Comment       string
 	OwnerRoleType string
+}
+
+// DescribeEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/describe-event-table.
+type DescribeEventTableOptions struct {
+	describe   bool                   `ddl:"static" sql:"DESCRIBE"`
+	eventTable bool                   `ddl:"static" sql:"EVENT TABLE"`
+	name       SchemaObjectIdentifier `ddl:"identifier"`
+}
+
+type eventTableDetailsRow struct {
+	Name    string `db:"name"`
+	Kind    string `db:"kind"`
+	Comment string `db:"comment"`
+}
+
+type EventTableDetails struct {
+	Name    string
+	Kind    string
+	Comment string
 }

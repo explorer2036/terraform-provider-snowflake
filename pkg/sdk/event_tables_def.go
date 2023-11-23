@@ -51,4 +51,20 @@ var EventTablesDef = g.NewInterface(
 		OptionalTextAssignment("STARTS WITH", g.ParameterOptions().SingleQuotes().NoEquals()).
 		OptionalNumberAssignment("LIMIT", g.ParameterOptions()).
 		OptionalTextAssignment("FROM", g.ParameterOptions().SingleQuotes().NoEquals()),
+).DescribeOperation(
+	g.DescriptionMappingKindSingleValue,
+	"https://docs.snowflake.com/en/sql-reference/sql/describe-event-table",
+	g.DbStruct("eventTableDetailsRow").
+		Field("name", "string").
+		Field("kind", "string").
+		Field("comment", "string"),
+	g.PlainStruct("EventTableDetails").
+		Field("Name", "string").
+		Field("Kind", "string").
+		Field("Comment", "string"),
+	g.NewQueryStruct("DescribeEventTable").
+		Describe().
+		SQL("EVENT TABLE").
+		Name().
+		WithValidation(g.ValidIdentifier, "name"),
 )

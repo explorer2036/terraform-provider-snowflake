@@ -25,6 +25,17 @@ func (v *eventTables) Show(ctx context.Context, request *ShowEventTableRequest) 
 	return resultList, nil
 }
 
+func (v *eventTables) Describe(ctx context.Context, id SchemaObjectIdentifier) (*EventTableDetails, error) {
+	opts := &DescribeEventTableOptions{
+		name: id,
+	}
+	result, err := validateAndQueryOne[eventTableDetailsRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	return result.convert(), nil
+}
+
 func (r *CreateEventTableRequest) toOpts() *CreateEventTableOptions {
 	opts := &CreateEventTableOptions{
 		OrReplace:                  r.OrReplace,
@@ -57,4 +68,16 @@ func (r *ShowEventTableRequest) toOpts() *ShowEventTableOptions {
 func (r eventTableRow) convert() *EventTable {
 	// TODO: Mapping
 	return &EventTable{}
+}
+
+func (r *DescribeEventTableRequest) toOpts() *DescribeEventTableOptions {
+	opts := &DescribeEventTableOptions{
+		name: r.name,
+	}
+	return opts
+}
+
+func (r eventTableDetailsRow) convert() *EventTableDetails {
+	// TODO: Mapping
+	return &EventTableDetails{}
 }

@@ -3,8 +3,9 @@ package sdk
 //go:generate go run ./dto-builder-generator/main.go
 
 var (
-	_ optionsProvider[CreateEventTableOptions] = new(CreateEventTableRequest)
-	_ optionsProvider[ShowEventTableOptions]   = new(ShowEventTableRequest)
+	_ optionsProvider[CreateEventTableOptions]   = new(CreateEventTableRequest)
+	_ optionsProvider[ShowEventTableOptions]     = new(ShowEventTableRequest)
+	_ optionsProvider[DescribeEventTableOptions] = new(DescribeEventTableRequest)
 )
 
 type CreateEventTableRequest struct {
@@ -28,4 +29,8 @@ type ShowEventTableRequest struct {
 	StartsWith *string
 	Limit      *int
 	From       *string
+}
+
+type DescribeEventTableRequest struct {
+	name SchemaObjectIdentifier // required
 }
