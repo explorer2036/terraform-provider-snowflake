@@ -36,6 +36,11 @@ func (v *eventTables) Describe(ctx context.Context, id SchemaObjectIdentifier) (
 	return result.convert(), nil
 }
 
+func (v *eventTables) Alter(ctx context.Context, request *AlterEventTableRequest) error {
+	opts := request.toOpts()
+	return validateAndExec(v.client, ctx, opts)
+}
+
 func (r *CreateEventTableRequest) toOpts() *CreateEventTableOptions {
 	opts := &CreateEventTableOptions{
 		OrReplace:                  r.OrReplace,
@@ -80,4 +85,62 @@ func (r *DescribeEventTableRequest) toOpts() *DescribeEventTableOptions {
 func (r eventTableDetailsRow) convert() *EventTableDetails {
 	// TODO: Mapping
 	return &EventTableDetails{}
+}
+
+func (r *AlterEventTableRequest) toOpts() *AlterEventTableOptions {
+	opts := &AlterEventTableOptions{
+		IfNotExists: r.IfNotExists,
+		name:        r.name,
+
+		AddRowAccessPolicy: r.AddRowAccessPolicy,
+
+		DropAllRowAccessPolicies: r.DropAllRowAccessPolicies,
+
+		RenameTo:  r.RenameTo,
+		SetTags:   r.SetTags,
+		UnsetTags: r.UnsetTags,
+	}
+	if r.Set != nil {
+		opts.Set = &EventTableSet{
+			DataRetentionTimeInDays:    r.Set.DataRetentionTimeInDays,
+			MaxDataExtensionTimeInDays: r.Set.MaxDataExtensionTimeInDays,
+			ChangeTracking:             r.Set.ChangeTracking,
+			Comment:                    r.Set.Comment,
+		}
+	}
+	if r.Unset != nil {
+		opts.Unset = &EventTableUnset{
+			DataRetentionTimeInDays:    r.Unset.DataRetentionTimeInDays,
+			MaxDataExtensionTimeInDays: r.Unset.MaxDataExtensionTimeInDays,
+			ChangeTracking:             r.Unset.ChangeTracking,
+			Comment:                    r.Unset.Comment,
+		}
+	}
+	if r.DropRowAccessPolicy != nil {
+		opts.DropRowAccessPolicy = &EventTableDropRowAccessPolicy{
+			Name: r.DropRowAccessPolicy.Name,
+		}
+	}
+	if r.ClusteringAction != nil {
+		opts.ClusteringAction = &EventTableClusteringAction{
+			ClusterBy:         r.ClusteringAction.ClusterBy,
+			SuspendRecluster:  r.ClusteringAction.SuspendRecluster,
+			ResumeRecluster:   r.ClusteringAction.ResumeRecluster,
+			DropClusteringKey: r.ClusteringAction.DropClusteringKey,
+		}
+	}
+	if r.SearchOptimizationAction != nil {
+		opts.SearchOptimizationAction = &EventTableSearchOptimizationAction{}
+		if r.SearchOptimizationAction.Add != nil {
+			opts.SearchOptimizationAction.Add = &SearchOptimization{
+				On: r.SearchOptimizationAction.Drop.On,
+			}
+		}
+		if r.SearchOptimizationAction.Drop != nil {
+			opts.SearchOptimizationAction.Drop = &SearchOptimization{
+				On: r.SearchOptimizationAction.Drop.On,
+			}
+		}
+	}
+	return opts
 }

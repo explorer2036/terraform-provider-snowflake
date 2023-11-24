@@ -6,6 +6,7 @@ var (
 	_ optionsProvider[CreateEventTableOptions]   = new(CreateEventTableRequest)
 	_ optionsProvider[ShowEventTableOptions]     = new(ShowEventTableRequest)
 	_ optionsProvider[DescribeEventTableOptions] = new(DescribeEventTableRequest)
+	_ optionsProvider[AlterEventTableOptions]    = new(AlterEventTableRequest)
 )
 
 type CreateEventTableRequest struct {
@@ -33,4 +34,53 @@ type ShowEventTableRequest struct {
 
 type DescribeEventTableRequest struct {
 	name SchemaObjectIdentifier // required
+}
+
+type AlterEventTableRequest struct {
+	IfNotExists              *bool
+	name                     SchemaObjectIdentifier // required
+	Set                      *EventTableSetRequest
+	Unset                    *EventTableUnsetRequest
+	AddRowAccessPolicy       *RowAccessPolicy
+	DropRowAccessPolicy      *EventTableDropRowAccessPolicyRequest
+	DropAllRowAccessPolicies *bool
+	ClusteringAction         *EventTableClusteringActionRequest
+	SearchOptimizationAction *EventTableSearchOptimizationActionRequest
+	RenameTo                 *SchemaObjectIdentifier
+	SetTags                  []TagAssociation   // required
+	UnsetTags                []ObjectIdentifier // required
+}
+
+type EventTableSetRequest struct {
+	DataRetentionTimeInDays    *int
+	MaxDataExtensionTimeInDays *int
+	ChangeTracking             *bool
+	Comment                    *string
+}
+
+type EventTableUnsetRequest struct {
+	DataRetentionTimeInDays    *bool
+	MaxDataExtensionTimeInDays *bool
+	ChangeTracking             *bool
+	Comment                    *bool
+}
+
+type EventTableDropRowAccessPolicyRequest struct {
+	Name SchemaObjectIdentifier
+}
+
+type EventTableClusteringActionRequest struct {
+	ClusterBy         *[]string
+	SuspendRecluster  *bool
+	ResumeRecluster   *bool
+	DropClusteringKey *bool
+}
+
+type EventTableSearchOptimizationActionRequest struct {
+	Add  *SearchOptimizationRequest
+	Drop *SearchOptimizationRequest
+}
+
+type SearchOptimizationRequest struct {
+	On []string
 }
