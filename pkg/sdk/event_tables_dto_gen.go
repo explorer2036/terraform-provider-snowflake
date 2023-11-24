@@ -46,9 +46,9 @@ type AlterEventTableRequest struct {
 	DropAllRowAccessPolicies *bool
 	ClusteringAction         *EventTableClusteringActionRequest
 	SearchOptimizationAction *EventTableSearchOptimizationActionRequest
+	SetTags                  []TagAssociation
+	UnsetTags                []ObjectIdentifier
 	RenameTo                 *SchemaObjectIdentifier
-	SetTags                  []TagAssociation   // required
-	UnsetTags                []ObjectIdentifier // required
 }
 
 type EventTableSetRequest struct {

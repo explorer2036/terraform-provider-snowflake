@@ -90,9 +90,9 @@ type AlterEventTableOptions struct {
 	DropAllRowAccessPolicies *bool                               `ddl:"keyword" sql:"DROP ALL ROW ACCESS POLICIES"`
 	ClusteringAction         *EventTableClusteringAction         `ddl:"keyword"`
 	SearchOptimizationAction *EventTableSearchOptimizationAction `ddl:"keyword"`
+	SetTags                  []TagAssociation                    `ddl:"keyword" sql:"SET TAG"`
+	UnsetTags                []ObjectIdentifier                  `ddl:"keyword" sql:"UNSET TAG"`
 	RenameTo                 *SchemaObjectIdentifier             `ddl:"identifier" sql:"RENAME TO"`
-	SetTags                  []TagAssociation                    `ddl:"keyword"`
-	UnsetTags                []ObjectIdentifier                  `ddl:"keyword"`
 }
 
 type EventTableSet struct {

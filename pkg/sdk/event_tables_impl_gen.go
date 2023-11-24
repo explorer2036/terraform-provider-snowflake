@@ -96,9 +96,9 @@ func (r *AlterEventTableRequest) toOpts() *AlterEventTableOptions {
 
 		DropAllRowAccessPolicies: r.DropAllRowAccessPolicies,
 
-		RenameTo:  r.RenameTo,
 		SetTags:   r.SetTags,
 		UnsetTags: r.UnsetTags,
+		RenameTo:  r.RenameTo,
 	}
 	if r.Set != nil {
 		opts.Set = &EventTableSet{

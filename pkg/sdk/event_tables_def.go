@@ -139,7 +139,8 @@ var EventTablesDef = g.NewInterface(
 			eventTableSearchOptimizationAction,
 			g.KeywordOptions(),
 		).
+		PredefinedQueryStructField("SetTags", "[]TagAssociation", g.KeywordOptions().SQL("SET TAG")).
+		PredefinedQueryStructField("UnsetTags", "[]ObjectIdentifier", g.KeywordOptions().SQL("UNSET TAG")).
 		Identifier("RenameTo", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RENAME TO")).
-		SetTags().UnsetTags().
 		WithValidation(g.ValidIdentifier, "name"),
 )
