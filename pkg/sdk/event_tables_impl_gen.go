@@ -2,6 +2,8 @@ package sdk
 
 import (
 	"context"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
 
 var _ EventTables = (*eventTables)(nil)
@@ -25,10 +27,17 @@ func (v *eventTables) Show(ctx context.Context, request *ShowEventTableRequest) 
 	return resultList, nil
 }
 
-func (v *eventTables) Describe(ctx context.Context, id SchemaObjectIdentifier) (*EventTableDetails, error) {
-	opts := &DescribeEventTableOptions{
-		name: id,
+func (v *eventTables) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*EventTable, error) {
+	request := NewShowEventTableRequest().WithLike(id.Name())
+	functions, err := v.Show(ctx, request)
+	if err != nil {
+		return nil, err
 	}
+	return collections.FindOne(functions, func(r EventTable) bool { return r.Name == id.Name() })
+}
+
+func (v *eventTables) Describe(ctx context.Context, request *DescribeEventTableRequest) (*EventTableDetails, error) {
+	opts := request.toOpts()
 	result, err := validateAndQueryOne[eventTableDetailsRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err
@@ -71,8 +80,16 @@ func (r *ShowEventTableRequest) toOpts() *ShowEventTableOptions {
 }
 
 func (r eventTableRow) convert() *EventTable {
-	// TODO: Mapping
-	return &EventTable{}
+	return &EventTable{
+		CreatedOn:      r.CreatedOn,
+		Name:           r.Name,
+		DatabaseName:   r.DatabaseName,
+		SchemaName:     r.SchemaName,
+		Owner:          r.Owner,
+		Comment:        r.Comment,
+		OwnerRoleType:  r.OwnerRoleType,
+		ChangeTracking: r.ChangeTracking == "ON",
+	}
 }
 
 func (r *DescribeEventTableRequest) toOpts() *DescribeEventTableOptions {
@@ -83,8 +100,11 @@ func (r *DescribeEventTableRequest) toOpts() *DescribeEventTableOptions {
 }
 
 func (r eventTableDetailsRow) convert() *EventTableDetails {
-	// TODO: Mapping
-	return &EventTableDetails{}
+	return &EventTableDetails{
+		Name:    r.Name,
+		Kind:    r.Kind,
+		Comment: r.Comment,
+	}
 }
 
 func (r *AlterEventTableRequest) toOpts() *AlterEventTableOptions {

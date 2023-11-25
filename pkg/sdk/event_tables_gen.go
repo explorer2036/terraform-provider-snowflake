@@ -5,7 +5,8 @@ import "context"
 type EventTables interface {
 	Create(ctx context.Context, request *CreateEventTableRequest) error
 	Show(ctx context.Context, request *ShowEventTableRequest) ([]EventTable, error)
-	Describe(ctx context.Context, id SchemaObjectIdentifier) (*EventTableDetails, error)
+	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*EventTable, error)
+	Describe(ctx context.Context, request *DescribeEventTableRequest) (*EventTableDetails, error)
 	Alter(ctx context.Context, request *AlterEventTableRequest) error
 }
 
@@ -39,23 +40,25 @@ type ShowEventTableOptions struct {
 }
 
 type eventTableRow struct {
-	CreatedOn     string `db:"created_on"`
-	Name          string `db:"name"`
-	DatabaseName  string `db:"database_name"`
-	SchemaName    string `db:"schema_name"`
-	Owner         string `db:"owner"`
-	Comment       string `db:"comment"`
-	OwnerRoleType string `db:"owner_role_type"`
+	CreatedOn      string `db:"created_on"`
+	Name           string `db:"name"`
+	DatabaseName   string `db:"database_name"`
+	SchemaName     string `db:"schema_name"`
+	Owner          string `db:"owner"`
+	Comment        string `db:"comment"`
+	OwnerRoleType  string `db:"owner_role_type"`
+	ChangeTracking string `db:"change_tracking"`
 }
 
 type EventTable struct {
-	CreatedOn     string
-	Name          string
-	DatabaseName  string
-	SchemaName    string
-	Owner         string
-	Comment       string
-	OwnerRoleType string
+	CreatedOn      string
+	Name           string
+	DatabaseName   string
+	SchemaName     string
+	Owner          string
+	Comment        string
+	OwnerRoleType  string
+	ChangeTracking bool
 }
 
 // DescribeEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/describe-event-table.
@@ -80,7 +83,7 @@ type EventTableDetails struct {
 // AlterEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-event-table.
 type AlterEventTableOptions struct {
 	alter                    bool                                `ddl:"static" sql:"ALTER"`
-	eventTable               bool                                `ddl:"static" sql:"EVENT TABLE"`
+	eventTable               bool                                `ddl:"static" sql:"TABLE"`
 	IfNotExists              *bool                               `ddl:"keyword" sql:"IF NOT EXISTS"`
 	name                     SchemaObjectIdentifier              `ddl:"identifier"`
 	Set                      *EventTableSet                      `ddl:"keyword" sql:"SET"`

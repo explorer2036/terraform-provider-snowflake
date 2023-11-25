@@ -57,6 +57,7 @@ type Client struct {
 	Users            Users
 	Views            Views
 	Warehouses       Warehouses
+	EventTables      EventTables
 }
 
 func (c *Client) GetAccountLocator() string {
@@ -186,6 +187,7 @@ func (c *Client) initialize() {
 	c.Users = &users{client: c}
 	c.Views = &views{client: c}
 	c.Warehouses = &warehouses{client: c}
+	c.EventTables = &eventTables{client: c}
 }
 
 func (c *Client) TraceLogs() []string {

@@ -72,7 +72,8 @@ var EventTablesDef = g.NewInterface(
 		Field("schema_name", "string").
 		Field("owner", "string").
 		Field("comment", "string").
-		Field("owner_role_type", "string"),
+		Field("owner_role_type", "string").
+		Field("change_tracking", "string"),
 	g.PlainStruct("EventTable").
 		Field("CreatedOn", "string").
 		Field("Name", "string").
@@ -80,7 +81,8 @@ var EventTablesDef = g.NewInterface(
 		Field("SchemaName", "string").
 		Field("Owner", "string").
 		Field("Comment", "string").
-		Field("OwnerRoleType", "string"),
+		Field("OwnerRoleType", "string").
+		Field("ChangeTracking", "bool"),
 	g.NewQueryStruct("ShowFunctions").
 		Show().
 		SQL("EVENT TABLES").
@@ -109,7 +111,7 @@ var EventTablesDef = g.NewInterface(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-event-table",
 	g.NewQueryStruct("AlterEventTable").
 		Alter().
-		SQL("EVENT TABLE").
+		SQL("TABLE").
 		IfNotExists().
 		Name().
 		OptionalQueryStructField(
