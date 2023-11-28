@@ -99,6 +99,24 @@ func NewDescribeEventTableRequest(
 	return &s
 }
 
+func NewDropEventTableRequest(
+	name SchemaObjectIdentifier,
+) *DropEventTableRequest {
+	s := DropEventTableRequest{}
+	s.name = name
+	return &s
+}
+
+func (s *DropEventTableRequest) WithIfExists(IfExists *bool) *DropEventTableRequest {
+	s.IfExists = IfExists
+	return s
+}
+
+func (s *DropEventTableRequest) WithRestrict(Restrict *bool) *DropEventTableRequest {
+	s.Restrict = Restrict
+	return s
+}
+
 func NewAlterEventTableRequest(
 	name SchemaObjectIdentifier,
 ) *AlterEventTableRequest {

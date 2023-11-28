@@ -6,6 +6,7 @@ var (
 	_ optionsProvider[CreateEventTableOptions]   = new(CreateEventTableRequest)
 	_ optionsProvider[ShowEventTableOptions]     = new(ShowEventTableRequest)
 	_ optionsProvider[DescribeEventTableOptions] = new(DescribeEventTableRequest)
+	_ optionsProvider[DropEventTableOptions]     = new(DropEventTableRequest)
 	_ optionsProvider[AlterEventTableOptions]    = new(AlterEventTableRequest)
 )
 
@@ -33,6 +34,12 @@ type ShowEventTableRequest struct {
 
 type DescribeEventTableRequest struct {
 	name SchemaObjectIdentifier // required
+}
+
+type DropEventTableRequest struct {
+	IfExists *bool
+	name     SchemaObjectIdentifier // required
+	Restrict *bool
 }
 
 type AlterEventTableRequest struct {

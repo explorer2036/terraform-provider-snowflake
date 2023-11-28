@@ -11,6 +11,7 @@ type EventTables interface {
 	Show(ctx context.Context, request *ShowEventTableRequest) ([]EventTable, error)
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*EventTable, error)
 	Describe(ctx context.Context, id SchemaObjectIdentifier) (*EventTableDetails, error)
+	Drop(ctx context.Context, request *DropEventTableRequest) error
 	Alter(ctx context.Context, request *AlterEventTableRequest) error
 }
 
@@ -79,6 +80,15 @@ type EventTableDetails struct {
 	Name    string
 	Kind    string
 	Comment string
+}
+
+// DropEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-event-table.
+type DropEventTableOptions struct {
+	drop     bool                   `ddl:"static" sql:"DROP"`
+	table    bool                   `ddl:"static" sql:"TABLE"`
+	IfExists *bool                  `ddl:"keyword" sql:"IF EXISTS"`
+	name     SchemaObjectIdentifier `ddl:"identifier"`
+	Restrict *bool                  `ddl:"keyword" sql:"RESTRICT"`
 }
 
 // AlterEventTableOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-event-table.

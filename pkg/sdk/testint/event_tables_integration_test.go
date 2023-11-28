@@ -2,7 +2,6 @@ package testint
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
@@ -31,7 +30,7 @@ func TestInt_EventTables(t *testing.T) {
 	cleanupTableHandle := func(t *testing.T, id sdk.SchemaObjectIdentifier) func() {
 		t.Helper()
 		return func() {
-			_, err := client.ExecForTests(ctx, fmt.Sprintf("DROP TABLE \"%s\".\"%s\".\"%s\"", id.DatabaseName(), id.SchemaName(), id.Name()))
+			err := client.EventTables.Drop(ctx, sdk.NewDropEventTableRequest(id).WithIfExists(sdk.Bool(true)))
 			require.NoError(t, err)
 		}
 	}

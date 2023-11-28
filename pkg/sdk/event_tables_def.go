@@ -117,6 +117,15 @@ var EventTablesDef = g.NewInterface(
 		SQL("EVENT TABLE").
 		Name().
 		WithValidation(g.ValidIdentifier, "name"),
+).DropOperation(
+	"https://docs.snowflake.com/en/sql-reference/sql/drop-event-table",
+	g.NewQueryStruct("DropEventTable").
+		Drop().
+		SQL("TABLE").
+		IfExists().
+		Name().
+		OptionalSQL("RESTRICT"). // CASCADE or RESTRICT, and CASCADE for Default
+		WithValidation(g.ValidIdentifier, "name"),
 ).AlterOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-event-table",
 	g.NewQueryStruct("AlterEventTable").

@@ -47,6 +47,11 @@ func (v *eventTables) Describe(ctx context.Context, id SchemaObjectIdentifier) (
 	return result.convert(), nil
 }
 
+func (v *eventTables) Drop(ctx context.Context, request *DropEventTableRequest) error {
+	opts := request.toOpts()
+	return validateAndExec(v.client, ctx, opts)
+}
+
 func (v *eventTables) Alter(ctx context.Context, request *AlterEventTableRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
@@ -112,6 +117,15 @@ func (r eventTableDetailsRow) convert() *EventTableDetails {
 		Kind:    r.Kind,
 		Comment: r.Comment,
 	}
+}
+
+func (r *DropEventTableRequest) toOpts() *DropEventTableOptions {
+	opts := &DropEventTableOptions{
+		IfExists: r.IfExists,
+		name:     r.name,
+		Restrict: r.Restrict,
+	}
+	return opts
 }
 
 func (r *AlterEventTableRequest) toOpts() *AlterEventTableOptions {
