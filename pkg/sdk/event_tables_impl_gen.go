@@ -143,13 +143,13 @@ func (r *AlterEventTableRequest) toOpts() *AlterEventTableOptions {
 	}
 	if r.AddRowAccessPolicy != nil {
 		opts.AddRowAccessPolicy = &EventTableAddRowAccessPolicy{
-			RowAccessPolicy: r.DropAndAddRowAccessPolicy.Add.RowAccessPolicy,
-			On:              r.DropAndAddRowAccessPolicy.Add.On,
+			RowAccessPolicy: r.AddRowAccessPolicy.RowAccessPolicy,
+			On:              r.AddRowAccessPolicy.On,
 		}
 	}
 	if r.DropRowAccessPolicy != nil {
 		opts.DropRowAccessPolicy = &EventTableDropRowAccessPolicy{
-			RowAccessPolicy: r.DropAndAddRowAccessPolicy.Drop.RowAccessPolicy,
+			RowAccessPolicy: r.DropRowAccessPolicy.RowAccessPolicy,
 		}
 	}
 	if r.DropAndAddRowAccessPolicy != nil {
