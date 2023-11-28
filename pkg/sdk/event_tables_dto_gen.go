@@ -28,8 +28,7 @@ type ShowEventTableRequest struct {
 	Like       *Like
 	In         *In
 	StartsWith *string
-	Limit      *int
-	From       *string
+	Limit      *LimitFrom
 }
 
 type DescribeEventTableRequest struct {
@@ -37,18 +36,19 @@ type DescribeEventTableRequest struct {
 }
 
 type AlterEventTableRequest struct {
-	IfNotExists              *bool
-	name                     SchemaObjectIdentifier // required
-	Set                      *EventTableSetRequest
-	Unset                    *EventTableUnsetRequest
-	AddRowAccessPolicy       *RowAccessPolicy
-	DropRowAccessPolicy      *EventTableDropRowAccessPolicyRequest
-	DropAllRowAccessPolicies *bool
-	ClusteringAction         *EventTableClusteringActionRequest
-	SearchOptimizationAction *EventTableSearchOptimizationActionRequest
-	SetTags                  []TagAssociation
-	UnsetTags                []ObjectIdentifier
-	RenameTo                 *SchemaObjectIdentifier
+	IfNotExists               *bool
+	name                      SchemaObjectIdentifier // required
+	Set                       *EventTableSetRequest
+	Unset                     *EventTableUnsetRequest
+	AddRowAccessPolicy        *EventTableAddRowAccessPolicyRequest
+	DropRowAccessPolicy       *EventTableDropRowAccessPolicyRequest
+	DropAndAddRowAccessPolicy *EventTableDropAndAddRowAccessPolicyRequest
+	DropAllRowAccessPolicies  *bool
+	ClusteringAction          *EventTableClusteringActionRequest
+	SearchOptimizationAction  *EventTableSearchOptimizationActionRequest
+	SetTags                   []TagAssociation
+	UnsetTags                 []ObjectIdentifier
+	RenameTo                  *SchemaObjectIdentifier
 }
 
 type EventTableSetRequest struct {
@@ -65,8 +65,18 @@ type EventTableUnsetRequest struct {
 	Comment                    *bool
 }
 
+type EventTableAddRowAccessPolicyRequest struct {
+	RowAccessPolicy SchemaObjectIdentifier // required
+	On              []string               // required
+}
+
 type EventTableDropRowAccessPolicyRequest struct {
-	Name SchemaObjectIdentifier
+	RowAccessPolicy SchemaObjectIdentifier // required
+}
+
+type EventTableDropAndAddRowAccessPolicyRequest struct {
+	Drop EventTableDropRowAccessPolicyRequest // required
+	Add  EventTableAddRowAccessPolicyRequest  // required
 }
 
 type EventTableClusteringActionRequest struct {

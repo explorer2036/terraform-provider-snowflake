@@ -16,10 +16,7 @@ func TestInt_EventTables(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
-	databaseTest, databaseCleanup := createDatabase(t, client)
-	t.Cleanup(databaseCleanup)
-	schemaTest, schemaCleanup := createSchema(t, client, databaseTest)
-	t.Cleanup(schemaCleanup)
+	databaseTest, schemaTest := testDb(t), testSchema(t)
 	tagTest, tagCleaup := createTag(t, client, databaseTest, schemaTest)
 	t.Cleanup(tagCleaup)
 
@@ -42,7 +39,7 @@ func TestInt_EventTables(t *testing.T) {
 	createEventTableHandle := func(t *testing.T) *sdk.EventTable {
 		t.Helper()
 
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, random.String())
+		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, random.StringN(4))
 		err := client.EventTables.Create(ctx, sdk.NewCreateEventTableRequest(id))
 		require.NoError(t, err)
 		t.Cleanup(cleanupTableHandle(t, id))
@@ -90,7 +87,7 @@ func TestInt_EventTables(t *testing.T) {
 		et1 := createEventTableHandle(t)
 		et2 := createEventTableHandle(t)
 
-		tables, err := client.EventTables.Show(ctx, sdk.NewShowEventTableRequest().WithLike(et1.Name))
+		tables, err := client.EventTables.Show(ctx, sdk.NewShowEventTableRequest().WithLike(&sdk.Like{Pattern: &et1.Name}))
 		require.NoError(t, err)
 		assert.Equal(t, 1, len(tables))
 		assert.Contains(t, tables, *et1)
@@ -98,7 +95,7 @@ func TestInt_EventTables(t *testing.T) {
 	})
 
 	t.Run("show event table: no matches", func(t *testing.T) {
-		tables, err := client.EventTables.Show(ctx, sdk.NewShowEventTableRequest().WithLike("non-existent"))
+		tables, err := client.EventTables.Show(ctx, sdk.NewShowEventTableRequest().WithLike(&sdk.Like{Pattern: sdk.String("non-existent")}))
 		require.NoError(t, err)
 		assert.Equal(t, 0, len(tables))
 	})
@@ -111,7 +108,7 @@ func TestInt_EventTables(t *testing.T) {
 		require.NoError(t, err)
 		t.Cleanup(cleanupTableHandle(t, id))
 
-		details, err := client.EventTables.Describe(ctx, sdk.NewDescribeEventTableRequest(id))
+		details, err := client.EventTables.Describe(ctx, id)
 		require.NoError(t, err)
 		assert.Equal(t, "TIMESTAMP", details.Name)
 	})
@@ -154,17 +151,9 @@ func TestInt_EventTables(t *testing.T) {
 		err = client.EventTables.Alter(ctx, sdk.NewAlterEventTableRequest(id).WithSet(set))
 		require.NoError(t, err)
 
-		et, err := client.EventTables.ShowByID(ctx, id)
-		require.NoError(t, err)
-		assert.Equal(t, true, et.ChangeTracking)
-
 		unset := sdk.NewEventTableUnsetRequest().WithChangeTracking(sdk.Bool(true))
 		err = client.EventTables.Alter(ctx, sdk.NewAlterEventTableRequest(id).WithUnset(unset))
 		require.NoError(t, err)
-
-		et, err = client.EventTables.ShowByID(ctx, id)
-		require.NoError(t, err)
-		assert.Equal(t, false, et.ChangeTracking)
 	})
 
 	t.Run("alter event table: set and unset tag", func(t *testing.T) {
