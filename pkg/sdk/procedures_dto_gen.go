@@ -20,23 +20,24 @@ type CreateProcedureForJavaProcedureRequest struct {
 	name                       SchemaObjectIdentifier // required
 	Arguments                  []ProcedureArgumentRequest
 	CopyGrants                 *bool
-	Returns                    *ProcedureReturnsRequest
-	RuntimeVersion             *string
-	Packages                   []ProcedurePackageRequest
+	Returns                    ProcedureReturnsRequest
+	RuntimeVersion             string                    // required
+	Packages                   []ProcedurePackageRequest // required
 	Imports                    []ProcedureImportRequest
-	Handler                    string
+	Handler                    string // required
 	ExternalAccessIntegrations []AccountObjectIdentifier
-	Secrets                    []ProcedureSecretRequest
+	Secrets                    []Secret
 	TargetPath                 *string
-	NullInputBehavior          *ProcedureNullInputBehavior
+	NullInputBehavior          *NullInputBehavior
 	Comment                    *string
-	ExecuteAs                  *ProcedureExecuteAs
+	ExecuteAs                  *ExecuteAs
 	ProcedureDefinition        *string
 }
 
 type ProcedureArgumentRequest struct {
-	ArgName     string
-	ArgDataType DataType
+	ArgName      string   // required
+	ArgDataType  DataType // required
+	DefaultValue *string
 }
 
 type ProcedureReturnsRequest struct {
@@ -45,7 +46,7 @@ type ProcedureReturnsRequest struct {
 }
 
 type ProcedureReturnsResultDataTypeRequest struct {
-	ResultDataType DataType
+	ResultDataType DataType // required
 	Null           *bool
 	NotNull        *bool
 }
@@ -56,7 +57,7 @@ type ProcedureReturnsTableRequest struct {
 
 type ProcedureColumnRequest struct {
 	ColumnName     string
-	ColumnDataType DataType
+	ColumnDataType DataType // required
 }
 
 type ProcedurePackageRequest struct {
@@ -67,26 +68,21 @@ type ProcedureImportRequest struct {
 	Import string
 }
 
-type ProcedureSecretRequest struct {
-	SecretVariableName string
-	SecretName         string
-}
-
 type CreateProcedureForJavaScriptProcedureRequest struct {
 	OrReplace           *bool
 	Secure              *bool
 	name                SchemaObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	CopyGrants          *bool
-	Returns             *ProcedureReturns2Request
-	NullInputBehavior   *ProcedureNullInputBehavior
+	Returns             *ProcedureJavascriptReturnsRequest
+	NullInputBehavior   *NullInputBehavior
 	Comment             *string
-	ExecuteAs           *ProcedureExecuteAs
-	ProcedureDefinition *string
+	ExecuteAs           *ExecuteAs
+	ProcedureDefinition string
 }
 
-type ProcedureReturns2Request struct {
-	ResultDataType DataType
+type ProcedureJavascriptReturnsRequest struct {
+	ResultDataType DataType // required
 	NotNull        *bool
 }
 
@@ -100,12 +96,12 @@ type CreateProcedureForPythonProcedureRequest struct {
 	RuntimeVersion             *string
 	Packages                   []ProcedurePackageRequest
 	Imports                    []ProcedureImportRequest
-	Handler                    string
+	Handler                    string // required
 	ExternalAccessIntegrations []AccountObjectIdentifier
-	Secrets                    []ProcedureSecretRequest
-	NullInputBehavior          *ProcedureNullInputBehavior
+	Secrets                    []Secret
+	NullInputBehavior          *NullInputBehavior
 	Comment                    *string
-	ExecuteAs                  *ProcedureExecuteAs
+	ExecuteAs                  *ExecuteAs
 	ProcedureDefinition        *string
 }
 
@@ -119,11 +115,11 @@ type CreateProcedureForScalaProcedureRequest struct {
 	RuntimeVersion      *string
 	Packages            []ProcedurePackageRequest
 	Imports             []ProcedureImportRequest
-	Handler             string
+	Handler             string // required
 	TargetPath          *string
-	NullInputBehavior   *ProcedureNullInputBehavior
+	NullInputBehavior   *NullInputBehavior
 	Comment             *string
-	ExecuteAs           *ProcedureExecuteAs
+	ExecuteAs           *ExecuteAs
 	ProcedureDefinition *string
 }
 
@@ -133,49 +129,37 @@ type CreateProcedureForSQLProcedureRequest struct {
 	name                SchemaObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	CopyGrants          *bool
-	Returns             *ProcedureReturns3Request
-	NullInputBehavior   *ProcedureNullInputBehavior
+	Returns             *ProcedureSQLReturnsRequest
+	NullInputBehavior   *NullInputBehavior
 	Comment             *string
-	ExecuteAs           *ProcedureExecuteAs
-	ProcedureDefinition *string
+	ExecuteAs           *ExecuteAs
+	ProcedureDefinition string
 }
 
-type ProcedureReturns3Request struct {
+type ProcedureSQLReturnsRequest struct {
 	ResultDataType *ProcedureReturnsResultDataTypeRequest
 	Table          *ProcedureReturnsTableRequest
 	NotNull        *bool
 }
 
 type AlterProcedureRequest struct {
-	IfExists      *bool
-	name          SchemaObjectIdentifier // required
-	ArgumentTypes []ProcedureArgumentTypeRequest
-	Set           *ProcedureSetRequest
-	Unset         *ProcedureUnsetRequest
-	ExecuteAs     *ProcedureExecuteAs
-	RenameTo      *SchemaObjectIdentifier
-	SetTags       []TagAssociation
-	UnsetTags     []ObjectIdentifier
-}
-
-type ProcedureArgumentTypeRequest struct {
-	ArgDataType DataType
-}
-
-type ProcedureSetRequest struct {
-	LogLevel   *string
-	TraceLevel *string
-	Comment    *string
-}
-
-type ProcedureUnsetRequest struct {
-	Comment *bool
+	IfExists          *bool
+	name              SchemaObjectIdentifier // required
+	ArgumentDataTypes []DataType             // required
+	RenameTo          *SchemaObjectIdentifier
+	SetComment        *string
+	SetLogLevel       *string
+	SetTraceLevel     *string
+	UnsetComment      *bool
+	SetTags           []TagAssociation
+	UnsetTags         []ObjectIdentifier
+	ExecuteAs         *ExecuteAs
 }
 
 type DropProcedureRequest struct {
-	IfExists      *bool
-	name          SchemaObjectIdentifier // required
-	ArgumentTypes []ProcedureArgumentTypeRequest
+	IfExists          *bool
+	name              SchemaObjectIdentifier // required
+	ArgumentDataTypes []DataType             // required
 }
 
 type ShowProcedureRequest struct {
@@ -184,6 +168,6 @@ type ShowProcedureRequest struct {
 }
 
 type DescribeProcedureRequest struct {
-	name          SchemaObjectIdentifier // required
-	ArgumentTypes []ProcedureArgumentTypeRequest
+	name              SchemaObjectIdentifier // required
+	ArgumentDataTypes []DataType             // required
 }

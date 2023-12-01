@@ -5,25 +5,19 @@ import g "github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/poc/gen
 //go:generate go run ./poc/main.go
 
 var procedureArgument = g.NewQueryStruct("ProcedureArgument").
-	Text("ArgName", g.KeywordOptions().NoQuotes()).
-	Text("ArgDataType", g.KeywordOptions().NoQuotes())
-
-var procedureArgumentType = g.NewQueryStruct("ProcedureArgumentType").
-	Text("ArgDataType", g.KeywordOptions().NoQuotes())
+	Text("ArgName", g.KeywordOptions().NoQuotes().Required()).
+	PredefinedQueryStructField("ArgDataType", "DataType", g.KeywordOptions().NoQuotes().Required()).
+	PredefinedQueryStructField("DefaultValue", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("DEFAULT"))
 
 var procedureColumn = g.NewQueryStruct("ProcedureColumn").
 	Text("ColumnName", g.KeywordOptions().NoQuotes()).
-	Text("ColumnDataType", g.KeywordOptions().NoQuotes())
-
-var procedureSecret = g.NewQueryStruct("ProcedureSecret").
-	Text("SecretVariableName", g.KeywordOptions().SingleQuotes()).
-	Text("SecretName", g.KeywordOptions().NoQuotes())
+	PredefinedQueryStructField("ColumnDataType", "DataType", g.KeywordOptions().NoQuotes().Required())
 
 var procedureReturns = g.NewQueryStruct("ProcedureReturns").
 	OptionalQueryStructField(
 		"ResultDataType",
 		g.NewQueryStruct("ProcedureReturnsResultDataType").
-			Text("ResultDataType", g.KeywordOptions()).
+			PredefinedQueryStructField("ResultDataType", "DataType", g.KeywordOptions().NoQuotes().Required()).
 			OptionalSQL("NULL").OptionalSQL("NOT NULL"),
 		g.KeywordOptions(),
 	).
@@ -38,14 +32,15 @@ var procedureReturns = g.NewQueryStruct("ProcedureReturns").
 		g.KeywordOptions().SQL("TABLE"),
 	)
 
-var procedureReturns2 = g.NewQueryStruct("ProcedureReturns2").
-	Text("ResultDataType", g.KeywordOptions()).OptionalSQL("NOT NULL")
+var procedureJavascriptReturns = g.NewQueryStruct("ProcedureJavascriptReturns").
+	PredefinedQueryStructField("ResultDataType", "DataType", g.KeywordOptions().NoQuotes().Required()).
+	OptionalSQL("NOT NULL")
 
-var procedureReturns3 = g.NewQueryStruct("ProcedureReturns3").
+var procedureSQLReturns = g.NewQueryStruct("ProcedureSQLReturns").
 	OptionalQueryStructField(
 		"ResultDataType",
 		g.NewQueryStruct("ProcedureReturnsResultDataType").
-			Text("ResultDataType", g.KeywordOptions()),
+			PredefinedQueryStructField("ResultDataType", "DataType", g.KeywordOptions().NoQuotes().Required()),
 		g.KeywordOptions(),
 	).
 	OptionalQueryStructField(
@@ -60,18 +55,9 @@ var procedureReturns3 = g.NewQueryStruct("ProcedureReturns3").
 	).
 	OptionalSQL("NOT NULL")
 
-var procedureSet = g.NewQueryStruct("ProcedureSet").
-	OptionalTextAssignment("LOG_LEVEL", g.ParameterOptions().SingleQuotes()).
-	OptionalTextAssignment("TRACE_LEVEL", g.ParameterOptions().SingleQuotes()).
-	OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes())
-
-var procedureUnset = g.NewQueryStruct("ProcedureUnset").OptionalSQL("COMMENT")
-
 var (
-	procedureStrictOrNot = g.NewQueryStruct("ProcedureStrictOrNot").OptionalSQL("STRICT").OptionalSQL("CALLED ON NULL INPUT")
-	procedureExecuteAs   = g.NewQueryStruct("ProcedureExecuteAs").OptionalSQL("CALLER").OptionalSQL("OWNER")
-	procedureImport      = g.NewQueryStruct("ProcedureImport").Text("Import", g.KeywordOptions().SingleQuotes())
-	procedurePackage     = g.NewQueryStruct("ProcedurePackage").Text("Package", g.KeywordOptions().SingleQuotes())
+	procedureImport  = g.NewQueryStruct("ProcedureImport").Text("Import", g.KeywordOptions().SingleQuotes())
+	procedurePackage = g.NewQueryStruct("ProcedurePackage").Text("Package", g.KeywordOptions().SingleQuotes())
 )
 
 var ProceduresDef = g.NewInterface(
@@ -80,7 +66,7 @@ var ProceduresDef = g.NewInterface(
 	g.KindOfT[SchemaObjectIdentifier](),
 ).CustomOperation(
 	"CreateProcedureForJava",
-	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure",
+	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#java-handler",
 	g.NewQueryStruct("CreateProcedureForJava").
 		Create().
 		OrReplace().
@@ -93,46 +79,35 @@ var ProceduresDef = g.NewInterface(
 			g.ParameterOptions().Parentheses().NoEquals(),
 		).
 		OptionalSQL("COPY GRANTS").
-		OptionalQueryStructField(
+		QueryStructField(
 			"Returns",
 			procedureReturns,
 			g.KeywordOptions().SQL("RETURNS"),
 		).
 		SQL("LANGUAGE JAVA").
-		OptionalTextAssignment("RUNTIME_VERSION", g.ParameterOptions().SingleQuotes()).
+		TextAssignment("RUNTIME_VERSION", g.ParameterOptions().SingleQuotes()).
 		ListQueryStructField(
 			"Packages",
 			procedurePackage,
-			g.ParameterOptions().Parentheses().SQL("PACKAGES"),
+			g.ParameterOptions().Parentheses().SQL("PACKAGES").Required(),
 		).
 		ListQueryStructField(
 			"Imports",
 			procedureImport,
 			g.ParameterOptions().Parentheses().SQL("IMPORTS"),
 		).
-		TextAssignment("HANDLER", g.ParameterOptions().SingleQuotes()).
+		TextAssignment("HANDLER", g.ParameterOptions().SingleQuotes().Required()).
 		ListAssignment("EXTERNAL_ACCESS_INTEGRATIONS", "AccountObjectIdentifier", g.ParameterOptions().Parentheses()).
-		ListQueryStructField(
-			"Secrets",
-			procedureSecret,
-			g.ParameterOptions().Parentheses().SQL("SECRETS"),
-		).
+		ListAssignment("SECRETS", "Secret", g.ParameterOptions().Parentheses()).
 		OptionalTextAssignment("TARGET_PATH", g.ParameterOptions().SingleQuotes()).
-		OptionalQueryStructField(
-			"StrictOrNot",
-			procedureStrictOrNot,
-			g.KeywordOptions(),
-		).
+		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		OptionalQueryStructField(
-			"ExecuteAs",
-			procedureExecuteAs,
-			g.KeywordOptions().SQL("EXECUTE AS"),
-		).
-		OptionalTextAssignment("AS", g.ParameterOptions().NoEquals().SingleQuotes()),
+		PredefinedQueryStructField("ExecuteAs", "*ExecuteAs", g.KeywordOptions()).
+		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")).
+		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
 	"CreateProcedureForJavaScript",
-	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure",
+	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#javascript-handler",
 	g.NewQueryStruct("CreateProcedureForJavaScript").
 		Create().
 		OrReplace().
@@ -147,25 +122,17 @@ var ProceduresDef = g.NewInterface(
 		OptionalSQL("COPY GRANTS").
 		OptionalQueryStructField(
 			"Returns",
-			procedureReturns2,
+			procedureJavascriptReturns,
 			g.KeywordOptions().SQL("RETURNS"),
 		).
 		SQL("LANGUAGE JAVASCRIPT").
-		OptionalQueryStructField(
-			"StrictOrNot",
-			procedureStrictOrNot,
-			g.KeywordOptions(),
-		).
+		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		OptionalQueryStructField(
-			"ExecuteAs",
-			procedureExecuteAs,
-			g.KeywordOptions().SQL("EXECUTE AS"),
-		).
-		OptionalTextAssignment("AS", g.ParameterOptions().NoEquals().SingleQuotes()),
+		PredefinedQueryStructField("ExecuteAs", "*ExecuteAs", g.KeywordOptions()).
+		PredefinedQueryStructField("ProcedureDefinition", "string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")),
 ).CustomOperation(
 	"CreateProcedureForPython",
-	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure",
+	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#python-handler",
 	g.NewQueryStruct("CreateProcedureForPython").
 		Create().
 		OrReplace().
@@ -197,26 +164,14 @@ var ProceduresDef = g.NewInterface(
 		).
 		TextAssignment("HANDLER", g.ParameterOptions().SingleQuotes()).
 		ListAssignment("EXTERNAL_ACCESS_INTEGRATIONS", "AccountObjectIdentifier", g.ParameterOptions().Parentheses()).
-		ListQueryStructField(
-			"Secrets",
-			procedureSecret,
-			g.ParameterOptions().Parentheses().SQL("SECRETS"),
-		).
-		OptionalQueryStructField(
-			"StrictOrNot",
-			procedureStrictOrNot,
-			g.KeywordOptions(),
-		).
+		ListAssignment("SECRETS", "Secret", g.ParameterOptions().Parentheses()).
+		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		OptionalQueryStructField(
-			"ExecuteAs",
-			procedureExecuteAs,
-			g.KeywordOptions().SQL("EXECUTE AS"),
-		).
-		OptionalTextAssignment("AS", g.ParameterOptions().NoEquals().SingleQuotes()),
+		PredefinedQueryStructField("ExecuteAs", "*ExecuteAs", g.KeywordOptions()).
+		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")),
 ).CustomOperation(
 	"CreateProcedureForScala",
-	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure",
+	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#scala-handler",
 	g.NewQueryStruct("CreateProcedureForScala").
 		Create().
 		OrReplace().
@@ -248,21 +203,13 @@ var ProceduresDef = g.NewInterface(
 		).
 		TextAssignment("HANDLER", g.ParameterOptions().SingleQuotes()).
 		OptionalTextAssignment("TARGET_PATH", g.ParameterOptions().SingleQuotes()).
-		OptionalQueryStructField(
-			"StrictOrNot",
-			procedureStrictOrNot,
-			g.KeywordOptions(),
-		).
+		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		OptionalQueryStructField(
-			"ExecuteAs",
-			procedureExecuteAs,
-			g.KeywordOptions().SQL("EXECUTE AS"),
-		).
-		OptionalTextAssignment("AS", g.ParameterOptions().NoEquals().SingleQuotes()),
+		PredefinedQueryStructField("ExecuteAs", "*ExecuteAs", g.KeywordOptions()).
+		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")),
 ).CustomOperation(
 	"CreateProcedureForSQL",
-	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure",
+	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#snowflake-scripting-handler",
 	g.NewQueryStruct("CreateProcedureForSQL").
 		Create().
 		OrReplace().
@@ -277,22 +224,14 @@ var ProceduresDef = g.NewInterface(
 		OptionalSQL("COPY GRANTS").
 		OptionalQueryStructField(
 			"Returns",
-			procedureReturns3,
+			procedureSQLReturns,
 			g.KeywordOptions().SQL("RETURNS"),
 		).
 		SQL("LANGUAGE SQL").
-		OptionalQueryStructField(
-			"StrictOrNot",
-			procedureStrictOrNot,
-			g.KeywordOptions(),
-		).
+		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		OptionalQueryStructField(
-			"ExecuteAs",
-			procedureExecuteAs,
-			g.KeywordOptions().SQL("EXECUTE AS"),
-		).
-		TextAssignment("AS", g.ParameterOptions().NoEquals().SingleQuotes()),
+		PredefinedQueryStructField("ExecuteAs", "*ExecuteAs", g.KeywordOptions()).
+		PredefinedQueryStructField("ProcedureDefinition", "string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")),
 ).AlterOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-procedure",
 	g.NewQueryStruct("AlterProcedure").
@@ -300,27 +239,18 @@ var ProceduresDef = g.NewInterface(
 		SQL("PROCEDURE").
 		IfExists().
 		Name().
-		ListQueryStructField(
-			"ArgumentTypes",
-			procedureArgumentType,
-			g.ParameterOptions().Parentheses().NoEquals()).
-		OptionalQueryStructField(
-			"Set",
-			procedureSet,
-			g.KeywordOptions().SQL("SET"),
-		).
-		OptionalQueryStructField(
-			"Unset",
-			procedureUnset,
-			g.KeywordOptions().SQL("UNSET"),
-		).
-		OptionalQueryStructField(
-			"ExecuteAs",
-			procedureExecuteAs,
-			g.KeywordOptions().SQL("EXECUTE AS"),
-		).
-		Identifier("RenameTo", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RENAME TO")).
-		SetTags().UnsetTags(),
+		PredefinedQueryStructField("ArgumentDataTypes", "[]DataType", g.KeywordOptions().Parentheses().Required()).
+		OptionalIdentifier("RenameTo", g.KindOfT[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RENAME TO")).
+		OptionalTextAssignment("SET COMMENT", g.ParameterOptions().SingleQuotes()).
+		OptionalTextAssignment("SET LOG_LEVEL", g.ParameterOptions().SingleQuotes()).
+		OptionalTextAssignment("SET TRACE_LEVEL", g.ParameterOptions().SingleQuotes()).
+		OptionalSQL("UNSET COMMENT").
+		OptionalSetTags().
+		OptionalUnsetTags().
+		PredefinedQueryStructField("ExecuteAs", "*ExecuteAs", g.KeywordOptions()).
+		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ValidIdentifierIfSet, "RenameTo").
+		WithValidation(g.ExactlyOneValueSet, "RenameTo", "SetComment", "SetLogLevel", "SetTraceLevel", "UnsetComment", "SetTags", "UnsetTags", "ExecuteAs"),
 ).DropOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/drop-procedure",
 	g.NewQueryStruct("DropProcedure").
@@ -328,36 +258,48 @@ var ProceduresDef = g.NewInterface(
 		SQL("PROCEDURE").
 		IfExists().
 		Name().
-		ListQueryStructField(
-			"ArgumentTypes",
-			procedureArgumentType,
-			g.ParameterOptions().Parentheses().NoEquals(),
-		).WithValidation(g.ValidIdentifier, "name"),
+		PredefinedQueryStructField("ArgumentDataTypes", "[]DataType", g.KeywordOptions().Parentheses().Required()).
+		WithValidation(g.ValidIdentifier, "name"),
 ).ShowOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/show-procedures",
 	g.DbStruct("procedureRow").
 		Field("created_on", "string").
 		Field("name", "string").
 		Field("schema_name", "string").
+		Field("is_builtin", "string").
+		Field("is_aggregate", "string").
+		Field("is_ansi", "string").
 		Field("min_num_arguments", "int").
 		Field("max_num_arguments", "int").
 		Field("arguments", "string").
-		Field("is_table_function", "string"),
+		Field("description", "string").
+		Field("catalog_name", "string").
+		Field("is_table_function", "string").
+		Field("valid_for_clustering", "string").
+		Field("is_secure", "string"),
 	g.PlainStruct("Procedure").
 		Field("CreatedOn", "string").
 		Field("Name", "string").
 		Field("SchemaName", "string").
+		Field("IsBuiltin", "bool").
+		Field("IsAggregate", "bool").
+		Field("IsAnsi", "bool").
 		Field("MinNumArguments", "int").
 		Field("MaxNumArguments", "int").
 		Field("Arguments", "string").
-		Field("IsTableFunction", "string"),
+		Field("Description", "string").
+		Field("CatalogName", "string").
+		Field("IsTableFunction", "bool").
+		Field("ValidForClustering", "bool").
+		Field("IsSecure", "bool"),
 	g.NewQueryStruct("ShowProcedures").
 		Show().
 		SQL("PROCEDURES").
-		OptionalLike().OptionalIn(),
-).DescribeOperation(
+		OptionalLike().
+		OptionalIn(), // TODO: 'In' struct for procedures not support keyword "CLASS" now
+).ShowByIdOperation().DescribeOperation(
 	g.DescriptionMappingKindSlice,
-	"https://docs.snowflake.com/en/sql-reference/sql/describe-procedure",
+	"https://docs.snowflake.com/en/sql-reference/sql/desc-procedure",
 	g.DbStruct("procedureDetailRow").
 		Field("property", "string").
 		Field("value", "string"),
@@ -368,9 +310,6 @@ var ProceduresDef = g.NewInterface(
 		Describe().
 		SQL("PROCEDURE").
 		Name().
-		ListQueryStructField(
-			"ArgumentTypes",
-			procedureArgumentType,
-			g.ParameterOptions().Parentheses().NoEquals(),
-		).WithValidation(g.ValidIdentifier, "name"),
+		PredefinedQueryStructField("ArgumentDataTypes", "[]DataType", g.KeywordOptions().Parentheses().Required()).
+		WithValidation(g.ValidIdentifier, "name"),
 )
