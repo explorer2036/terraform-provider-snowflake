@@ -38,7 +38,7 @@ func TestProcedures_CreateProcedureForJava(t *testing.T) {
 			{
 				ArgName:      "name",
 				ArgDataType:  DataTypeVARCHAR,
-				DefaultValue: String("test"),
+				DefaultValue: String("'test'"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
@@ -78,11 +78,9 @@ func TestProcedures_CreateProcedureForJava(t *testing.T) {
 			},
 		}
 		opts.TargetPath = String("@~/testfunc.jar")
-		behavior := NullInputBehaviorStrict
-		opts.NullInputBehavior = &behavior
+		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.Comment = String("test comment")
-		executeAs := ExecuteAsCaller
-		opts.ExecuteAs = &executeAs
+		opts.ExecuteAs = ExecuteAsPointer(ExecuteAsCaller)
 		opts.ProcedureDefinition = String("return id + name;")
 		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (id NUMBER, name VARCHAR DEFAULT 'test') COPY GRANTS RETURNS TABLE (country_code VARCHAR) LANGUAGE JAVA RUNTIME_VERSION = '1.8' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('test_jar.jar') HANDLER = 'TestFunc.echoVarchar' EXTERNAL_ACCESS_INTEGRATIONS = ("ext_integration") SECRETS = ('variable1' = name1, 'variable2' = name2) TARGET_PATH = '@~/testfunc.jar' STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS 'return id + name;'`, id.FullyQualifiedName())
 	})
@@ -114,22 +112,19 @@ func TestProcedures_CreateProcedureForJavaScript(t *testing.T) {
 		opts.Secure = Bool(true)
 		opts.Arguments = []ProcedureArgument{
 			{
-				ArgName:     "d",
-				ArgDataType: "DOUBLE",
+				ArgName:      "d",
+				ArgDataType:  "DOUBLE",
+				DefaultValue: String("1.0"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
-		opts.Returns = &ProcedureJavascriptReturns{
-			ResultDataType: "DOUBLE",
-			NotNull:        Bool(true),
-		}
-		behavior := NullInputBehaviorStrict
-		opts.NullInputBehavior = &behavior
+		opts.ResultDataType = "DOUBLE"
+		opts.NotNull = Bool(true)
+		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.Comment = String("test comment")
-		executeAs := ExecuteAsCaller
-		opts.ExecuteAs = &executeAs
+		opts.ExecuteAs = ExecuteAsPointer(ExecuteAsCaller)
 		opts.ProcedureDefinition = "return 1;"
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (d DOUBLE) COPY GRANTS RETURNS DOUBLE NOT NULL LANGUAGE JAVASCRIPT STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS 'return 1;'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (d DOUBLE DEFAULT 1.0) COPY GRANTS RETURNS DOUBLE NOT NULL LANGUAGE JAVASCRIPT STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS 'return 1;'`, id.FullyQualifiedName())
 	})
 }
 
@@ -159,18 +154,19 @@ func TestProcedures_CreateProcedureForPython(t *testing.T) {
 		opts.Secure = Bool(true)
 		opts.Arguments = []ProcedureArgument{
 			{
-				ArgName:     "i",
-				ArgDataType: "int",
+				ArgName:      "i",
+				ArgDataType:  "int",
+				DefaultValue: String("1"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
-		opts.Returns = &ProcedureReturns{
+		opts.Returns = ProcedureReturns{
 			ResultDataType: &ProcedureReturnsResultDataType{
 				ResultDataType: "VARIANT",
 				Null:           Bool(true),
 			},
 		}
-		opts.RuntimeVersion = String("3.8")
+		opts.RuntimeVersion = "3.8"
 		opts.Packages = []ProcedurePackage{
 			{
 				Package: "numpy",
@@ -201,13 +197,11 @@ func TestProcedures_CreateProcedureForPython(t *testing.T) {
 				Name:         "name2",
 			},
 		}
-		behavior := NullInputBehaviorStrict
-		opts.NullInputBehavior = &behavior
+		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.Comment = String("test comment")
-		executeAs := ExecuteAsCaller
-		opts.ExecuteAs = &executeAs
+		opts.ExecuteAs = ExecuteAsPointer(ExecuteAsCaller)
 		opts.ProcedureDefinition = String("import numpy as np")
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (i int) COPY GRANTS RETURNS VARIANT NULL LANGUAGE PYTHON RUNTIME_VERSION = '3.8' PACKAGES = ('numpy', 'pandas') IMPORTS = ('numpy', 'pandas') HANDLER = 'udf' EXTERNAL_ACCESS_INTEGRATIONS = ("ext_integration") SECRETS = ('variable1' = name1, 'variable2' = name2) STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS 'import numpy as np'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (i int DEFAULT 1) COPY GRANTS RETURNS VARIANT NULL LANGUAGE PYTHON RUNTIME_VERSION = '3.8' PACKAGES = ('numpy', 'pandas') IMPORTS = ('numpy', 'pandas') HANDLER = 'udf' EXTERNAL_ACCESS_INTEGRATIONS = ("ext_integration") SECRETS = ('variable1' = name1, 'variable2' = name2) STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS 'import numpy as np'`, id.FullyQualifiedName())
 	})
 }
 
@@ -237,18 +231,19 @@ func TestProcedures_CreateProcedureForScala(t *testing.T) {
 		opts.Secure = Bool(true)
 		opts.Arguments = []ProcedureArgument{
 			{
-				ArgName:     "x",
-				ArgDataType: "VARCHAR",
+				ArgName:      "x",
+				ArgDataType:  "VARCHAR",
+				DefaultValue: String("'test'"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
-		opts.Returns = &ProcedureReturns{
+		opts.Returns = ProcedureReturns{
 			ResultDataType: &ProcedureReturnsResultDataType{
 				ResultDataType: "VARCHAR",
 				NotNull:        Bool(true),
 			},
 		}
-		opts.RuntimeVersion = String("2.0")
+		opts.RuntimeVersion = "2.0"
 		opts.Packages = []ProcedurePackage{
 			{
 				Package: "com.snowflake:snowpark:1.2.0",
@@ -261,13 +256,11 @@ func TestProcedures_CreateProcedureForScala(t *testing.T) {
 		}
 		opts.Handler = "Echo.echoVarchar"
 		opts.TargetPath = String("@~/testfunc.jar")
-		behavior := NullInputBehaviorStrict
-		opts.NullInputBehavior = &behavior
+		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.Comment = String("test comment")
-		executeAs := ExecuteAsCaller
-		opts.ExecuteAs = &executeAs
+		opts.ExecuteAs = ExecuteAsPointer(ExecuteAsCaller)
 		opts.ProcedureDefinition = String("return x")
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (x VARCHAR) COPY GRANTS RETURNS VARCHAR NOT NULL LANGUAGE SCALA RUNTIME_VERSION = '2.0' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('@udf_libs/echohandler.jar') HANDLER = 'Echo.echoVarchar' TARGET_PATH = '@~/testfunc.jar' STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS 'return x'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (x VARCHAR DEFAULT 'test') COPY GRANTS RETURNS VARCHAR NOT NULL LANGUAGE SCALA RUNTIME_VERSION = '2.0' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('@udf_libs/echohandler.jar') HANDLER = 'Echo.echoVarchar' TARGET_PATH = '@~/testfunc.jar' STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS 'return x'`, id.FullyQualifiedName())
 	})
 }
 
@@ -297,24 +290,23 @@ func TestProcedures_CreateProcedureForSQL(t *testing.T) {
 		opts.Secure = Bool(true)
 		opts.Arguments = []ProcedureArgument{
 			{
-				ArgName:     "message",
-				ArgDataType: "VARCHAR",
+				ArgName:      "message",
+				ArgDataType:  "VARCHAR",
+				DefaultValue: String("'test'"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
-		opts.Returns = &ProcedureSQLReturns{
+		opts.Returns = ProcedureSQLReturns{
 			ResultDataType: &ProcedureReturnsResultDataType{
 				ResultDataType: "VARCHAR",
 			},
 			NotNull: Bool(true),
 		}
-		behavior := NullInputBehaviorStrict
-		opts.NullInputBehavior = &behavior
+		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.Comment = String("test comment")
-		executeAs := ExecuteAsCaller
-		opts.ExecuteAs = &executeAs
+		opts.ExecuteAs = ExecuteAsPointer(ExecuteAsCaller)
 		opts.ProcedureDefinition = "3.141592654::FLOAT"
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (message VARCHAR) COPY GRANTS RETURNS VARCHAR NOT NULL LANGUAGE SQL STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS '3.141592654::FLOAT'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE PROCEDURE %s (message VARCHAR DEFAULT 'test') COPY GRANTS RETURNS VARCHAR NOT NULL LANGUAGE SQL STRICT COMMENT = 'test comment' EXECUTE AS CALLER AS '3.141592654::FLOAT'`, id.FullyQualifiedName())
 	})
 }
 

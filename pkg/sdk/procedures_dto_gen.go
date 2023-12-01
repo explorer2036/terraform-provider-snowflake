@@ -20,7 +20,7 @@ type CreateProcedureForJavaProcedureRequest struct {
 	name                       SchemaObjectIdentifier // required
 	Arguments                  []ProcedureArgumentRequest
 	CopyGrants                 *bool
-	Returns                    ProcedureReturnsRequest
+	Returns                    ProcedureReturnsRequest   // required
 	RuntimeVersion             string                    // required
 	Packages                   []ProcedurePackageRequest // required
 	Imports                    []ProcedureImportRequest
@@ -56,16 +56,16 @@ type ProcedureReturnsTableRequest struct {
 }
 
 type ProcedureColumnRequest struct {
-	ColumnName     string
+	ColumnName     string   // required
 	ColumnDataType DataType // required
 }
 
 type ProcedurePackageRequest struct {
-	Package string
+	Package string // required
 }
 
 type ProcedureImportRequest struct {
-	Import string
+	Import string // required
 }
 
 type CreateProcedureForJavaScriptProcedureRequest struct {
@@ -74,16 +74,12 @@ type CreateProcedureForJavaScriptProcedureRequest struct {
 	name                SchemaObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	CopyGrants          *bool
-	Returns             *ProcedureJavascriptReturnsRequest
+	ResultDataType      DataType // required
+	NotNull             *bool
 	NullInputBehavior   *NullInputBehavior
 	Comment             *string
 	ExecuteAs           *ExecuteAs
-	ProcedureDefinition string
-}
-
-type ProcedureJavascriptReturnsRequest struct {
-	ResultDataType DataType // required
-	NotNull        *bool
+	ProcedureDefinition string // required
 }
 
 type CreateProcedureForPythonProcedureRequest struct {
@@ -92,9 +88,9 @@ type CreateProcedureForPythonProcedureRequest struct {
 	name                       SchemaObjectIdentifier // required
 	Arguments                  []ProcedureArgumentRequest
 	CopyGrants                 *bool
-	Returns                    *ProcedureReturnsRequest
-	RuntimeVersion             *string
-	Packages                   []ProcedurePackageRequest
+	Returns                    ProcedureReturnsRequest   // required
+	RuntimeVersion             string                    // required
+	Packages                   []ProcedurePackageRequest // required
 	Imports                    []ProcedureImportRequest
 	Handler                    string // required
 	ExternalAccessIntegrations []AccountObjectIdentifier
@@ -111,9 +107,9 @@ type CreateProcedureForScalaProcedureRequest struct {
 	name                SchemaObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	CopyGrants          *bool
-	Returns             *ProcedureReturnsRequest
-	RuntimeVersion      *string
-	Packages            []ProcedurePackageRequest
+	Returns             ProcedureReturnsRequest   // required
+	RuntimeVersion      string                    // required
+	Packages            []ProcedurePackageRequest // required
 	Imports             []ProcedureImportRequest
 	Handler             string // required
 	TargetPath          *string
@@ -129,11 +125,11 @@ type CreateProcedureForSQLProcedureRequest struct {
 	name                SchemaObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	CopyGrants          *bool
-	Returns             *ProcedureSQLReturnsRequest
+	Returns             ProcedureSQLReturnsRequest // required
 	NullInputBehavior   *NullInputBehavior
 	Comment             *string
 	ExecuteAs           *ExecuteAs
-	ProcedureDefinition string
+	ProcedureDefinition string // required
 }
 
 type ProcedureSQLReturnsRequest struct {

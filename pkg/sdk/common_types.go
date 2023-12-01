@@ -210,12 +210,20 @@ func (row *propertyRow) toBoolProperty() *BoolProperty {
 
 type ExecuteAs string
 
+func ExecuteAsPointer(v ExecuteAs) *ExecuteAs {
+	return &v
+}
+
 const (
 	ExecuteAsCaller ExecuteAs = "EXECUTE AS CALLER"
 	ExecuteAsOwner  ExecuteAs = "EXECUTE AS OWNER"
 )
 
 type NullInputBehavior string
+
+func NullInputBehaviorPointer(v NullInputBehavior) *NullInputBehavior {
+	return &v
+}
 
 const (
 	NullInputBehaviorCalledOnNullInput NullInputBehavior = "CALLED ON NULL INPUT"

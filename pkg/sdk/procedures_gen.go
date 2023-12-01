@@ -1,6 +1,9 @@
 package sdk
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 type Procedures interface {
 	CreateProcedureForJava(ctx context.Context, request *CreateProcedureForJavaProcedureRequest) error
@@ -42,7 +45,7 @@ type CreateProcedureForJavaProcedureOptions struct {
 type ProcedureArgument struct {
 	ArgName      string   `ddl:"keyword,no_quotes"`
 	ArgDataType  DataType `ddl:"keyword,no_quotes"`
-	DefaultValue *string  `ddl:"parameter,single_quotes,no_equals" sql:"DEFAULT"`
+	DefaultValue *string  `ddl:"parameter,no_equals" sql:"DEFAULT"`
 }
 
 type ProcedureReturns struct {
@@ -75,24 +78,20 @@ type ProcedureImport struct {
 
 // CreateProcedureForJavaScriptProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#javascript-handler.
 type CreateProcedureForJavaScriptProcedureOptions struct {
-	create              bool                        `ddl:"static" sql:"CREATE"`
-	OrReplace           *bool                       `ddl:"keyword" sql:"OR REPLACE"`
-	Secure              *bool                       `ddl:"keyword" sql:"SECURE"`
-	procedure           bool                        `ddl:"static" sql:"PROCEDURE"`
-	name                SchemaObjectIdentifier      `ddl:"identifier"`
-	Arguments           []ProcedureArgument         `ddl:"parameter,parentheses,no_equals"`
-	CopyGrants          *bool                       `ddl:"keyword" sql:"COPY GRANTS"`
-	Returns             *ProcedureJavascriptReturns `ddl:"keyword" sql:"RETURNS"`
-	languageJavascript  bool                        `ddl:"static" sql:"LANGUAGE JAVASCRIPT"`
-	NullInputBehavior   *NullInputBehavior          `ddl:"keyword"`
-	Comment             *string                     `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	ExecuteAs           *ExecuteAs                  `ddl:"keyword"`
-	ProcedureDefinition string                      `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
-}
-
-type ProcedureJavascriptReturns struct {
-	ResultDataType DataType `ddl:"keyword,no_quotes"`
-	NotNull        *bool    `ddl:"keyword" sql:"NOT NULL"`
+	create              bool                   `ddl:"static" sql:"CREATE"`
+	OrReplace           *bool                  `ddl:"keyword" sql:"OR REPLACE"`
+	Secure              *bool                  `ddl:"keyword" sql:"SECURE"`
+	procedure           bool                   `ddl:"static" sql:"PROCEDURE"`
+	name                SchemaObjectIdentifier `ddl:"identifier"`
+	Arguments           []ProcedureArgument    `ddl:"parameter,parentheses,no_equals"`
+	CopyGrants          *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
+	ResultDataType      DataType               `ddl:"parameter,no_equals" sql:"RETURNS"`
+	NotNull             *bool                  `ddl:"keyword" sql:"NOT NULL"`
+	languageJavascript  bool                   `ddl:"static" sql:"LANGUAGE JAVASCRIPT"`
+	NullInputBehavior   *NullInputBehavior     `ddl:"keyword"`
+	Comment             *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
+	ExecuteAs           *ExecuteAs             `ddl:"keyword"`
+	ProcedureDefinition string                 `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
 }
 
 // CreateProcedureForPythonProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#python-handler.
@@ -104,14 +103,14 @@ type CreateProcedureForPythonProcedureOptions struct {
 	name                       SchemaObjectIdentifier    `ddl:"identifier"`
 	Arguments                  []ProcedureArgument       `ddl:"parameter,parentheses,no_equals"`
 	CopyGrants                 *bool                     `ddl:"keyword" sql:"COPY GRANTS"`
-	Returns                    *ProcedureReturns         `ddl:"keyword" sql:"RETURNS"`
+	Returns                    ProcedureReturns          `ddl:"keyword" sql:"RETURNS"`
 	languagePython             bool                      `ddl:"static" sql:"LANGUAGE PYTHON"`
-	RuntimeVersion             *string                   `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
+	RuntimeVersion             string                    `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
 	Packages                   []ProcedurePackage        `ddl:"parameter,parentheses" sql:"PACKAGES"`
 	Imports                    []ProcedureImport         `ddl:"parameter,parentheses" sql:"IMPORTS"`
 	Handler                    string                    `ddl:"parameter,single_quotes" sql:"HANDLER"`
 	ExternalAccessIntegrations []AccountObjectIdentifier `ddl:"parameter,parentheses" sql:"EXTERNAL_ACCESS_INTEGRATIONS"`
-	Secrets                    []Secret                  `ddl:"keyword,parentheses" sql:"SECRETS"`
+	Secrets                    []Secret                  `ddl:"parameter,parentheses" sql:"SECRETS"`
 	NullInputBehavior          *NullInputBehavior        `ddl:"keyword"`
 	Comment                    *string                   `ddl:"parameter,single_quotes" sql:"COMMENT"`
 	ExecuteAs                  *ExecuteAs                `ddl:"keyword"`
@@ -127,9 +126,9 @@ type CreateProcedureForScalaProcedureOptions struct {
 	name                SchemaObjectIdentifier `ddl:"identifier"`
 	Arguments           []ProcedureArgument    `ddl:"parameter,parentheses,no_equals"`
 	CopyGrants          *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
-	Returns             *ProcedureReturns      `ddl:"keyword" sql:"RETURNS"`
+	Returns             ProcedureReturns       `ddl:"keyword" sql:"RETURNS"`
 	languageScala       bool                   `ddl:"static" sql:"LANGUAGE SCALA"`
-	RuntimeVersion      *string                `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
+	RuntimeVersion      string                 `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
 	Packages            []ProcedurePackage     `ddl:"parameter,parentheses" sql:"PACKAGES"`
 	Imports             []ProcedureImport      `ddl:"parameter,parentheses" sql:"IMPORTS"`
 	Handler             string                 `ddl:"parameter,single_quotes" sql:"HANDLER"`
@@ -149,7 +148,7 @@ type CreateProcedureForSQLProcedureOptions struct {
 	name                SchemaObjectIdentifier `ddl:"identifier"`
 	Arguments           []ProcedureArgument    `ddl:"parameter,parentheses,no_equals"`
 	CopyGrants          *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
-	Returns             *ProcedureSQLReturns   `ddl:"keyword" sql:"RETURNS"`
+	Returns             ProcedureSQLReturns    `ddl:"keyword" sql:"RETURNS"`
 	languageSql         bool                   `ddl:"static" sql:"LANGUAGE SQL"`
 	NullInputBehavior   *NullInputBehavior     `ddl:"keyword"`
 	Comment             *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
@@ -175,9 +174,9 @@ type AlterProcedureOptions struct {
 	SetLogLevel       *string                 `ddl:"parameter,single_quotes" sql:"SET LOG_LEVEL"`
 	SetTraceLevel     *string                 `ddl:"parameter,single_quotes" sql:"SET TRACE_LEVEL"`
 	UnsetComment      *bool                   `ddl:"keyword" sql:"UNSET COMMENT"`
-	SetTags           []TagAssociation
-	UnsetTags         []ObjectIdentifier
-	ExecuteAs         *ExecuteAs `ddl:"keyword"`
+	SetTags           []TagAssociation        `ddl:"keyword" sql:"SET TAG"`
+	UnsetTags         []ObjectIdentifier      `ddl:"keyword" sql:"UNSET TAG"`
+	ExecuteAs         *ExecuteAs              `ddl:"keyword"`
 }
 
 // DropProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-procedure.
@@ -198,20 +197,20 @@ type ShowProcedureOptions struct {
 }
 
 type procedureRow struct {
-	CreatedOn          string `db:"created_on"`
-	Name               string `db:"name"`
-	SchemaName         string `db:"schema_name"`
-	IsBuiltin          string `db:"is_builtin"`
-	IsAggregate        string `db:"is_aggregate"`
-	IsAnsi             string `db:"is_ansi"`
-	MinNumArguments    int    `db:"min_num_arguments"`
-	MaxNumArguments    int    `db:"max_num_arguments"`
-	Arguments          string `db:"arguments"`
-	Description        string `db:"description"`
-	CatalogName        string `db:"catalog_name"`
-	IsTableFunction    string `db:"is_table_function"`
-	ValidForClustering string `db:"valid_for_clustering"`
-	IsSecure           string `db:"is_secure"`
+	CreatedOn          string         `db:"created_on"`
+	Name               string         `db:"name"`
+	SchemaName         string         `db:"schema_name"`
+	IsBuiltin          string         `db:"is_builtin"`
+	IsAggregate        string         `db:"is_aggregate"`
+	IsAnsi             string         `db:"is_ansi"`
+	MinNumArguments    int            `db:"min_num_arguments"`
+	MaxNumArguments    int            `db:"max_num_arguments"`
+	Arguments          string         `db:"arguments"`
+	Description        string         `db:"description"`
+	CatalogName        string         `db:"catalog_name"`
+	IsTableFunction    string         `db:"is_table_function"`
+	ValidForClustering string         `db:"valid_for_clustering"`
+	IsSecure           sql.NullString `db:"is_secure"`
 }
 
 type Procedure struct {

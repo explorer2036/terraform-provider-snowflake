@@ -1,5 +1,9 @@
 package sdk
 
+import (
+	"errors"
+)
+
 var (
 	_ validatable = new(CreateProcedureForJavaProcedureOptions)
 	_ validatable = new(CreateProcedureForJavaScriptProcedureOptions)
@@ -20,6 +24,9 @@ func (opts *CreateProcedureForJavaProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
+	if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
+		errs = append(errs, errors.New("TARGET_PATH must be nil when AS is nil"))
+	}
 	return JoinErrors(errs...)
 }
 
@@ -28,6 +35,9 @@ func (opts *CreateProcedureForJavaScriptProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
+	if !ValidObjectIdentifier(opts.name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
 	return JoinErrors(errs...)
 }
 
@@ -36,6 +46,9 @@ func (opts *CreateProcedureForPythonProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
+	if !ValidObjectIdentifier(opts.name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
 	return JoinErrors(errs...)
 }
 
@@ -44,6 +57,12 @@ func (opts *CreateProcedureForScalaProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
+	if !ValidObjectIdentifier(opts.name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
+		errs = append(errs, errors.New("TARGET_PATH must be nil when AS is nil"))
+	}
 	return JoinErrors(errs...)
 }
 
@@ -52,6 +71,9 @@ func (opts *CreateProcedureForSQLProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
+	if !ValidObjectIdentifier(opts.name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
 	return JoinErrors(errs...)
 }
 

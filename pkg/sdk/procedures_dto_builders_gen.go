@@ -6,12 +6,14 @@ import ()
 
 func NewCreateProcedureForJavaProcedureRequest(
 	name SchemaObjectIdentifier,
+	Returns ProcedureReturnsRequest,
 	RuntimeVersion string,
 	Packages []ProcedurePackageRequest,
 	Handler string,
 ) *CreateProcedureForJavaProcedureRequest {
 	s := CreateProcedureForJavaProcedureRequest{}
 	s.name = name
+	s.Returns = Returns
 	s.RuntimeVersion = RuntimeVersion
 	s.Packages = Packages
 	s.Handler = Handler
@@ -35,11 +37,6 @@ func (s *CreateProcedureForJavaProcedureRequest) WithArguments(Arguments []Proce
 
 func (s *CreateProcedureForJavaProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForJavaProcedureRequest {
 	s.CopyGrants = CopyGrants
-	return s
-}
-
-func (s *CreateProcedureForJavaProcedureRequest) WithReturns(Returns ProcedureReturnsRequest) *CreateProcedureForJavaProcedureRequest {
-	s.Returns = Returns
 	return s
 }
 
@@ -140,41 +137,40 @@ func (s *ProcedureReturnsTableRequest) WithColumns(Columns []ProcedureColumnRequ
 }
 
 func NewProcedureColumnRequest(
+	ColumnName string,
 	ColumnDataType DataType,
 ) *ProcedureColumnRequest {
 	s := ProcedureColumnRequest{}
+	s.ColumnName = ColumnName
 	s.ColumnDataType = ColumnDataType
 	return &s
 }
 
-func (s *ProcedureColumnRequest) WithColumnName(ColumnName string) *ProcedureColumnRequest {
-	s.ColumnName = ColumnName
-	return s
-}
-
-func NewProcedurePackageRequest() *ProcedurePackageRequest {
-	return &ProcedurePackageRequest{}
-}
-
-func (s *ProcedurePackageRequest) WithPackage(Package string) *ProcedurePackageRequest {
+func NewProcedurePackageRequest(
+	Package string,
+) *ProcedurePackageRequest {
+	s := ProcedurePackageRequest{}
 	s.Package = Package
-	return s
+	return &s
 }
 
-func NewProcedureImportRequest() *ProcedureImportRequest {
-	return &ProcedureImportRequest{}
-}
-
-func (s *ProcedureImportRequest) WithImport(Import string) *ProcedureImportRequest {
+func NewProcedureImportRequest(
+	Import string,
+) *ProcedureImportRequest {
+	s := ProcedureImportRequest{}
 	s.Import = Import
-	return s
+	return &s
 }
 
 func NewCreateProcedureForJavaScriptProcedureRequest(
 	name SchemaObjectIdentifier,
+	ResultDataType DataType,
+	ProcedureDefinition string,
 ) *CreateProcedureForJavaScriptProcedureRequest {
 	s := CreateProcedureForJavaScriptProcedureRequest{}
 	s.name = name
+	s.ResultDataType = ResultDataType
+	s.ProcedureDefinition = ProcedureDefinition
 	return &s
 }
 
@@ -198,8 +194,8 @@ func (s *CreateProcedureForJavaScriptProcedureRequest) WithCopyGrants(CopyGrants
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithReturns(Returns *ProcedureJavascriptReturnsRequest) *CreateProcedureForJavaScriptProcedureRequest {
-	s.Returns = Returns
+func (s *CreateProcedureForJavaScriptProcedureRequest) WithNotNull(NotNull *bool) *CreateProcedureForJavaScriptProcedureRequest {
+	s.NotNull = NotNull
 	return s
 }
 
@@ -218,30 +214,18 @@ func (s *CreateProcedureForJavaScriptProcedureRequest) WithExecuteAs(ExecuteAs *
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithProcedureDefinition(ProcedureDefinition string) *CreateProcedureForJavaScriptProcedureRequest {
-	s.ProcedureDefinition = ProcedureDefinition
-	return s
-}
-
-func NewProcedureJavascriptReturnsRequest(
-	ResultDataType DataType,
-) *ProcedureJavascriptReturnsRequest {
-	s := ProcedureJavascriptReturnsRequest{}
-	s.ResultDataType = ResultDataType
-	return &s
-}
-
-func (s *ProcedureJavascriptReturnsRequest) WithNotNull(NotNull *bool) *ProcedureJavascriptReturnsRequest {
-	s.NotNull = NotNull
-	return s
-}
-
 func NewCreateProcedureForPythonProcedureRequest(
 	name SchemaObjectIdentifier,
+	Returns ProcedureReturnsRequest,
+	RuntimeVersion string,
+	Packages []ProcedurePackageRequest,
 	Handler string,
 ) *CreateProcedureForPythonProcedureRequest {
 	s := CreateProcedureForPythonProcedureRequest{}
 	s.name = name
+	s.Returns = Returns
+	s.RuntimeVersion = RuntimeVersion
+	s.Packages = Packages
 	s.Handler = Handler
 	return &s
 }
@@ -263,21 +247,6 @@ func (s *CreateProcedureForPythonProcedureRequest) WithArguments(Arguments []Pro
 
 func (s *CreateProcedureForPythonProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForPythonProcedureRequest {
 	s.CopyGrants = CopyGrants
-	return s
-}
-
-func (s *CreateProcedureForPythonProcedureRequest) WithReturns(Returns *ProcedureReturnsRequest) *CreateProcedureForPythonProcedureRequest {
-	s.Returns = Returns
-	return s
-}
-
-func (s *CreateProcedureForPythonProcedureRequest) WithRuntimeVersion(RuntimeVersion *string) *CreateProcedureForPythonProcedureRequest {
-	s.RuntimeVersion = RuntimeVersion
-	return s
-}
-
-func (s *CreateProcedureForPythonProcedureRequest) WithPackages(Packages []ProcedurePackageRequest) *CreateProcedureForPythonProcedureRequest {
-	s.Packages = Packages
 	return s
 }
 
@@ -318,10 +287,16 @@ func (s *CreateProcedureForPythonProcedureRequest) WithProcedureDefinition(Proce
 
 func NewCreateProcedureForScalaProcedureRequest(
 	name SchemaObjectIdentifier,
+	Returns ProcedureReturnsRequest,
+	RuntimeVersion string,
+	Packages []ProcedurePackageRequest,
 	Handler string,
 ) *CreateProcedureForScalaProcedureRequest {
 	s := CreateProcedureForScalaProcedureRequest{}
 	s.name = name
+	s.Returns = Returns
+	s.RuntimeVersion = RuntimeVersion
+	s.Packages = Packages
 	s.Handler = Handler
 	return &s
 }
@@ -343,21 +318,6 @@ func (s *CreateProcedureForScalaProcedureRequest) WithArguments(Arguments []Proc
 
 func (s *CreateProcedureForScalaProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForScalaProcedureRequest {
 	s.CopyGrants = CopyGrants
-	return s
-}
-
-func (s *CreateProcedureForScalaProcedureRequest) WithReturns(Returns *ProcedureReturnsRequest) *CreateProcedureForScalaProcedureRequest {
-	s.Returns = Returns
-	return s
-}
-
-func (s *CreateProcedureForScalaProcedureRequest) WithRuntimeVersion(RuntimeVersion *string) *CreateProcedureForScalaProcedureRequest {
-	s.RuntimeVersion = RuntimeVersion
-	return s
-}
-
-func (s *CreateProcedureForScalaProcedureRequest) WithPackages(Packages []ProcedurePackageRequest) *CreateProcedureForScalaProcedureRequest {
-	s.Packages = Packages
 	return s
 }
 
@@ -393,9 +353,13 @@ func (s *CreateProcedureForScalaProcedureRequest) WithProcedureDefinition(Proced
 
 func NewCreateProcedureForSQLProcedureRequest(
 	name SchemaObjectIdentifier,
+	Returns ProcedureSQLReturnsRequest,
+	ProcedureDefinition string,
 ) *CreateProcedureForSQLProcedureRequest {
 	s := CreateProcedureForSQLProcedureRequest{}
 	s.name = name
+	s.Returns = Returns
+	s.ProcedureDefinition = ProcedureDefinition
 	return &s
 }
 
@@ -419,11 +383,6 @@ func (s *CreateProcedureForSQLProcedureRequest) WithCopyGrants(CopyGrants *bool)
 	return s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithReturns(Returns *ProcedureSQLReturnsRequest) *CreateProcedureForSQLProcedureRequest {
-	s.Returns = Returns
-	return s
-}
-
 func (s *CreateProcedureForSQLProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateProcedureForSQLProcedureRequest {
 	s.NullInputBehavior = NullInputBehavior
 	return s
@@ -436,11 +395,6 @@ func (s *CreateProcedureForSQLProcedureRequest) WithComment(Comment *string) *Cr
 
 func (s *CreateProcedureForSQLProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateProcedureForSQLProcedureRequest {
 	s.ExecuteAs = ExecuteAs
-	return s
-}
-
-func (s *CreateProcedureForSQLProcedureRequest) WithProcedureDefinition(ProcedureDefinition string) *CreateProcedureForSQLProcedureRequest {
-	s.ProcedureDefinition = ProcedureDefinition
 	return s
 }
 
