@@ -1,22 +1,20 @@
 package sdk
 
-import (
-	"errors"
-)
+import "errors"
 
 var (
-	_ validatable = new(CreateProcedureForJavaProcedureOptions)
-	_ validatable = new(CreateProcedureForJavaScriptProcedureOptions)
-	_ validatable = new(CreateProcedureForPythonProcedureOptions)
-	_ validatable = new(CreateProcedureForScalaProcedureOptions)
-	_ validatable = new(CreateProcedureForSQLProcedureOptions)
+	_ validatable = new(CreateForJavaProcedureOptions)
+	_ validatable = new(CreateForJavaScriptProcedureOptions)
+	_ validatable = new(CreateForPythonProcedureOptions)
+	_ validatable = new(CreateForScalaProcedureOptions)
+	_ validatable = new(CreateForSQLProcedureOptions)
 	_ validatable = new(AlterProcedureOptions)
 	_ validatable = new(DropProcedureOptions)
 	_ validatable = new(ShowProcedureOptions)
 	_ validatable = new(DescribeProcedureOptions)
 )
 
-func (opts *CreateProcedureForJavaProcedureOptions) validate() error {
+func (opts *CreateForJavaProcedureOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -30,7 +28,7 @@ func (opts *CreateProcedureForJavaProcedureOptions) validate() error {
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateProcedureForJavaScriptProcedureOptions) validate() error {
+func (opts *CreateForJavaScriptProcedureOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -41,7 +39,7 @@ func (opts *CreateProcedureForJavaScriptProcedureOptions) validate() error {
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateProcedureForPythonProcedureOptions) validate() error {
+func (opts *CreateForPythonProcedureOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -52,7 +50,7 @@ func (opts *CreateProcedureForPythonProcedureOptions) validate() error {
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateProcedureForScalaProcedureOptions) validate() error {
+func (opts *CreateForScalaProcedureOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -66,7 +64,7 @@ func (opts *CreateProcedureForScalaProcedureOptions) validate() error {
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateProcedureForSQLProcedureOptions) validate() error {
+func (opts *CreateForSQLProcedureOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}

@@ -10,7 +10,7 @@ func (v *procedures) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*
 }
 
 func (r procedureRow) convert() *Procedure {
-	return &Procedure{
+	e := &Procedure{
 		CreatedOn:          r.CreatedOn,
 		Name:               r.Name,
 		SchemaName:         r.SchemaName,
@@ -24,8 +24,11 @@ func (r procedureRow) convert() *Procedure {
 		CatalogName:        r.CatalogName,
 		IsTableFunction:    r.IsTableFunction == "Y",
 		ValidForClustering: r.ValidForClustering == "Y",
-		IsSecure:           r.IsSecure == "Y",
 	}
+	if r.IsSecure.Valid {
+		e.IsSecure = r.IsSecure.String == "Y"
+	}
+	return e
 }
 
 func (r procedureDetailRow) convert() *ProcedureDetail {
@@ -37,7 +40,18 @@ func (r procedureDetailRow) convert() *ProcedureDetail {
 
 ## procedures_validations_gen.go
 
-<!-- CreateProcedureForJavaProcedureOptions and CreateProcedureForScalaProcedureOptions-->
+<!-- CreateForJavaProcedureOptions and CreateForScalaProcedureOptions-->
 if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
 	errs = append(errs, errors.New("TARGET_PATH must be nil when AS is nil"))
+}
+
+Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
+
+func (v *procedures) Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error) {
+	opts := request.toOpts()
+	rows, err := validateAndQuery[procedureDetailRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	return convertRows[procedureDetailRow, ProcedureDetail](rows), nil
 }

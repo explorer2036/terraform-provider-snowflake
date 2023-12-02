@@ -4,14 +4,14 @@ package sdk
 
 import ()
 
-func NewCreateProcedureForJavaProcedureRequest(
+func NewCreateForJavaProcedureRequest(
 	name SchemaObjectIdentifier,
 	Returns ProcedureReturnsRequest,
 	RuntimeVersion string,
 	Packages []ProcedurePackageRequest,
 	Handler string,
-) *CreateProcedureForJavaProcedureRequest {
-	s := CreateProcedureForJavaProcedureRequest{}
+) *CreateForJavaProcedureRequest {
+	s := CreateForJavaProcedureRequest{}
 	s.name = name
 	s.Returns = Returns
 	s.RuntimeVersion = RuntimeVersion
@@ -20,62 +20,62 @@ func NewCreateProcedureForJavaProcedureRequest(
 	return &s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithOrReplace(OrReplace *bool) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithOrReplace(OrReplace *bool) *CreateForJavaProcedureRequest {
 	s.OrReplace = OrReplace
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithSecure(Secure *bool) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithSecure(Secure *bool) *CreateForJavaProcedureRequest {
 	s.Secure = Secure
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateForJavaProcedureRequest {
 	s.Arguments = Arguments
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateForJavaProcedureRequest {
 	s.CopyGrants = CopyGrants
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateForJavaProcedureRequest {
 	s.Imports = Imports
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithExternalAccessIntegrations(ExternalAccessIntegrations []AccountObjectIdentifier) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithExternalAccessIntegrations(ExternalAccessIntegrations []AccountObjectIdentifier) *CreateForJavaProcedureRequest {
 	s.ExternalAccessIntegrations = ExternalAccessIntegrations
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithSecrets(Secrets []Secret) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithSecrets(Secrets []Secret) *CreateForJavaProcedureRequest {
 	s.Secrets = Secrets
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithTargetPath(TargetPath *string) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithTargetPath(TargetPath *string) *CreateForJavaProcedureRequest {
 	s.TargetPath = TargetPath
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateForJavaProcedureRequest {
 	s.NullInputBehavior = NullInputBehavior
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithComment(Comment *string) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithComment(Comment *string) *CreateForJavaProcedureRequest {
 	s.Comment = Comment
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateForJavaProcedureRequest {
 	s.ExecuteAs = ExecuteAs
 	return s
 }
 
-func (s *CreateProcedureForJavaProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateProcedureForJavaProcedureRequest {
+func (s *CreateForJavaProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateForJavaProcedureRequest {
 	s.ProcedureDefinition = ProcedureDefinition
 	return s
 }
@@ -162,66 +162,66 @@ func NewProcedureImportRequest(
 	return &s
 }
 
-func NewCreateProcedureForJavaScriptProcedureRequest(
+func NewCreateForJavaScriptProcedureRequest(
 	name SchemaObjectIdentifier,
 	ResultDataType DataType,
 	ProcedureDefinition string,
-) *CreateProcedureForJavaScriptProcedureRequest {
-	s := CreateProcedureForJavaScriptProcedureRequest{}
+) *CreateForJavaScriptProcedureRequest {
+	s := CreateForJavaScriptProcedureRequest{}
 	s.name = name
 	s.ResultDataType = ResultDataType
 	s.ProcedureDefinition = ProcedureDefinition
 	return &s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithOrReplace(OrReplace *bool) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithOrReplace(OrReplace *bool) *CreateForJavaScriptProcedureRequest {
 	s.OrReplace = OrReplace
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithSecure(Secure *bool) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithSecure(Secure *bool) *CreateForJavaScriptProcedureRequest {
 	s.Secure = Secure
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateForJavaScriptProcedureRequest {
 	s.Arguments = Arguments
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateForJavaScriptProcedureRequest {
 	s.CopyGrants = CopyGrants
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithNotNull(NotNull *bool) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithNotNull(NotNull *bool) *CreateForJavaScriptProcedureRequest {
 	s.NotNull = NotNull
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateForJavaScriptProcedureRequest {
 	s.NullInputBehavior = NullInputBehavior
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithComment(Comment *string) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithComment(Comment *string) *CreateForJavaScriptProcedureRequest {
 	s.Comment = Comment
 	return s
 }
 
-func (s *CreateProcedureForJavaScriptProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateProcedureForJavaScriptProcedureRequest {
+func (s *CreateForJavaScriptProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateForJavaScriptProcedureRequest {
 	s.ExecuteAs = ExecuteAs
 	return s
 }
 
-func NewCreateProcedureForPythonProcedureRequest(
+func NewCreateForPythonProcedureRequest(
 	name SchemaObjectIdentifier,
 	Returns ProcedureReturnsRequest,
 	RuntimeVersion string,
 	Packages []ProcedurePackageRequest,
 	Handler string,
-) *CreateProcedureForPythonProcedureRequest {
-	s := CreateProcedureForPythonProcedureRequest{}
+) *CreateForPythonProcedureRequest {
+	s := CreateForPythonProcedureRequest{}
 	s.name = name
 	s.Returns = Returns
 	s.RuntimeVersion = RuntimeVersion
@@ -230,69 +230,69 @@ func NewCreateProcedureForPythonProcedureRequest(
 	return &s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithOrReplace(OrReplace *bool) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithOrReplace(OrReplace *bool) *CreateForPythonProcedureRequest {
 	s.OrReplace = OrReplace
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithSecure(Secure *bool) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithSecure(Secure *bool) *CreateForPythonProcedureRequest {
 	s.Secure = Secure
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateForPythonProcedureRequest {
 	s.Arguments = Arguments
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateForPythonProcedureRequest {
 	s.CopyGrants = CopyGrants
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateForPythonProcedureRequest {
 	s.Imports = Imports
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithExternalAccessIntegrations(ExternalAccessIntegrations []AccountObjectIdentifier) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithExternalAccessIntegrations(ExternalAccessIntegrations []AccountObjectIdentifier) *CreateForPythonProcedureRequest {
 	s.ExternalAccessIntegrations = ExternalAccessIntegrations
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithSecrets(Secrets []Secret) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithSecrets(Secrets []Secret) *CreateForPythonProcedureRequest {
 	s.Secrets = Secrets
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateForPythonProcedureRequest {
 	s.NullInputBehavior = NullInputBehavior
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithComment(Comment *string) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithComment(Comment *string) *CreateForPythonProcedureRequest {
 	s.Comment = Comment
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateForPythonProcedureRequest {
 	s.ExecuteAs = ExecuteAs
 	return s
 }
 
-func (s *CreateProcedureForPythonProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateProcedureForPythonProcedureRequest {
+func (s *CreateForPythonProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateForPythonProcedureRequest {
 	s.ProcedureDefinition = ProcedureDefinition
 	return s
 }
 
-func NewCreateProcedureForScalaProcedureRequest(
+func NewCreateForScalaProcedureRequest(
 	name SchemaObjectIdentifier,
 	Returns ProcedureReturnsRequest,
 	RuntimeVersion string,
 	Packages []ProcedurePackageRequest,
 	Handler string,
-) *CreateProcedureForScalaProcedureRequest {
-	s := CreateProcedureForScalaProcedureRequest{}
+) *CreateForScalaProcedureRequest {
+	s := CreateForScalaProcedureRequest{}
 	s.name = name
 	s.Returns = Returns
 	s.RuntimeVersion = RuntimeVersion
@@ -301,99 +301,99 @@ func NewCreateProcedureForScalaProcedureRequest(
 	return &s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithOrReplace(OrReplace *bool) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithOrReplace(OrReplace *bool) *CreateForScalaProcedureRequest {
 	s.OrReplace = OrReplace
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithSecure(Secure *bool) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithSecure(Secure *bool) *CreateForScalaProcedureRequest {
 	s.Secure = Secure
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateForScalaProcedureRequest {
 	s.Arguments = Arguments
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateForScalaProcedureRequest {
 	s.CopyGrants = CopyGrants
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateForScalaProcedureRequest {
 	s.Imports = Imports
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithTargetPath(TargetPath *string) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithTargetPath(TargetPath *string) *CreateForScalaProcedureRequest {
 	s.TargetPath = TargetPath
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateForScalaProcedureRequest {
 	s.NullInputBehavior = NullInputBehavior
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithComment(Comment *string) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithComment(Comment *string) *CreateForScalaProcedureRequest {
 	s.Comment = Comment
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateForScalaProcedureRequest {
 	s.ExecuteAs = ExecuteAs
 	return s
 }
 
-func (s *CreateProcedureForScalaProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateProcedureForScalaProcedureRequest {
+func (s *CreateForScalaProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateForScalaProcedureRequest {
 	s.ProcedureDefinition = ProcedureDefinition
 	return s
 }
 
-func NewCreateProcedureForSQLProcedureRequest(
+func NewCreateForSQLProcedureRequest(
 	name SchemaObjectIdentifier,
 	Returns ProcedureSQLReturnsRequest,
 	ProcedureDefinition string,
-) *CreateProcedureForSQLProcedureRequest {
-	s := CreateProcedureForSQLProcedureRequest{}
+) *CreateForSQLProcedureRequest {
+	s := CreateForSQLProcedureRequest{}
 	s.name = name
 	s.Returns = Returns
 	s.ProcedureDefinition = ProcedureDefinition
 	return &s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithOrReplace(OrReplace *bool) *CreateProcedureForSQLProcedureRequest {
+func (s *CreateForSQLProcedureRequest) WithOrReplace(OrReplace *bool) *CreateForSQLProcedureRequest {
 	s.OrReplace = OrReplace
 	return s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithSecure(Secure *bool) *CreateProcedureForSQLProcedureRequest {
+func (s *CreateForSQLProcedureRequest) WithSecure(Secure *bool) *CreateForSQLProcedureRequest {
 	s.Secure = Secure
 	return s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateProcedureForSQLProcedureRequest {
+func (s *CreateForSQLProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateForSQLProcedureRequest {
 	s.Arguments = Arguments
 	return s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateProcedureForSQLProcedureRequest {
+func (s *CreateForSQLProcedureRequest) WithCopyGrants(CopyGrants *bool) *CreateForSQLProcedureRequest {
 	s.CopyGrants = CopyGrants
 	return s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateProcedureForSQLProcedureRequest {
+func (s *CreateForSQLProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateForSQLProcedureRequest {
 	s.NullInputBehavior = NullInputBehavior
 	return s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithComment(Comment *string) *CreateProcedureForSQLProcedureRequest {
+func (s *CreateForSQLProcedureRequest) WithComment(Comment *string) *CreateForSQLProcedureRequest {
 	s.Comment = Comment
 	return s
 }
 
-func (s *CreateProcedureForSQLProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateProcedureForSQLProcedureRequest {
+func (s *CreateForSQLProcedureRequest) WithExecuteAs(ExecuteAs *ExecuteAs) *CreateForSQLProcedureRequest {
 	s.ExecuteAs = ExecuteAs
 	return s
 }

@@ -12,27 +12,27 @@ type procedures struct {
 	client *Client
 }
 
-func (v *procedures) CreateProcedureForJava(ctx context.Context, request *CreateProcedureForJavaProcedureRequest) error {
+func (v *procedures) CreateForJava(ctx context.Context, request *CreateForJavaProcedureRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *procedures) CreateProcedureForJavaScript(ctx context.Context, request *CreateProcedureForJavaScriptProcedureRequest) error {
+func (v *procedures) CreateForJavaScript(ctx context.Context, request *CreateForJavaScriptProcedureRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *procedures) CreateProcedureForPython(ctx context.Context, request *CreateProcedureForPythonProcedureRequest) error {
+func (v *procedures) CreateForPython(ctx context.Context, request *CreateForPythonProcedureRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *procedures) CreateProcedureForScala(ctx context.Context, request *CreateProcedureForScalaProcedureRequest) error {
+func (v *procedures) CreateForScala(ctx context.Context, request *CreateForScalaProcedureRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *procedures) CreateProcedureForSQL(ctx context.Context, request *CreateProcedureForSQLProcedureRequest) error {
+func (v *procedures) CreateForSQL(ctx context.Context, request *CreateForSQLProcedureRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
@@ -66,10 +66,8 @@ func (v *procedures) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*
 	return collections.FindOne(procedures, func(r Procedure) bool { return r.Name == id.Name() })
 }
 
-func (v *procedures) Describe(ctx context.Context, id SchemaObjectIdentifier) ([]ProcedureDetail, error) {
-	opts := &DescribeProcedureOptions{
-		name: id,
-	}
+func (v *procedures) Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error) {
+	opts := request.toOpts()
 	rows, err := validateAndQuery[procedureDetailRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err
@@ -77,8 +75,8 @@ func (v *procedures) Describe(ctx context.Context, id SchemaObjectIdentifier) ([
 	return convertRows[procedureDetailRow, ProcedureDetail](rows), nil
 }
 
-func (r *CreateProcedureForJavaProcedureRequest) toOpts() *CreateProcedureForJavaProcedureOptions {
-	opts := &CreateProcedureForJavaProcedureOptions{
+func (r *CreateForJavaProcedureRequest) toOpts() *CreateForJavaProcedureOptions {
+	opts := &CreateForJavaProcedureOptions{
 		OrReplace: r.OrReplace,
 		Secure:    r.Secure,
 		name:      r.name,
@@ -148,8 +146,8 @@ func (r *CreateProcedureForJavaProcedureRequest) toOpts() *CreateProcedureForJav
 	return opts
 }
 
-func (r *CreateProcedureForJavaScriptProcedureRequest) toOpts() *CreateProcedureForJavaScriptProcedureOptions {
-	opts := &CreateProcedureForJavaScriptProcedureOptions{
+func (r *CreateForJavaScriptProcedureRequest) toOpts() *CreateForJavaScriptProcedureOptions {
+	opts := &CreateForJavaScriptProcedureOptions{
 		OrReplace: r.OrReplace,
 		Secure:    r.Secure,
 		name:      r.name,
@@ -176,8 +174,8 @@ func (r *CreateProcedureForJavaScriptProcedureRequest) toOpts() *CreateProcedure
 	return opts
 }
 
-func (r *CreateProcedureForPythonProcedureRequest) toOpts() *CreateProcedureForPythonProcedureOptions {
-	opts := &CreateProcedureForPythonProcedureOptions{
+func (r *CreateForPythonProcedureRequest) toOpts() *CreateForPythonProcedureOptions {
+	opts := &CreateForPythonProcedureOptions{
 		OrReplace: r.OrReplace,
 		Secure:    r.Secure,
 		name:      r.name,
@@ -246,8 +244,8 @@ func (r *CreateProcedureForPythonProcedureRequest) toOpts() *CreateProcedureForP
 	return opts
 }
 
-func (r *CreateProcedureForScalaProcedureRequest) toOpts() *CreateProcedureForScalaProcedureOptions {
-	opts := &CreateProcedureForScalaProcedureOptions{
+func (r *CreateForScalaProcedureRequest) toOpts() *CreateForScalaProcedureOptions {
+	opts := &CreateForScalaProcedureOptions{
 		OrReplace: r.OrReplace,
 		Secure:    r.Secure,
 		name:      r.name,
@@ -315,8 +313,8 @@ func (r *CreateProcedureForScalaProcedureRequest) toOpts() *CreateProcedureForSc
 	return opts
 }
 
-func (r *CreateProcedureForSQLProcedureRequest) toOpts() *CreateProcedureForSQLProcedureOptions {
-	opts := &CreateProcedureForSQLProcedureOptions{
+func (r *CreateForSQLProcedureRequest) toOpts() *CreateForSQLProcedureOptions {
+	opts := &CreateForSQLProcedureOptions{
 		OrReplace: r.OrReplace,
 		Secure:    r.Secure,
 		name:      r.name,
@@ -395,6 +393,14 @@ func (r *ShowProcedureRequest) toOpts() *ShowProcedureOptions {
 	return opts
 }
 
+func (r *DescribeProcedureRequest) toOpts() *DescribeProcedureOptions {
+	opts := &DescribeProcedureOptions{
+		name:              r.name,
+		ArgumentDataTypes: r.ArgumentDataTypes,
+	}
+	return opts
+}
+
 func (r procedureRow) convert() *Procedure {
 	e := &Procedure{
 		CreatedOn:          r.CreatedOn,
@@ -415,14 +421,6 @@ func (r procedureRow) convert() *Procedure {
 		e.IsSecure = r.IsSecure.String == "Y"
 	}
 	return e
-}
-
-func (r *DescribeProcedureRequest) toOpts() *DescribeProcedureOptions {
-	opts := &DescribeProcedureOptions{
-		name:              r.name,
-		ArgumentDataTypes: r.ArgumentDataTypes,
-	}
-	return opts
 }
 
 func (r procedureDetailRow) convert() *ProcedureDetail {

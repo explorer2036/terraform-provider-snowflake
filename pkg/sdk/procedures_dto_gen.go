@@ -3,18 +3,18 @@ package sdk
 //go:generate go run ./dto-builder-generator/main.go
 
 var (
-	_ optionsProvider[CreateProcedureForJavaProcedureOptions]       = new(CreateProcedureForJavaProcedureRequest)
-	_ optionsProvider[CreateProcedureForJavaScriptProcedureOptions] = new(CreateProcedureForJavaScriptProcedureRequest)
-	_ optionsProvider[CreateProcedureForPythonProcedureOptions]     = new(CreateProcedureForPythonProcedureRequest)
-	_ optionsProvider[CreateProcedureForScalaProcedureOptions]      = new(CreateProcedureForScalaProcedureRequest)
-	_ optionsProvider[CreateProcedureForSQLProcedureOptions]        = new(CreateProcedureForSQLProcedureRequest)
-	_ optionsProvider[AlterProcedureOptions]                        = new(AlterProcedureRequest)
-	_ optionsProvider[DropProcedureOptions]                         = new(DropProcedureRequest)
-	_ optionsProvider[ShowProcedureOptions]                         = new(ShowProcedureRequest)
-	_ optionsProvider[DescribeProcedureOptions]                     = new(DescribeProcedureRequest)
+	_ optionsProvider[CreateForJavaProcedureOptions]       = new(CreateForJavaProcedureRequest)
+	_ optionsProvider[CreateForJavaScriptProcedureOptions] = new(CreateForJavaScriptProcedureRequest)
+	_ optionsProvider[CreateForPythonProcedureOptions]     = new(CreateForPythonProcedureRequest)
+	_ optionsProvider[CreateForScalaProcedureOptions]      = new(CreateForScalaProcedureRequest)
+	_ optionsProvider[CreateForSQLProcedureOptions]        = new(CreateForSQLProcedureRequest)
+	_ optionsProvider[AlterProcedureOptions]               = new(AlterProcedureRequest)
+	_ optionsProvider[DropProcedureOptions]                = new(DropProcedureRequest)
+	_ optionsProvider[ShowProcedureOptions]                = new(ShowProcedureRequest)
+	_ optionsProvider[DescribeProcedureOptions]            = new(DescribeProcedureRequest)
 )
 
-type CreateProcedureForJavaProcedureRequest struct {
+type CreateForJavaProcedureRequest struct {
 	OrReplace                  *bool
 	Secure                     *bool
 	name                       SchemaObjectIdentifier // required
@@ -68,7 +68,7 @@ type ProcedureImportRequest struct {
 	Import string // required
 }
 
-type CreateProcedureForJavaScriptProcedureRequest struct {
+type CreateForJavaScriptProcedureRequest struct {
 	OrReplace           *bool
 	Secure              *bool
 	name                SchemaObjectIdentifier // required
@@ -82,7 +82,7 @@ type CreateProcedureForJavaScriptProcedureRequest struct {
 	ProcedureDefinition string // required
 }
 
-type CreateProcedureForPythonProcedureRequest struct {
+type CreateForPythonProcedureRequest struct {
 	OrReplace                  *bool
 	Secure                     *bool
 	name                       SchemaObjectIdentifier // required
@@ -101,7 +101,7 @@ type CreateProcedureForPythonProcedureRequest struct {
 	ProcedureDefinition        *string
 }
 
-type CreateProcedureForScalaProcedureRequest struct {
+type CreateForScalaProcedureRequest struct {
 	OrReplace           *bool
 	Secure              *bool
 	name                SchemaObjectIdentifier // required
@@ -119,7 +119,7 @@ type CreateProcedureForScalaProcedureRequest struct {
 	ProcedureDefinition *string
 }
 
-type CreateProcedureForSQLProcedureRequest struct {
+type CreateForSQLProcedureRequest struct {
 	OrReplace           *bool
 	Secure              *bool
 	name                SchemaObjectIdentifier // required

@@ -6,20 +6,20 @@ import (
 )
 
 type Procedures interface {
-	CreateProcedureForJava(ctx context.Context, request *CreateProcedureForJavaProcedureRequest) error
-	CreateProcedureForJavaScript(ctx context.Context, request *CreateProcedureForJavaScriptProcedureRequest) error
-	CreateProcedureForPython(ctx context.Context, request *CreateProcedureForPythonProcedureRequest) error
-	CreateProcedureForScala(ctx context.Context, request *CreateProcedureForScalaProcedureRequest) error
-	CreateProcedureForSQL(ctx context.Context, request *CreateProcedureForSQLProcedureRequest) error
+	CreateForJava(ctx context.Context, request *CreateForJavaProcedureRequest) error
+	CreateForJavaScript(ctx context.Context, request *CreateForJavaScriptProcedureRequest) error
+	CreateForPython(ctx context.Context, request *CreateForPythonProcedureRequest) error
+	CreateForScala(ctx context.Context, request *CreateForScalaProcedureRequest) error
+	CreateForSQL(ctx context.Context, request *CreateForSQLProcedureRequest) error
 	Alter(ctx context.Context, request *AlterProcedureRequest) error
 	Drop(ctx context.Context, request *DropProcedureRequest) error
 	Show(ctx context.Context, request *ShowProcedureRequest) ([]Procedure, error)
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Procedure, error)
-	Describe(ctx context.Context, id SchemaObjectIdentifier) ([]ProcedureDetail, error)
+	Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
 }
 
-// CreateProcedureForJavaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#java-handler.
-type CreateProcedureForJavaProcedureOptions struct {
+// CreateForJavaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#java-handler.
+type CreateForJavaProcedureOptions struct {
 	create                     bool                      `ddl:"static" sql:"CREATE"`
 	OrReplace                  *bool                     `ddl:"keyword" sql:"OR REPLACE"`
 	Secure                     *bool                     `ddl:"keyword" sql:"SECURE"`
@@ -76,8 +76,8 @@ type ProcedureImport struct {
 	Import string `ddl:"keyword,single_quotes"`
 }
 
-// CreateProcedureForJavaScriptProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#javascript-handler.
-type CreateProcedureForJavaScriptProcedureOptions struct {
+// CreateForJavaScriptProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#javascript-handler.
+type CreateForJavaScriptProcedureOptions struct {
 	create              bool                   `ddl:"static" sql:"CREATE"`
 	OrReplace           *bool                  `ddl:"keyword" sql:"OR REPLACE"`
 	Secure              *bool                  `ddl:"keyword" sql:"SECURE"`
@@ -94,8 +94,8 @@ type CreateProcedureForJavaScriptProcedureOptions struct {
 	ProcedureDefinition string                 `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
 }
 
-// CreateProcedureForPythonProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#python-handler.
-type CreateProcedureForPythonProcedureOptions struct {
+// CreateForPythonProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#python-handler.
+type CreateForPythonProcedureOptions struct {
 	create                     bool                      `ddl:"static" sql:"CREATE"`
 	OrReplace                  *bool                     `ddl:"keyword" sql:"OR REPLACE"`
 	Secure                     *bool                     `ddl:"keyword" sql:"SECURE"`
@@ -117,8 +117,8 @@ type CreateProcedureForPythonProcedureOptions struct {
 	ProcedureDefinition        *string                   `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
 }
 
-// CreateProcedureForScalaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#scala-handler.
-type CreateProcedureForScalaProcedureOptions struct {
+// CreateForScalaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#scala-handler.
+type CreateForScalaProcedureOptions struct {
 	create              bool                   `ddl:"static" sql:"CREATE"`
 	OrReplace           *bool                  `ddl:"keyword" sql:"OR REPLACE"`
 	Secure              *bool                  `ddl:"keyword" sql:"SECURE"`
@@ -139,8 +139,8 @@ type CreateProcedureForScalaProcedureOptions struct {
 	ProcedureDefinition *string                `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
 }
 
-// CreateProcedureForSQLProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#snowflake-scripting-handler.
-type CreateProcedureForSQLProcedureOptions struct {
+// CreateForSQLProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#snowflake-scripting-handler.
+type CreateForSQLProcedureOptions struct {
 	create              bool                   `ddl:"static" sql:"CREATE"`
 	OrReplace           *bool                  `ddl:"keyword" sql:"OR REPLACE"`
 	Secure              *bool                  `ddl:"keyword" sql:"SECURE"`

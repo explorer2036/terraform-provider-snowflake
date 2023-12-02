@@ -61,9 +61,9 @@ var ProceduresDef = g.NewInterface(
 	"Procedure",
 	g.KindOfT[SchemaObjectIdentifier](),
 ).CustomOperation(
-	"CreateProcedureForJava",
+	"CreateForJava",
 	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#java-handler",
-	g.NewQueryStruct("CreateProcedureForJava").
+	g.NewQueryStruct("CreateForJava").
 		Create().
 		OrReplace().
 		OptionalSQL("SECURE").
@@ -102,9 +102,9 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")).
 		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
-	"CreateProcedureForJavaScript",
+	"CreateForJavaScript",
 	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#javascript-handler",
-	g.NewQueryStruct("CreateProcedureForJavaScript").
+	g.NewQueryStruct("CreateForJavaScript").
 		Create().
 		OrReplace().
 		OptionalSQL("SECURE").
@@ -125,9 +125,9 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("ProcedureDefinition", "string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS").Required()).
 		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
-	"CreateProcedureForPython",
+	"CreateForPython",
 	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#python-handler",
-	g.NewQueryStruct("CreateProcedureForPython").
+	g.NewQueryStruct("CreateForPython").
 		Create().
 		OrReplace().
 		OptionalSQL("SECURE").
@@ -165,9 +165,9 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")).
 		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
-	"CreateProcedureForScala",
+	"CreateForScala",
 	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#scala-handler",
-	g.NewQueryStruct("CreateProcedureForScala").
+	g.NewQueryStruct("CreateForScala").
 		Create().
 		OrReplace().
 		OptionalSQL("SECURE").
@@ -204,9 +204,9 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")).
 		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
-	"CreateProcedureForSQL",
+	"CreateForSQL",
 	"https://docs.snowflake.com/en/sql-reference/sql/create-procedure#snowflake-scripting-handler",
-	g.NewQueryStruct("CreateProcedureForSQL").
+	g.NewQueryStruct("CreateForSQL").
 		Create().
 		OrReplace().
 		OptionalSQL("SECURE").

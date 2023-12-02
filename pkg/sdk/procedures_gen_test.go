@@ -6,17 +6,17 @@ import (
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
 )
 
-func TestProcedures_CreateProcedureForJava(t *testing.T) {
+func TestProcedures_CreateForJava(t *testing.T) {
 	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *CreateProcedureForJavaProcedureOptions {
-		return &CreateProcedureForJavaProcedureOptions{
+	defaultOpts := func() *CreateForJavaProcedureOptions {
+		return &CreateForJavaProcedureOptions{
 			name: id,
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *CreateProcedureForJavaProcedureOptions = nil
+		var opts *CreateForJavaProcedureOptions = nil
 		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
@@ -86,17 +86,17 @@ func TestProcedures_CreateProcedureForJava(t *testing.T) {
 	})
 }
 
-func TestProcedures_CreateProcedureForJavaScript(t *testing.T) {
+func TestProcedures_CreateForJavaScript(t *testing.T) {
 	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *CreateProcedureForJavaScriptProcedureOptions {
-		return &CreateProcedureForJavaScriptProcedureOptions{
+	defaultOpts := func() *CreateForJavaScriptProcedureOptions {
+		return &CreateForJavaScriptProcedureOptions{
 			name: id,
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *CreateProcedureForJavaScriptProcedureOptions = nil
+		var opts *CreateForJavaScriptProcedureOptions = nil
 		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
@@ -128,17 +128,17 @@ func TestProcedures_CreateProcedureForJavaScript(t *testing.T) {
 	})
 }
 
-func TestProcedures_CreateProcedureForPython(t *testing.T) {
+func TestProcedures_CreateForPython(t *testing.T) {
 	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *CreateProcedureForPythonProcedureOptions {
-		return &CreateProcedureForPythonProcedureOptions{
+	defaultOpts := func() *CreateForPythonProcedureOptions {
+		return &CreateForPythonProcedureOptions{
 			name: id,
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *CreateProcedureForPythonProcedureOptions = nil
+		var opts *CreateForPythonProcedureOptions = nil
 		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
@@ -205,17 +205,17 @@ func TestProcedures_CreateProcedureForPython(t *testing.T) {
 	})
 }
 
-func TestProcedures_CreateProcedureForScala(t *testing.T) {
+func TestProcedures_CreateForScala(t *testing.T) {
 	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *CreateProcedureForScalaProcedureOptions {
-		return &CreateProcedureForScalaProcedureOptions{
+	defaultOpts := func() *CreateForScalaProcedureOptions {
+		return &CreateForScalaProcedureOptions{
 			name: id,
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *CreateProcedureForScalaProcedureOptions = nil
+		var opts *CreateForScalaProcedureOptions = nil
 		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
@@ -264,17 +264,17 @@ func TestProcedures_CreateProcedureForScala(t *testing.T) {
 	})
 }
 
-func TestProcedures_CreateProcedureForSQL(t *testing.T) {
+func TestProcedures_CreateForSQL(t *testing.T) {
 	id := RandomSchemaObjectIdentifier()
 
-	defaultOpts := func() *CreateProcedureForSQLProcedureOptions {
-		return &CreateProcedureForSQLProcedureOptions{
+	defaultOpts := func() *CreateForSQLProcedureOptions {
+		return &CreateForSQLProcedureOptions{
 			name: id,
 		}
 	}
 
 	t.Run("validation: nil options", func(t *testing.T) {
-		var opts *CreateProcedureForSQLProcedureOptions = nil
+		var opts *CreateForSQLProcedureOptions = nil
 		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
 	})
 
