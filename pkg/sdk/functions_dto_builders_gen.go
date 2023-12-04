@@ -178,10 +178,12 @@ func (s *FunctionPackagesRequest) WithPackage(Package string) *FunctionPackagesR
 func NewCreateForJavascriptFunctionRequest(
 	name SchemaObjectIdentifier,
 	Returns FunctionReturnsRequest,
+	FunctionDefinition *string,
 ) *CreateForJavascriptFunctionRequest {
 	s := CreateForJavascriptFunctionRequest{}
 	s.name = name
 	s.Returns = Returns
+	s.FunctionDefinition = FunctionDefinition
 	return &s
 }
 
@@ -227,11 +229,6 @@ func (s *CreateForJavascriptFunctionRequest) WithReturnResultsBehavior(ReturnRes
 
 func (s *CreateForJavascriptFunctionRequest) WithComment(Comment *string) *CreateForJavascriptFunctionRequest {
 	s.Comment = Comment
-	return s
-}
-
-func (s *CreateForJavascriptFunctionRequest) WithFunctionDefinition(FunctionDefinition *string) *CreateForJavascriptFunctionRequest {
-	s.FunctionDefinition = FunctionDefinition
 	return s
 }
 
@@ -414,10 +411,12 @@ func (s *CreateForScalaFunctionRequest) WithFunctionDefinition(FunctionDefinitio
 func NewCreateForSQLFunctionRequest(
 	name SchemaObjectIdentifier,
 	Returns FunctionReturnsRequest,
+	FunctionDefinition *string,
 ) *CreateForSQLFunctionRequest {
 	s := CreateForSQLFunctionRequest{}
 	s.name = name
 	s.Returns = Returns
+	s.FunctionDefinition = FunctionDefinition
 	return &s
 }
 
@@ -463,11 +462,6 @@ func (s *CreateForSQLFunctionRequest) WithMemoizable(Memoizable *bool) *CreateFo
 
 func (s *CreateForSQLFunctionRequest) WithComment(Comment *string) *CreateForSQLFunctionRequest {
 	s.Comment = Comment
-	return s
-}
-
-func (s *CreateForSQLFunctionRequest) WithFunctionDefinition(FunctionDefinition *string) *CreateForSQLFunctionRequest {
-	s.FunctionDefinition = FunctionDefinition
 	return s
 }
 

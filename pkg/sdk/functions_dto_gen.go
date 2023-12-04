@@ -81,7 +81,7 @@ type CreateForJavascriptFunctionRequest struct {
 	NullInputBehavior     *NullInputBehavior
 	ReturnResultsBehavior *ReturnResultsBehavior
 	Comment               *string
-	FunctionDefinition    *string
+	FunctionDefinition    *string // required
 }
 
 type CreateForPythonFunctionRequest struct {
@@ -139,7 +139,7 @@ type CreateForSQLFunctionRequest struct {
 	ReturnResultsBehavior *ReturnResultsBehavior
 	Memoizable            *bool
 	Comment               *string
-	FunctionDefinition    *string
+	FunctionDefinition    *string // required
 }
 
 type AlterFunctionRequest struct {

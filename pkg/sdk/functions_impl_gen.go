@@ -66,10 +66,8 @@ func (v *functions) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*F
 	return collections.FindOne(functions, func(r Function) bool { return r.Name == id.Name() })
 }
 
-func (v *functions) Describe(ctx context.Context, id SchemaObjectIdentifier) ([]FunctionDetail, error) {
-	opts := &DescribeFunctionOptions{
-		name: id,
-	}
+func (v *functions) Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error) {
+	opts := request.toOpts()
 	rows, err := validateAndQuery[functionDetailRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err

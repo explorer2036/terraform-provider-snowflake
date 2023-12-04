@@ -51,8 +51,9 @@ func TestFunctions_CreateForJava(t *testing.T) {
 				ArgDataType: DataTypeNumber,
 			},
 			{
-				ArgName:     "name",
-				ArgDataType: DataTypeVARCHAR,
+				ArgName:      "name",
+				ArgDataType:  DataTypeVARCHAR,
+				DefaultValue: String("'test'"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
@@ -101,7 +102,7 @@ func TestFunctions_CreateForJava(t *testing.T) {
 		}
 		opts.TargetPath = String("@~/testfunc.jar")
 		opts.FunctionDefinition = String("return id + name;")
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (id NUMBER, name VARCHAR) COPY GRANTS RETURNS TABLE (country_code VARCHAR, country_name VARCHAR) NOT NULL LANGUAGE JAVA CALLED ON NULL INPUT IMMUTABLE RUNTIME_VERSION = '2.0' COMMENT = 'comment' IMPORTS = ('@~/my_decrement_udf_package_dir/my_decrement_udf_jar.jar') PACKAGES = ('com.snowflake:snowpark:1.2.0') HANDLER = 'TestFunc.echoVarchar' EXTERNAL_ACCESS_INTEGRATIONS = ("ext_integration") SECRETS = ('variable1' = name1, 'variable2' = name2) TARGET_PATH = '@~/testfunc.jar' AS 'return id + name;'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (id NUMBER, name VARCHAR DEFAULT 'test') COPY GRANTS RETURNS TABLE (country_code VARCHAR, country_name VARCHAR) NOT NULL LANGUAGE JAVA CALLED ON NULL INPUT IMMUTABLE RUNTIME_VERSION = '2.0' COMMENT = 'comment' IMPORTS = ('@~/my_decrement_udf_package_dir/my_decrement_udf_jar.jar') PACKAGES = ('com.snowflake:snowpark:1.2.0') HANDLER = 'TestFunc.echoVarchar' EXTERNAL_ACCESS_INTEGRATIONS = ("ext_integration") SECRETS = ('variable1' = name1, 'variable2' = name2) TARGET_PATH = '@~/testfunc.jar' AS 'return id + name;'`, id.FullyQualifiedName())
 	})
 }
 
@@ -132,8 +133,9 @@ func TestFunctions_CreateForJavascript(t *testing.T) {
 		opts.Secure = Bool(true)
 		opts.Arguments = []FunctionArgument{
 			{
-				ArgName:     "d",
-				ArgDataType: DataTypeFloat,
+				ArgName:      "d",
+				ArgDataType:  DataTypeFloat,
+				DefaultValue: String("1.0"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
@@ -147,7 +149,7 @@ func TestFunctions_CreateForJavascript(t *testing.T) {
 		opts.ReturnResultsBehavior = ReturnResultsBehaviorPointer(ReturnResultsBehaviorImmutable)
 		opts.Comment = String("comment")
 		opts.FunctionDefinition = String("return 1;")
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (d FLOAT) COPY GRANTS RETURNS FLOAT NOT NULL LANGUAGE JAVASCRIPT CALLED ON NULL INPUT IMMUTABLE COMMENT = 'comment' AS 'return 1;'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (d FLOAT DEFAULT 1.0) COPY GRANTS RETURNS FLOAT NOT NULL LANGUAGE JAVASCRIPT CALLED ON NULL INPUT IMMUTABLE COMMENT = 'comment' AS 'return 1;'`, id.FullyQualifiedName())
 	})
 }
 
@@ -188,8 +190,9 @@ func TestFunctions_CreateForPython(t *testing.T) {
 		opts.Secure = Bool(true)
 		opts.Arguments = []FunctionArgument{
 			{
-				ArgName:     "i",
-				ArgDataType: DataTypeNumber,
+				ArgName:      "i",
+				ArgDataType:  DataTypeNumber,
+				DefaultValue: String("1"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
@@ -234,7 +237,7 @@ func TestFunctions_CreateForPython(t *testing.T) {
 			},
 		}
 		opts.FunctionDefinition = String("import numpy as np")
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (i NUMBER) COPY GRANTS RETURNS VARIANT NOT NULL LANGUAGE PYTHON CALLED ON NULL INPUT IMMUTABLE RUNTIME_VERSION = '3.8' COMMENT = 'comment' IMPORTS = ('numpy', 'pandas') PACKAGES = ('numpy', 'pandas') HANDLER = 'udf' EXTERNAL_ACCESS_INTEGRATIONS = ("ext_integration") SECRETS = ('variable1' = name1, 'variable2' = name2) AS 'import numpy as np'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (i NUMBER DEFAULT 1) COPY GRANTS RETURNS VARIANT NOT NULL LANGUAGE PYTHON CALLED ON NULL INPUT IMMUTABLE RUNTIME_VERSION = '3.8' COMMENT = 'comment' IMPORTS = ('numpy', 'pandas') PACKAGES = ('numpy', 'pandas') HANDLER = 'udf' EXTERNAL_ACCESS_INTEGRATIONS = ("ext_integration") SECRETS = ('variable1' = name1, 'variable2' = name2) AS 'import numpy as np'`, id.FullyQualifiedName())
 	})
 }
 
@@ -278,8 +281,9 @@ func TestFunctions_CreateForScala(t *testing.T) {
 		opts.Secure = Bool(true)
 		opts.Arguments = []FunctionArgument{
 			{
-				ArgName:     "x",
-				ArgDataType: DataTypeVARCHAR,
+				ArgName:      "x",
+				ArgDataType:  DataTypeVARCHAR,
+				DefaultValue: String("'test'"),
 			},
 		}
 		opts.CopyGrants = Bool(true)
@@ -296,7 +300,7 @@ func TestFunctions_CreateForScala(t *testing.T) {
 		}
 		opts.Handler = "Echo.echoVarchar"
 		opts.FunctionDefinition = String("return x")
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (x VARCHAR) COPY GRANTS RETURNS VARCHAR NOT NULL LANGUAGE SCALA CALLED ON NULL INPUT IMMUTABLE RUNTIME_VERSION = '2.0' COMMENT = 'comment' IMPORTS = ('@udf_libs/echohandler.jar') HANDLER = 'Echo.echoVarchar' AS 'return x'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (x VARCHAR DEFAULT 'test') COPY GRANTS RETURNS VARCHAR NOT NULL LANGUAGE SCALA CALLED ON NULL INPUT IMMUTABLE RUNTIME_VERSION = '2.0' COMMENT = 'comment' IMPORTS = ('@udf_libs/echohandler.jar') HANDLER = 'Echo.echoVarchar' AS 'return x'`, id.FullyQualifiedName())
 	})
 }
 
@@ -325,6 +329,13 @@ func TestFunctions_CreateForSQL(t *testing.T) {
 		opts.OrReplace = Bool(true)
 		opts.Temporary = Bool(true)
 		opts.Secure = Bool(true)
+		opts.Arguments = []FunctionArgument{
+			{
+				ArgName:      "message",
+				ArgDataType:  "VARCHAR",
+				DefaultValue: String("'test'"),
+			},
+		}
 		opts.CopyGrants = Bool(true)
 		opts.Returns = FunctionReturns{
 			ResultDataType: &FunctionReturnsResultDataType{
@@ -336,7 +347,7 @@ func TestFunctions_CreateForSQL(t *testing.T) {
 		opts.Memoizable = Bool(true)
 		opts.Comment = String("comment")
 		opts.FunctionDefinition = String("3.141592654::FLOAT")
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s COPY GRANTS RETURNS FLOAT NOT NULL IMMUTABLE MEMOIZABLE COMMENT = 'comment' AS '3.141592654::FLOAT'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE TEMPORARY SECURE FUNCTION %s (message VARCHAR DEFAULT 'test') COPY GRANTS RETURNS FLOAT NOT NULL IMMUTABLE MEMOIZABLE COMMENT = 'comment' AS '3.141592654::FLOAT'`, id.FullyQualifiedName())
 	})
 }
 

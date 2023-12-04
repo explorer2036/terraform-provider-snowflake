@@ -15,7 +15,7 @@ type Functions interface {
 	Drop(ctx context.Context, request *DropFunctionRequest) error
 	Show(ctx context.Context, request *ShowFunctionRequest) ([]Function, error)
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Function, error)
-	Describe(ctx context.Context, id SchemaObjectIdentifier) ([]FunctionDetail, error)
+	Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error)
 }
 
 // CreateForJavaFunctionOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-function#java-handler.
