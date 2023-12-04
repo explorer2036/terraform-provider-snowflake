@@ -1,29 +1,18 @@
 package sdk
 
 var (
-	_ validatable = new(CreateFunctionForJavaFunctionOptions)
-	_ validatable = new(CreateFunctionForJavascriptFunctionOptions)
-	_ validatable = new(CreateFunctionForPythonFunctionOptions)
-	_ validatable = new(CreateFunctionForScalaFunctionOptions)
-	_ validatable = new(CreateFunctionForSQLFunctionOptions)
+	_ validatable = new(CreateForJavaFunctionOptions)
+	_ validatable = new(CreateForJavascriptFunctionOptions)
+	_ validatable = new(CreateForPythonFunctionOptions)
+	_ validatable = new(CreateForScalaFunctionOptions)
+	_ validatable = new(CreateForSQLFunctionOptions)
 	_ validatable = new(AlterFunctionOptions)
 	_ validatable = new(DropFunctionOptions)
 	_ validatable = new(ShowFunctionOptions)
 	_ validatable = new(DescribeFunctionOptions)
 )
 
-func (v *FunctionReturns) validate() error {
-	if v == nil {
-		return ErrNilOptions
-	}
-	var errs []error
-	if ok := exactlyOneValueSet(v.ResultDataType, v.Table); !ok {
-		errs = append(errs, errOneOf("Returns.ResultDataType", "Returns.Table"))
-	}
-	return JoinErrors(errs...)
-}
-
-func (opts *CreateFunctionForJavaFunctionOptions) validate() error {
+func (opts *CreateForJavaFunctionOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -31,13 +20,13 @@ func (opts *CreateFunctionForJavaFunctionOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if err := opts.Returns.validate(); err != nil {
-		errs = append(errs, err)
+	if everyValueSet(opts.OrReplace, opts.IfNotExists) {
+		errs = append(errs, errOneOf("CreateForJavaFunctionOptions", "OrReplace", "IfNotExists"))
 	}
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateFunctionForJavascriptFunctionOptions) validate() error {
+func (opts *CreateForJavascriptFunctionOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -45,13 +34,10 @@ func (opts *CreateFunctionForJavascriptFunctionOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if err := opts.Returns.validate(); err != nil {
-		errs = append(errs, err)
-	}
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateFunctionForPythonFunctionOptions) validate() error {
+func (opts *CreateForPythonFunctionOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -59,13 +45,13 @@ func (opts *CreateFunctionForPythonFunctionOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if err := opts.Returns.validate(); err != nil {
-		errs = append(errs, err)
+	if everyValueSet(opts.OrReplace, opts.IfNotExists) {
+		errs = append(errs, errOneOf("CreateForPythonFunctionOptions", "OrReplace", "IfNotExists"))
 	}
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateFunctionForScalaFunctionOptions) validate() error {
+func (opts *CreateForScalaFunctionOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
@@ -73,22 +59,19 @@ func (opts *CreateFunctionForScalaFunctionOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if err := opts.Returns.validate(); err != nil {
-		errs = append(errs, err)
+	if everyValueSet(opts.OrReplace, opts.IfNotExists) {
+		errs = append(errs, errOneOf("CreateForScalaFunctionOptions", "OrReplace", "IfNotExists"))
 	}
 	return JoinErrors(errs...)
 }
 
-func (opts *CreateFunctionForSQLFunctionOptions) validate() error {
+func (opts *CreateForSQLFunctionOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions
 	}
 	var errs []error
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
-	}
-	if err := opts.Returns.validate(); err != nil {
-		errs = append(errs, err)
 	}
 	return JoinErrors(errs...)
 }
@@ -101,8 +84,8 @@ func (opts *AlterFunctionOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !exactlyOneValueSet(opts.Set, opts.Unset, opts.SetTags, opts.UnsetTags, opts.RenameTo) {
-		errs = append(errs, errExactlyOneOf("Set", "Unset", "SetTags", "UnsetTags", "RenameTo"))
+	if !exactlyOneValueSet(opts.RenameTo, opts.SetComment, opts.SetLogLevel, opts.SetTraceLevel, opts.SetSecure, opts.UnsetLogLevel, opts.UnsetTraceLevel, opts.UnsetSecure, opts.UnsetComment, opts.SetTags, opts.UnsetTags) {
+		errs = append(errs, errExactlyOneOf("AlterFunctionOptions", "RenameTo", "SetComment", "SetLogLevel", "SetTraceLevel", "SetSecure", "UnsetLogLevel", "UnsetTraceLevel", "UnsetSecure", "UnsetComment", "SetTags", "UnsetTags"))
 	}
 	return JoinErrors(errs...)
 }
@@ -123,9 +106,6 @@ func (opts *ShowFunctionOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
-	if valueSet(opts.Like) && !valueSet(opts.Like.Pattern) {
-		errs = append(errs, ErrPatternRequiredForLikeKeyword)
-	}
 	return JoinErrors(errs...)
 }
 

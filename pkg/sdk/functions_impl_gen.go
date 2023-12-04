@@ -2,8 +2,6 @@ package sdk
 
 import (
 	"context"
-
-	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
 
 var _ Functions = (*functions)(nil)
@@ -12,27 +10,27 @@ type functions struct {
 	client *Client
 }
 
-func (v *functions) CreateFunctionForJava(ctx context.Context, request *CreateFunctionForJavaFunctionRequest) error {
+func (v *functions) CreateForJava(ctx context.Context, request *CreateForJavaFunctionRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *functions) CreateFunctionForJavascript(ctx context.Context, request *CreateFunctionForJavascriptFunctionRequest) error {
+func (v *functions) CreateForJavascript(ctx context.Context, request *CreateForJavascriptFunctionRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *functions) CreateFunctionForPython(ctx context.Context, request *CreateFunctionForPythonFunctionRequest) error {
+func (v *functions) CreateForPython(ctx context.Context, request *CreateForPythonFunctionRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *functions) CreateFunctionForScala(ctx context.Context, request *CreateFunctionForScalaFunctionRequest) error {
+func (v *functions) CreateForScala(ctx context.Context, request *CreateForScalaFunctionRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *functions) CreateFunctionForSQL(ctx context.Context, request *CreateFunctionForSQLFunctionRequest) error {
+func (v *functions) CreateForSQL(ctx context.Context, request *CreateForSQLFunctionRequest) error {
 	opts := request.toOpts()
 	return validateAndExec(v.client, ctx, opts)
 }
@@ -57,17 +55,10 @@ func (v *functions) Show(ctx context.Context, request *ShowFunctionRequest) ([]F
 	return resultList, nil
 }
 
-func (v *functions) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Function, error) {
-	request := NewShowFunctionRequest().WithLike(id.Name())
-	functions, err := v.Show(ctx, request)
-	if err != nil {
-		return nil, err
+func (v *functions) Describe(ctx context.Context, id SchemaObjectIdentifier) ([]FunctionDetail, error) {
+	opts := &DescribeFunctionOptions{
+		name: id,
 	}
-	return collections.FindOne(functions, func(r Function) bool { return r.Name == id.Name() })
-}
-
-func (v *functions) Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error) {
-	opts := request.toOpts()
 	rows, err := validateAndQuery[functionDetailRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err
@@ -75,8 +66,8 @@ func (v *functions) Describe(ctx context.Context, request *DescribeFunctionReque
 	return convertRows[functionDetailRow, FunctionDetail](rows), nil
 }
 
-func (r *CreateFunctionForJavaFunctionRequest) toOpts() *CreateFunctionForJavaFunctionOptions {
-	opts := &CreateFunctionForJavaFunctionOptions{
+func (r *CreateForJavaFunctionRequest) toOpts() *CreateForJavaFunctionOptions {
+	opts := &CreateForJavaFunctionOptions{
 		OrReplace:   r.OrReplace,
 		Temporary:   r.Temporary,
 		Secure:      r.Secure,
@@ -85,21 +76,25 @@ func (r *CreateFunctionForJavaFunctionRequest) toOpts() *CreateFunctionForJavaFu
 
 		CopyGrants: r.CopyGrants,
 
-		RuntimeVersion: r.RuntimeVersion,
-		Comment:        r.Comment,
+		ReturnNullValues:      r.ReturnNullValues,
+		NullInputBehavior:     r.NullInputBehavior,
+		ReturnResultsBehavior: r.ReturnResultsBehavior,
+		RuntimeVersion:        r.RuntimeVersion,
+		Comment:               r.Comment,
 
 		Handler:                    r.Handler,
 		ExternalAccessIntegrations: r.ExternalAccessIntegrations,
-
-		TargetPath: r.TargetPath,
+		Secrets:                    r.Secrets,
+		TargetPath:                 r.TargetPath,
+		FunctionDefinition:         r.FunctionDefinition,
 	}
 	if r.Arguments != nil {
 		s := make([]FunctionArgument, len(r.Arguments))
 		for i, v := range r.Arguments {
 			s[i] = FunctionArgument{
-				ArgName:     v.ArgName,
-				ArgDataType: v.ArgDataType,
-				Default:     v.Default,
+				ArgName:      v.ArgName,
+				ArgDataType:  v.ArgDataType,
+				DefaultValue: v.DefaultValue,
 			}
 		}
 		opts.Arguments = s
@@ -121,15 +116,6 @@ func (r *CreateFunctionForJavaFunctionRequest) toOpts() *CreateFunctionForJavaFu
 				opts.Returns.Table.Columns = s
 			}
 		}
-	}
-	if r.ReturnNullValues != nil {
-		opts.ReturnNullValues = r.ReturnNullValues
-	}
-	if r.NullInputBehavior != nil {
-		opts.NullInputBehavior = r.NullInputBehavior
-	}
-	if r.ReturnResultsBehavior != nil {
-		opts.ReturnResultsBehavior = r.ReturnResultsBehavior
 	}
 	if r.Imports != nil {
 		s := make([]FunctionImports, len(r.Imports))
@@ -149,39 +135,31 @@ func (r *CreateFunctionForJavaFunctionRequest) toOpts() *CreateFunctionForJavaFu
 		}
 		opts.Packages = s
 	}
-	if r.Secrets != nil {
-		s := make([]FunctionSecret, len(r.Secrets))
-		for i, v := range r.Secrets {
-			s[i] = FunctionSecret{
-				SecretVariableName: v.SecretVariableName,
-				SecretName:         v.SecretName,
-			}
-		}
-		opts.Secrets = s
-	}
-	opts.FunctionDefinition = r.FunctionDefinition
 	return opts
 }
 
-func (r *CreateFunctionForJavascriptFunctionRequest) toOpts() *CreateFunctionForJavascriptFunctionOptions {
-	opts := &CreateFunctionForJavascriptFunctionOptions{
-		OrReplace:   r.OrReplace,
-		Temporary:   r.Temporary,
-		Secure:      r.Secure,
-		IfNotExists: r.IfNotExists,
-		name:        r.name,
+func (r *CreateForJavascriptFunctionRequest) toOpts() *CreateForJavascriptFunctionOptions {
+	opts := &CreateForJavascriptFunctionOptions{
+		OrReplace: r.OrReplace,
+		Temporary: r.Temporary,
+		Secure:    r.Secure,
+		name:      r.name,
 
 		CopyGrants: r.CopyGrants,
 
-		Comment: r.Comment,
+		ReturnNullValues:      r.ReturnNullValues,
+		NullInputBehavior:     r.NullInputBehavior,
+		ReturnResultsBehavior: r.ReturnResultsBehavior,
+		Comment:               r.Comment,
+		FunctionDefinition:    r.FunctionDefinition,
 	}
 	if r.Arguments != nil {
 		s := make([]FunctionArgument, len(r.Arguments))
 		for i, v := range r.Arguments {
 			s[i] = FunctionArgument{
-				ArgName:     v.ArgName,
-				ArgDataType: v.ArgDataType,
-				Default:     v.Default,
+				ArgName:      v.ArgName,
+				ArgDataType:  v.ArgDataType,
+				DefaultValue: v.DefaultValue,
 			}
 		}
 		opts.Arguments = s
@@ -204,22 +182,11 @@ func (r *CreateFunctionForJavascriptFunctionRequest) toOpts() *CreateFunctionFor
 			}
 		}
 	}
-	if r.ReturnNullValues != nil {
-		opts.ReturnNullValues = r.ReturnNullValues
-	}
-	if r.NullInputBehavior != nil {
-		opts.NullInputBehavior = r.NullInputBehavior
-	}
-	if r.ReturnResultsBehavior != nil {
-		opts.ReturnResultsBehavior = r.ReturnResultsBehavior
-	}
-
-	opts.FunctionDefinition = r.FunctionDefinition
 	return opts
 }
 
-func (r *CreateFunctionForPythonFunctionRequest) toOpts() *CreateFunctionForPythonFunctionOptions {
-	opts := &CreateFunctionForPythonFunctionOptions{
+func (r *CreateForPythonFunctionRequest) toOpts() *CreateForPythonFunctionOptions {
+	opts := &CreateForPythonFunctionOptions{
 		OrReplace:   r.OrReplace,
 		Temporary:   r.Temporary,
 		Secure:      r.Secure,
@@ -228,19 +195,24 @@ func (r *CreateFunctionForPythonFunctionRequest) toOpts() *CreateFunctionForPyth
 
 		CopyGrants: r.CopyGrants,
 
-		RuntimeVersion: r.RuntimeVersion,
-		Comment:        r.Comment,
+		ReturnNullValues:      r.ReturnNullValues,
+		NullInputBehavior:     r.NullInputBehavior,
+		ReturnResultsBehavior: r.ReturnResultsBehavior,
+		RuntimeVersion:        r.RuntimeVersion,
+		Comment:               r.Comment,
 
 		Handler:                    r.Handler,
 		ExternalAccessIntegrations: r.ExternalAccessIntegrations,
+		Secrets:                    r.Secrets,
+		FunctionDefinition:         r.FunctionDefinition,
 	}
 	if r.Arguments != nil {
 		s := make([]FunctionArgument, len(r.Arguments))
 		for i, v := range r.Arguments {
 			s[i] = FunctionArgument{
-				ArgName:     v.ArgName,
-				ArgDataType: v.ArgDataType,
-				Default:     v.Default,
+				ArgName:      v.ArgName,
+				ArgDataType:  v.ArgDataType,
+				DefaultValue: v.DefaultValue,
 			}
 		}
 		opts.Arguments = s
@@ -262,15 +234,6 @@ func (r *CreateFunctionForPythonFunctionRequest) toOpts() *CreateFunctionForPyth
 				opts.Returns.Table.Columns = s
 			}
 		}
-	}
-	if r.ReturnNullValues != nil {
-		opts.ReturnNullValues = r.ReturnNullValues
-	}
-	if r.NullInputBehavior != nil {
-		opts.NullInputBehavior = r.NullInputBehavior
-	}
-	if r.ReturnResultsBehavior != nil {
-		opts.ReturnResultsBehavior = r.ReturnResultsBehavior
 	}
 	if r.Imports != nil {
 		s := make([]FunctionImports, len(r.Imports))
@@ -290,73 +253,39 @@ func (r *CreateFunctionForPythonFunctionRequest) toOpts() *CreateFunctionForPyth
 		}
 		opts.Packages = s
 	}
-	if r.Secrets != nil {
-		s := make([]FunctionSecret, len(r.Secrets))
-		for i, v := range r.Secrets {
-			s[i] = FunctionSecret{
-				SecretVariableName: v.SecretVariableName,
-				SecretName:         v.SecretName,
-			}
-		}
-		opts.Secrets = s
-	}
-	opts.FunctionDefinition = r.FunctionDefinition
 	return opts
 }
 
-func (r *CreateFunctionForScalaFunctionRequest) toOpts() *CreateFunctionForScalaFunctionOptions {
-	opts := &CreateFunctionForScalaFunctionOptions{
+func (r *CreateForScalaFunctionRequest) toOpts() *CreateForScalaFunctionOptions {
+	opts := &CreateForScalaFunctionOptions{
 		OrReplace:   r.OrReplace,
 		Temporary:   r.Temporary,
 		Secure:      r.Secure,
 		IfNotExists: r.IfNotExists,
 		name:        r.name,
 
-		CopyGrants: r.CopyGrants,
+		CopyGrants:            r.CopyGrants,
+		ResultDataType:        r.ResultDataType,
+		ReturnNullValues:      r.ReturnNullValues,
+		NullInputBehavior:     r.NullInputBehavior,
+		ReturnResultsBehavior: r.ReturnResultsBehavior,
+		RuntimeVersion:        r.RuntimeVersion,
+		Comment:               r.Comment,
 
-		RuntimeVersion: r.RuntimeVersion,
-		Comment:        r.Comment,
-
-		Handler:    r.Handler,
-		TargetPath: r.TargetPath,
+		Handler:            r.Handler,
+		TargetPath:         r.TargetPath,
+		FunctionDefinition: r.FunctionDefinition,
 	}
 	if r.Arguments != nil {
 		s := make([]FunctionArgument, len(r.Arguments))
 		for i, v := range r.Arguments {
 			s[i] = FunctionArgument{
-				ArgName:     v.ArgName,
-				ArgDataType: v.ArgDataType,
-				Default:     v.Default,
+				ArgName:      v.ArgName,
+				ArgDataType:  v.ArgDataType,
+				DefaultValue: v.DefaultValue,
 			}
 		}
 		opts.Arguments = s
-	}
-	if r.Returns != nil {
-		opts.Returns = &FunctionReturns{
-			ResultDataType: r.Returns.ResultDataType,
-		}
-		if r.Returns.Table != nil {
-			opts.Returns.Table = &FunctionReturnsTable{}
-			if r.Returns.Table.Columns != nil {
-				s := make([]FunctionColumn, len(r.Returns.Table.Columns))
-				for i, v := range r.Returns.Table.Columns {
-					s[i] = FunctionColumn{
-						ColumnName:     v.ColumnName,
-						ColumnDataType: v.ColumnDataType,
-					}
-				}
-				opts.Returns.Table.Columns = s
-			}
-		}
-	}
-	if r.ReturnNullValues != nil {
-		opts.ReturnNullValues = r.ReturnNullValues
-	}
-	if r.NullInputBehavior != nil {
-		opts.NullInputBehavior = r.NullInputBehavior
-	}
-	if r.ReturnResultsBehavior != nil {
-		opts.ReturnResultsBehavior = r.ReturnResultsBehavior
 	}
 	if r.Imports != nil {
 		s := make([]FunctionImports, len(r.Imports))
@@ -376,30 +305,31 @@ func (r *CreateFunctionForScalaFunctionRequest) toOpts() *CreateFunctionForScala
 		}
 		opts.Packages = s
 	}
-	opts.FunctionDefinition = r.FunctionDefinition
 	return opts
 }
 
-func (r *CreateFunctionForSQLFunctionRequest) toOpts() *CreateFunctionForSQLFunctionOptions {
-	opts := &CreateFunctionForSQLFunctionOptions{
-		OrReplace:   r.OrReplace,
-		Temporary:   r.Temporary,
-		Secure:      r.Secure,
-		IfNotExists: r.IfNotExists,
-		name:        r.name,
+func (r *CreateForSQLFunctionRequest) toOpts() *CreateForSQLFunctionOptions {
+	opts := &CreateForSQLFunctionOptions{
+		OrReplace: r.OrReplace,
+		Temporary: r.Temporary,
+		Secure:    r.Secure,
+		name:      r.name,
 
 		CopyGrants: r.CopyGrants,
 
-		Memoizable: r.Memoizable,
-		Comment:    r.Comment,
+		ReturnNullValues:      r.ReturnNullValues,
+		ReturnResultsBehavior: r.ReturnResultsBehavior,
+		Memoizable:            r.Memoizable,
+		Comment:               r.Comment,
+		FunctionDefinition:    r.FunctionDefinition,
 	}
 	if r.Arguments != nil {
 		s := make([]FunctionArgument, len(r.Arguments))
 		for i, v := range r.Arguments {
 			s[i] = FunctionArgument{
-				ArgName:     v.ArgName,
-				ArgDataType: v.ArgDataType,
-				Default:     v.Default,
+				ArgName:      v.ArgName,
+				ArgDataType:  v.ArgDataType,
+				DefaultValue: v.DefaultValue,
 			}
 		}
 		opts.Arguments = s
@@ -422,66 +352,34 @@ func (r *CreateFunctionForSQLFunctionRequest) toOpts() *CreateFunctionForSQLFunc
 			}
 		}
 	}
-	if r.ReturnNullValues != nil {
-		opts.ReturnNullValues = r.ReturnNullValues
-	}
-	if r.ReturnResultsBehavior != nil {
-		opts.ReturnResultsBehavior = r.ReturnResultsBehavior
-	}
-	opts.FunctionDefinition = r.FunctionDefinition
 	return opts
 }
 
 func (r *AlterFunctionRequest) toOpts() *AlterFunctionOptions {
 	opts := &AlterFunctionOptions{
-		IfExists: r.IfExists,
-		name:     r.name,
-
-		RenameTo:  r.RenameTo,
-		SetTags:   r.SetTags,
-		UnsetTags: r.UnsetTags,
-	}
-	if r.ArgumentTypes != nil {
-		s := make([]FunctionArgumentType, len(r.ArgumentTypes))
-		for i, v := range r.ArgumentTypes {
-			s[i] = FunctionArgumentType{
-				ArgDataType: v.ArgDataType,
-			}
-		}
-		opts.ArgumentTypes = s
-	}
-	if r.Set != nil {
-		opts.Set = &FunctionSet{
-			LogLevel:   r.Set.LogLevel,
-			TraceLevel: r.Set.TraceLevel,
-			Comment:    r.Set.Comment,
-			Secure:     r.Set.Secure,
-		}
-	}
-	if r.Unset != nil {
-		opts.Unset = &FunctionUnset{
-			Secure:     r.Unset.Secure,
-			Comment:    r.Unset.Comment,
-			LogLevel:   r.Unset.LogLevel,
-			TraceLevel: r.Unset.TraceLevel,
-		}
+		IfExists:          r.IfExists,
+		name:              r.name,
+		ArgumentDataTypes: r.ArgumentDataTypes,
+		RenameTo:          r.RenameTo,
+		SetComment:        r.SetComment,
+		SetLogLevel:       r.SetLogLevel,
+		SetTraceLevel:     r.SetTraceLevel,
+		SetSecure:         r.SetSecure,
+		UnsetSecure:       r.UnsetSecure,
+		UnsetLogLevel:     r.UnsetLogLevel,
+		UnsetTraceLevel:   r.UnsetTraceLevel,
+		UnsetComment:      r.UnsetComment,
+		SetTags:           r.SetTags,
+		UnsetTags:         r.UnsetTags,
 	}
 	return opts
 }
 
 func (r *DropFunctionRequest) toOpts() *DropFunctionOptions {
 	opts := &DropFunctionOptions{
-		IfExists: r.IfExists,
-		name:     r.name,
-	}
-	if r.ArgumentTypes != nil {
-		s := make([]FunctionArgumentType, len(r.ArgumentTypes))
-		for i, v := range r.ArgumentTypes {
-			s[i] = FunctionArgumentType{
-				ArgDataType: v.ArgDataType,
-			}
-		}
-		opts.ArgumentTypes = s
+		IfExists:          r.IfExists,
+		name:              r.name,
+		ArgumentDataTypes: r.ArgumentDataTypes,
 	}
 	return opts
 }
@@ -495,46 +393,19 @@ func (r *ShowFunctionRequest) toOpts() *ShowFunctionOptions {
 }
 
 func (r functionRow) convert() *Function {
-	return &Function{
-		CreatedOn:          r.CreatedOn,
-		Name:               r.Name,
-		SchemaName:         r.SchemaName,
-		IsBuiltIn:          r.IsBuiltIn == "Y",
-		IsAggregate:        r.IsAggregate == "Y",
-		IsAnsi:             r.IsAnsi == "Y",
-		MinNumArguments:    r.MinNumArguments,
-		MaxNumArguments:    r.MaxNumArguments,
-		Arguments:          r.Arguments,
-		Description:        r.Description,
-		CatalogName:        r.CatalogName,
-		IsTableFunction:    r.IsTableFunction == "Y",
-		ValidForClustering: r.ValidForClustering == "Y",
-		IsSecure:           r.IsSecure == "Y",
-		IsExternalFunction: r.IsExternalFunction == "Y",
-		Language:           r.Language,
-		IsMemoizable:       r.IsMemoizable == "Y",
-	}
+	// TODO: Mapping
+	return &Function{}
 }
 
 func (r *DescribeFunctionRequest) toOpts() *DescribeFunctionOptions {
 	opts := &DescribeFunctionOptions{
-		name: r.name,
-	}
-	if r.ArgumentTypes != nil {
-		s := make([]FunctionArgumentType, len(r.ArgumentTypes))
-		for i, v := range r.ArgumentTypes {
-			s[i] = FunctionArgumentType{
-				ArgDataType: v.ArgDataType,
-			}
-		}
-		opts.ArgumentTypes = s
+		name:              r.name,
+		ArgumentDataTypes: r.ArgumentDataTypes,
 	}
 	return opts
 }
 
 func (r functionDetailRow) convert() *FunctionDetail {
-	return &FunctionDetail{
-		Property: r.Property,
-		Value:    r.Value,
-	}
+	// TODO: Mapping
+	return &FunctionDetail{}
 }

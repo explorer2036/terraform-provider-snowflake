@@ -3,18 +3,18 @@ package sdk
 //go:generate go run ./dto-builder-generator/main.go
 
 var (
-	_ optionsProvider[CreateFunctionForJavaFunctionOptions]       = new(CreateFunctionForJavaFunctionRequest)
-	_ optionsProvider[CreateFunctionForJavascriptFunctionOptions] = new(CreateFunctionForJavascriptFunctionRequest)
-	_ optionsProvider[CreateFunctionForPythonFunctionOptions]     = new(CreateFunctionForPythonFunctionRequest)
-	_ optionsProvider[CreateFunctionForScalaFunctionOptions]      = new(CreateFunctionForScalaFunctionRequest)
-	_ optionsProvider[CreateFunctionForSQLFunctionOptions]        = new(CreateFunctionForSQLFunctionRequest)
-	_ optionsProvider[AlterFunctionOptions]                       = new(AlterFunctionRequest)
-	_ optionsProvider[DropFunctionOptions]                        = new(DropFunctionRequest)
-	_ optionsProvider[ShowFunctionOptions]                        = new(ShowFunctionRequest)
-	_ optionsProvider[DescribeFunctionOptions]                    = new(DescribeFunctionRequest)
+	_ optionsProvider[CreateForJavaFunctionOptions]       = new(CreateForJavaFunctionRequest)
+	_ optionsProvider[CreateForJavascriptFunctionOptions] = new(CreateForJavascriptFunctionRequest)
+	_ optionsProvider[CreateForPythonFunctionOptions]     = new(CreateForPythonFunctionRequest)
+	_ optionsProvider[CreateForScalaFunctionOptions]      = new(CreateForScalaFunctionRequest)
+	_ optionsProvider[CreateForSQLFunctionOptions]        = new(CreateForSQLFunctionRequest)
+	_ optionsProvider[AlterFunctionOptions]               = new(AlterFunctionRequest)
+	_ optionsProvider[DropFunctionOptions]                = new(DropFunctionRequest)
+	_ optionsProvider[ShowFunctionOptions]                = new(ShowFunctionRequest)
+	_ optionsProvider[DescribeFunctionOptions]            = new(DescribeFunctionRequest)
 )
 
-type CreateFunctionForJavaFunctionRequest struct {
+type CreateForJavaFunctionRequest struct {
 	OrReplace                  *bool
 	Temporary                  *bool
 	Secure                     *bool
@@ -22,30 +22,30 @@ type CreateFunctionForJavaFunctionRequest struct {
 	name                       SchemaObjectIdentifier // required
 	Arguments                  []FunctionArgumentRequest
 	CopyGrants                 *bool
-	Returns                    *FunctionReturnsRequest
-	ReturnNullValues           *FunctionReturnNullValues
-	NullInputBehavior          *FunctionNullInputBehavior
-	ReturnResultsBehavior      *FunctionReturnResultsBehavior
-	RuntimeVersion             *string
+	Returns                    FunctionReturnsRequest
+	ReturnNullValues           *ReturnNullValues
+	NullInputBehavior          *NullInputBehavior
+	ReturnResultsBehavior      *ReturnResultsBehavior
+	RuntimeVersion             string // required
 	Comment                    *string
 	Imports                    []FunctionImportsRequest
 	Packages                   []FunctionPackagesRequest
-	Handler                    string
+	Handler                    string // required
 	ExternalAccessIntegrations []AccountObjectIdentifier
-	Secrets                    []FunctionSecretRequest
+	Secrets                    []Secret
 	TargetPath                 *string
-	FunctionDefinition         string
+	FunctionDefinition         *string
 }
 
 type FunctionArgumentRequest struct {
-	ArgName     string
-	ArgDataType DataType
-	Default     *string
+	ArgName      string   // required
+	ArgDataType  DataType // required
+	DefaultValue *string
 }
 
 type FunctionReturnsRequest struct {
-	ResultDataType *DataType
-	Table          *FunctionReturnsTableRequest
+	ResultDataType DataType // required
+	Table          FunctionReturnsTableRequest
 }
 
 type FunctionReturnsTableRequest struct {
@@ -53,8 +53,8 @@ type FunctionReturnsTableRequest struct {
 }
 
 type FunctionColumnRequest struct {
-	ColumnName     string
-	ColumnDataType DataType
+	ColumnName     string   // required
+	ColumnDataType DataType // required
 }
 
 type FunctionImportsRequest struct {
@@ -65,28 +65,22 @@ type FunctionPackagesRequest struct {
 	Package string
 }
 
-type FunctionSecretRequest struct {
-	SecretVariableName string
-	SecretName         string
-}
-
-type CreateFunctionForJavascriptFunctionRequest struct {
+type CreateForJavascriptFunctionRequest struct {
 	OrReplace             *bool
 	Temporary             *bool
 	Secure                *bool
-	IfNotExists           *bool
 	name                  SchemaObjectIdentifier // required
 	Arguments             []FunctionArgumentRequest
 	CopyGrants            *bool
-	Returns               *FunctionReturnsRequest
-	ReturnNullValues      *FunctionReturnNullValues
-	NullInputBehavior     *FunctionNullInputBehavior
-	ReturnResultsBehavior *FunctionReturnResultsBehavior
+	Returns               FunctionReturnsRequest
+	ReturnNullValues      *ReturnNullValues
+	NullInputBehavior     *NullInputBehavior
+	ReturnResultsBehavior *ReturnResultsBehavior
 	Comment               *string
-	FunctionDefinition    string
+	FunctionDefinition    *string
 }
 
-type CreateFunctionForPythonFunctionRequest struct {
+type CreateForPythonFunctionRequest struct {
 	OrReplace                  *bool
 	Temporary                  *bool
 	Secure                     *bool
@@ -94,21 +88,21 @@ type CreateFunctionForPythonFunctionRequest struct {
 	name                       SchemaObjectIdentifier // required
 	Arguments                  []FunctionArgumentRequest
 	CopyGrants                 *bool
-	Returns                    *FunctionReturnsRequest
-	ReturnNullValues           *FunctionReturnNullValues
-	NullInputBehavior          *FunctionNullInputBehavior
-	ReturnResultsBehavior      *FunctionReturnResultsBehavior
-	RuntimeVersion             string
+	Returns                    FunctionReturnsRequest
+	ReturnNullValues           *ReturnNullValues
+	NullInputBehavior          *NullInputBehavior
+	ReturnResultsBehavior      *ReturnResultsBehavior
+	RuntimeVersion             string // required
 	Comment                    *string
 	Imports                    []FunctionImportsRequest
 	Packages                   []FunctionPackagesRequest
-	Handler                    string
+	Handler                    string // required
 	ExternalAccessIntegrations []AccountObjectIdentifier
-	Secrets                    []FunctionSecretRequest
-	FunctionDefinition         string
+	Secrets                    []Secret
+	FunctionDefinition         *string
 }
 
-type CreateFunctionForScalaFunctionRequest struct {
+type CreateForScalaFunctionRequest struct {
 	OrReplace             *bool
 	Temporary             *bool
 	Secure                *bool
@@ -116,68 +110,55 @@ type CreateFunctionForScalaFunctionRequest struct {
 	name                  SchemaObjectIdentifier // required
 	Arguments             []FunctionArgumentRequest
 	CopyGrants            *bool
-	Returns               *FunctionReturnsRequest
-	ReturnNullValues      *FunctionReturnNullValues
-	NullInputBehavior     *FunctionNullInputBehavior
-	ReturnResultsBehavior *FunctionReturnResultsBehavior
-	RuntimeVersion        *string
+	ResultDataType        DataType // required
+	ReturnNullValues      *ReturnNullValues
+	NullInputBehavior     *NullInputBehavior
+	ReturnResultsBehavior *ReturnResultsBehavior
+	RuntimeVersion        string // required
 	Comment               *string
 	Imports               []FunctionImportsRequest
 	Packages              []FunctionPackagesRequest
-	Handler               string
+	Handler               string // required
 	TargetPath            *string
-	FunctionDefinition    string
+	FunctionDefinition    *string
 }
 
-type CreateFunctionForSQLFunctionRequest struct {
+type CreateForSQLFunctionRequest struct {
 	OrReplace             *bool
 	Temporary             *bool
 	Secure                *bool
-	IfNotExists           *bool
 	name                  SchemaObjectIdentifier // required
 	Arguments             []FunctionArgumentRequest
 	CopyGrants            *bool
-	Returns               *FunctionReturnsRequest
-	ReturnNullValues      *FunctionReturnNullValues
-	ReturnResultsBehavior *FunctionReturnResultsBehavior
+	Returns               FunctionReturnsRequest
+	ReturnNullValues      *ReturnNullValues
+	ReturnResultsBehavior *ReturnResultsBehavior
 	Memoizable            *bool
 	Comment               *string
-	FunctionDefinition    string
+	FunctionDefinition    *string
 }
 
 type AlterFunctionRequest struct {
-	IfExists      *bool
-	name          SchemaObjectIdentifier // required
-	ArgumentTypes []FunctionArgumentTypeRequest
-	Set           *FunctionSetRequest
-	Unset         *FunctionUnsetRequest
-	RenameTo      *SchemaObjectIdentifier
-	SetTags       []TagAssociation
-	UnsetTags     []ObjectIdentifier
-}
-
-type FunctionArgumentTypeRequest struct {
-	ArgDataType DataType
-}
-
-type FunctionSetRequest struct {
-	LogLevel   *string
-	TraceLevel *string
-	Comment    *string
-	Secure     *bool
-}
-
-type FunctionUnsetRequest struct {
-	Secure     *bool
-	Comment    *bool
-	LogLevel   *bool
-	TraceLevel *bool
+	IfExists          *bool
+	name              SchemaObjectIdentifier // required
+	ArgumentDataTypes []DataType             // required
+	RenameTo          *SchemaObjectIdentifier
+	SetComment        *string
+	SetLogLevel       *string
+	SetTraceLevel     *string
+	SetSecure         *bool
+	UnsetSecure       *bool
+	UnsetLogLevel     *bool
+	UnsetTraceLevel   *bool
+	UnsetComment      *bool
+	SetTags           []TagAssociation
+	UnsetTags         []ObjectIdentifier
 }
 
 type DropFunctionRequest struct {
-	IfExists      *bool
-	name          SchemaObjectIdentifier // required
-	ArgumentTypes []FunctionArgumentTypeRequest
+	IfExists          *bool
+	name              SchemaObjectIdentifier // required
+	ArgumentDataTypes []DataType             // required
 }
 
 type ShowFunctionRequest struct {
@@ -186,6 +167,6 @@ type ShowFunctionRequest struct {
 }
 
 type DescribeFunctionRequest struct {
-	name          SchemaObjectIdentifier // required
-	ArgumentTypes []FunctionArgumentTypeRequest
+	name              SchemaObjectIdentifier // required
+	ArgumentDataTypes []DataType             // required
 }
