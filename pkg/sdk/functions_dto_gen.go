@@ -22,11 +22,11 @@ type CreateForJavaFunctionRequest struct {
 	name                       SchemaObjectIdentifier // required
 	Arguments                  []FunctionArgumentRequest
 	CopyGrants                 *bool
-	Returns                    FunctionReturnsRequest
+	Returns                    FunctionReturnsRequest // required
 	ReturnNullValues           *ReturnNullValues
 	NullInputBehavior          *NullInputBehavior
 	ReturnResultsBehavior      *ReturnResultsBehavior
-	RuntimeVersion             string // required
+	RuntimeVersion             *string
 	Comment                    *string
 	Imports                    []FunctionImportsRequest
 	Packages                   []FunctionPackagesRequest
@@ -44,8 +44,12 @@ type FunctionArgumentRequest struct {
 }
 
 type FunctionReturnsRequest struct {
+	ResultDataType *FunctionReturnsResultDataTypeRequest
+	Table          *FunctionReturnsTableRequest
+}
+
+type FunctionReturnsResultDataTypeRequest struct {
 	ResultDataType DataType // required
-	Table          FunctionReturnsTableRequest
 }
 
 type FunctionReturnsTableRequest struct {
@@ -72,7 +76,7 @@ type CreateForJavascriptFunctionRequest struct {
 	name                  SchemaObjectIdentifier // required
 	Arguments             []FunctionArgumentRequest
 	CopyGrants            *bool
-	Returns               FunctionReturnsRequest
+	Returns               FunctionReturnsRequest // required
 	ReturnNullValues      *ReturnNullValues
 	NullInputBehavior     *NullInputBehavior
 	ReturnResultsBehavior *ReturnResultsBehavior
@@ -88,7 +92,7 @@ type CreateForPythonFunctionRequest struct {
 	name                       SchemaObjectIdentifier // required
 	Arguments                  []FunctionArgumentRequest
 	CopyGrants                 *bool
-	Returns                    FunctionReturnsRequest
+	Returns                    FunctionReturnsRequest // required
 	ReturnNullValues           *ReturnNullValues
 	NullInputBehavior          *NullInputBehavior
 	ReturnResultsBehavior      *ReturnResultsBehavior
@@ -114,7 +118,7 @@ type CreateForScalaFunctionRequest struct {
 	ReturnNullValues      *ReturnNullValues
 	NullInputBehavior     *NullInputBehavior
 	ReturnResultsBehavior *ReturnResultsBehavior
-	RuntimeVersion        string // required
+	RuntimeVersion        *string
 	Comment               *string
 	Imports               []FunctionImportsRequest
 	Packages              []FunctionPackagesRequest
@@ -130,7 +134,7 @@ type CreateForSQLFunctionRequest struct {
 	name                  SchemaObjectIdentifier // required
 	Arguments             []FunctionArgumentRequest
 	CopyGrants            *bool
-	Returns               FunctionReturnsRequest
+	Returns               FunctionReturnsRequest // required
 	ReturnNullValues      *ReturnNullValues
 	ReturnResultsBehavior *ReturnResultsBehavior
 	Memoizable            *bool

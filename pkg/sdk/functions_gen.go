@@ -1,6 +1,9 @@
 package sdk
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 type Functions interface {
 	CreateForJava(ctx context.Context, request *CreateForJavaFunctionRequest) error
@@ -11,6 +14,7 @@ type Functions interface {
 	Alter(ctx context.Context, request *AlterFunctionRequest) error
 	Drop(ctx context.Context, request *DropFunctionRequest) error
 	Show(ctx context.Context, request *ShowFunctionRequest) ([]Function, error)
+	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Function, error)
 	Describe(ctx context.Context, id SchemaObjectIdentifier) ([]FunctionDetail, error)
 }
 
@@ -30,7 +34,7 @@ type CreateForJavaFunctionOptions struct {
 	languageJava               bool                      `ddl:"static" sql:"LANGUAGE JAVA"`
 	NullInputBehavior          *NullInputBehavior        `ddl:"keyword"`
 	ReturnResultsBehavior      *ReturnResultsBehavior    `ddl:"keyword"`
-	RuntimeVersion             string                    `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
+	RuntimeVersion             *string                   `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
 	Comment                    *string                   `ddl:"parameter,single_quotes" sql:"COMMENT"`
 	Imports                    []FunctionImports         `ddl:"parameter,parentheses" sql:"IMPORTS"`
 	Packages                   []FunctionPackages        `ddl:"parameter,parentheses" sql:"PACKAGES"`
@@ -48,8 +52,12 @@ type FunctionArgument struct {
 }
 
 type FunctionReturns struct {
-	ResultDataType DataType             `ddl:"keyword,no_quotes"`
-	Table          FunctionReturnsTable `ddl:"keyword" sql:"TABLE"`
+	ResultDataType *FunctionReturnsResultDataType `ddl:"keyword"`
+	Table          *FunctionReturnsTable          `ddl:"keyword" sql:"TABLE"`
+}
+
+type FunctionReturnsResultDataType struct {
+	ResultDataType DataType `ddl:"keyword,no_quotes"`
 }
 
 type FunctionReturnsTable struct {
@@ -125,12 +133,12 @@ type CreateForScalaFunctionOptions struct {
 	name                  SchemaObjectIdentifier `ddl:"identifier"`
 	Arguments             []FunctionArgument     `ddl:"parameter,parentheses,no_equals"`
 	CopyGrants            *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
-	ResultDataType        DataType               `ddl:"keyword,no_quotes" sql:"RETURNS"`
+	ResultDataType        DataType               `ddl:"parameter,no_equals" sql:"RETURNS"`
 	ReturnNullValues      *ReturnNullValues      `ddl:"keyword"`
 	languageScala         bool                   `ddl:"static" sql:"LANGUAGE SCALA"`
 	NullInputBehavior     *NullInputBehavior     `ddl:"keyword"`
 	ReturnResultsBehavior *ReturnResultsBehavior `ddl:"keyword"`
-	RuntimeVersion        string                 `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
+	RuntimeVersion        *string                `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
 	Comment               *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
 	Imports               []FunctionImports      `ddl:"parameter,parentheses" sql:"IMPORTS"`
 	Packages              []FunctionPackages     `ddl:"parameter,parentheses" sql:"PACKAGES"`
@@ -195,23 +203,23 @@ type ShowFunctionOptions struct {
 }
 
 type functionRow struct {
-	CreatedOn          string `db:"created_on"`
-	Name               string `db:"name"`
-	SchemaName         string `db:"schema_name"`
-	IsBuiltin          bool   `db:"is_builtin"`
-	IsAggregate        bool   `db:"is_aggregate"`
-	IsAnsi             bool   `db:"is_ansi"`
-	MinNumArguments    int    `db:"min_num_arguments"`
-	MaxNumArguments    int    `db:"max_num_arguments"`
-	Arguments          string `db:"arguments"`
-	Description        string `db:"description"`
-	CatalogName        string `db:"catalog_name"`
-	IsTableFunction    bool   `db:"is_table_function"`
-	ValidForClustering bool   `db:"valid_for_clustering"`
-	IsSecure           string `db:"is_secure"`
-	IsExternalFunction string `db:"is_external_function"`
-	Language           string `db:"language"`
-	IsMemoizable       string `db:"is_memoizable"`
+	CreatedOn          string         `db:"created_on"`
+	Name               string         `db:"name"`
+	SchemaName         string         `db:"schema_name"`
+	IsBuiltin          string         `db:"is_builtin"`
+	IsAggregate        string         `db:"is_aggregate"`
+	IsAnsi             string         `db:"is_ansi"`
+	MinNumArguments    int            `db:"min_num_arguments"`
+	MaxNumArguments    int            `db:"max_num_arguments"`
+	Arguments          string         `db:"arguments"`
+	Description        string         `db:"description"`
+	CatalogName        string         `db:"catalog_name"`
+	IsTableFunction    string         `db:"is_table_function"`
+	ValidForClustering string         `db:"valid_for_clustering"`
+	IsSecure           sql.NullString `db:"is_secure"`
+	IsExternalFunction string         `db:"is_external_function"`
+	Language           string         `db:"language"`
+	IsMemoizable       sql.NullString `db:"is_memoizable"`
 }
 
 type Function struct {
@@ -224,6 +232,8 @@ type Function struct {
 	MinNumArguments    int
 	MaxNumArguments    int
 	Arguments          string
+	Description        string
+	CatalogName        string
 	IsTableFunction    bool
 	ValidForClustering bool
 	IsSecure           bool

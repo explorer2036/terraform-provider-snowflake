@@ -38,7 +38,7 @@ type Client struct {
 	ExternalTables   ExternalTables
 	FailoverGroups   FailoverGroups
 	FileFormats      FileFormats
-	// Functions        Functions
+	Functions        Functions
 	Grants           Grants
 	MaskingPolicies  MaskingPolicies
 	NetworkPolicies  NetworkPolicies

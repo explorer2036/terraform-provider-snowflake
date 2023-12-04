@@ -14,8 +14,13 @@ var functionColumn = g.NewQueryStruct("FunctionColumn").
 	PredefinedQueryStructField("ColumnDataType", "DataType", g.KeywordOptions().NoQuotes().Required())
 
 var functionReturns = g.NewQueryStruct("FunctionReturns").
-	PredefinedQueryStructField("ResultDataType", "DataType", g.KeywordOptions().NoQuotes().Required()).
-	QueryStructField(
+	OptionalQueryStructField(
+		"ResultDataType",
+		g.NewQueryStruct("FunctionReturnsResultDataType").
+			PredefinedQueryStructField("ResultDataType", "DataType", g.KeywordOptions().NoQuotes().Required()),
+		g.KeywordOptions(),
+	).
+	OptionalQueryStructField(
 		"Table",
 		g.NewQueryStruct("FunctionReturnsTable").
 			ListQueryStructField(
@@ -24,7 +29,7 @@ var functionReturns = g.NewQueryStruct("FunctionReturns").
 				g.ParameterOptions().Parentheses().NoEquals(),
 			),
 		g.KeywordOptions().SQL("TABLE"),
-	)
+	).WithValidation(g.ExactlyOneValueSet, "ResultDataType", "Table")
 
 var (
 	functionImports  = g.NewQueryStruct("FunctionImports").Text("Import", g.KeywordOptions().SingleQuotes())
@@ -54,13 +59,13 @@ var FunctionsDef = g.NewInterface(
 		QueryStructField(
 			"Returns",
 			functionReturns,
-			g.KeywordOptions().SQL("RETURNS"),
+			g.KeywordOptions().SQL("RETURNS").Required(),
 		).
 		PredefinedQueryStructField("ReturnNullValues", "*ReturnNullValues", g.KeywordOptions()).
 		SQL("LANGUAGE JAVA").
 		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		PredefinedQueryStructField("ReturnResultsBehavior", "*ReturnResultsBehavior", g.KeywordOptions()).
-		TextAssignment("RUNTIME_VERSION", g.ParameterOptions().SingleQuotes().Required()).
+		OptionalTextAssignment("RUNTIME_VERSION", g.ParameterOptions().SingleQuotes()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
 		ListQueryStructField(
 			"Imports",
@@ -97,7 +102,7 @@ var FunctionsDef = g.NewInterface(
 		QueryStructField(
 			"Returns",
 			functionReturns,
-			g.KeywordOptions().SQL("RETURNS"),
+			g.KeywordOptions().SQL("RETURNS").Required(),
 		).
 		PredefinedQueryStructField("ReturnNullValues", "*ReturnNullValues", g.KeywordOptions()).
 		SQL("LANGUAGE JAVASCRIPT").
@@ -125,7 +130,7 @@ var FunctionsDef = g.NewInterface(
 		QueryStructField(
 			"Returns",
 			functionReturns,
-			g.KeywordOptions().SQL("RETURNS"),
+			g.KeywordOptions().SQL("RETURNS").Required(),
 		).
 		PredefinedQueryStructField("ReturnNullValues", "*ReturnNullValues", g.KeywordOptions()).
 		SQL("LANGUAGE PYTHON").
@@ -165,12 +170,12 @@ var FunctionsDef = g.NewInterface(
 			functionArgument,
 			g.ParameterOptions().Parentheses().NoEquals()).
 		OptionalSQL("COPY GRANTS").
-		PredefinedQueryStructField("ResultDataType", "DataType", g.KeywordOptions().NoQuotes().SQL("RETURNS").Required()).
+		PredefinedQueryStructField("ResultDataType", "DataType", g.ParameterOptions().NoEquals().SQL("RETURNS").Required()).
 		PredefinedQueryStructField("ReturnNullValues", "*ReturnNullValues", g.KeywordOptions()).
 		SQL("LANGUAGE SCALA").
 		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		PredefinedQueryStructField("ReturnResultsBehavior", "*ReturnResultsBehavior", g.KeywordOptions()).
-		TextAssignment("RUNTIME_VERSION", g.ParameterOptions().SingleQuotes().Required()).
+		OptionalTextAssignment("RUNTIME_VERSION", g.ParameterOptions().SingleQuotes()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
 		ListQueryStructField(
 			"Imports",
@@ -205,7 +210,7 @@ var FunctionsDef = g.NewInterface(
 		QueryStructField(
 			"Returns",
 			functionReturns,
-			g.KeywordOptions().SQL("RETURNS"),
+			g.KeywordOptions().SQL("RETURNS").Required(),
 		).
 		PredefinedQueryStructField("ReturnNullValues", "*ReturnNullValues", g.KeywordOptions()).
 		PredefinedQueryStructField("ReturnResultsBehavior", "*ReturnResultsBehavior", g.KeywordOptions()).
@@ -233,6 +238,7 @@ var FunctionsDef = g.NewInterface(
 		OptionalSetTags().
 		OptionalUnsetTags().
 		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ValidIdentifierIfSet, "RenameTo").
 		WithValidation(g.ExactlyOneValueSet, "RenameTo", "SetComment", "SetLogLevel", "SetTraceLevel", "SetSecure", "UnsetLogLevel", "UnsetTraceLevel", "UnsetSecure", "UnsetComment", "SetTags", "UnsetTags"),
 ).DropOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/drop-function",
@@ -249,20 +255,20 @@ var FunctionsDef = g.NewInterface(
 		Field("created_on", "string").
 		Field("name", "string").
 		Field("schema_name", "string").
-		Field("is_builtin", "bool").
-		Field("is_aggregate", "bool").
-		Field("is_ansi", "bool").
+		Field("is_builtin", "string").
+		Field("is_aggregate", "string").
+		Field("is_ansi", "string").
 		Field("min_num_arguments", "int").
 		Field("max_num_arguments", "int").
 		Field("arguments", "string").
 		Field("description", "string").
 		Field("catalog_name", "string").
-		Field("is_table_function", "bool").
-		Field("valid_for_clustering", "bool").
-		Field("is_secure", "string").
+		Field("is_table_function", "string").
+		Field("valid_for_clustering", "string").
+		Field("is_secure", "sql.NullString").
 		Field("is_external_function", "string").
 		Field("language", "string").
-		Field("is_memoizable", "string"),
+		Field("is_memoizable", "sql.NullString"),
 	g.PlainStruct("Function").
 		Field("CreatedOn", "string").
 		Field("Name", "string").
@@ -273,6 +279,8 @@ var FunctionsDef = g.NewInterface(
 		Field("MinNumArguments", "int").
 		Field("MaxNumArguments", "int").
 		Field("Arguments", "string").
+		Field("Description", "string").
+		Field("CatalogName", "string").
 		Field("IsTableFunction", "bool").
 		Field("ValidForClustering", "bool").
 		Field("IsSecure", "bool").
@@ -284,7 +292,7 @@ var FunctionsDef = g.NewInterface(
 		SQL("USER FUNCTIONS").
 		OptionalLike().
 		OptionalIn(),
-).DescribeOperation(
+).ShowByIdOperation().DescribeOperation(
 	g.DescriptionMappingKindSlice,
 	"https://docs.snowflake.com/en/sql-reference/sql/desc-function",
 	g.DbStruct("functionDetailRow").

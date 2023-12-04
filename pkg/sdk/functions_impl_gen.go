@@ -2,6 +2,8 @@ package sdk
 
 import (
 	"context"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
 
 var _ Functions = (*functions)(nil)
@@ -55,6 +57,15 @@ func (v *functions) Show(ctx context.Context, request *ShowFunctionRequest) ([]F
 	return resultList, nil
 }
 
+func (v *functions) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Function, error) {
+	request := NewShowFunctionRequest().WithIn(&In{Database: NewAccountObjectIdentifier(id.DatabaseName())}).WithLike(&Like{String(id.Name())})
+	functions, err := v.Show(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return collections.FindOne(functions, func(r Function) bool { return r.Name == id.Name() })
+}
+
 func (v *functions) Describe(ctx context.Context, id SchemaObjectIdentifier) ([]FunctionDetail, error) {
 	opts := &DescribeFunctionOptions{
 		name: id,
@@ -99,22 +110,23 @@ func (r *CreateForJavaFunctionRequest) toOpts() *CreateForJavaFunctionOptions {
 		}
 		opts.Arguments = s
 	}
-	if r.Returns != nil {
-		opts.Returns = &FunctionReturns{
-			ResultDataType: r.Returns.ResultDataType,
+	opts.Returns = FunctionReturns{}
+	if r.Returns.ResultDataType != nil {
+		opts.Returns.ResultDataType = &FunctionReturnsResultDataType{
+			ResultDataType: r.Returns.ResultDataType.ResultDataType,
 		}
-		if r.Returns.Table != nil {
-			opts.Returns.Table = &FunctionReturnsTable{}
-			if r.Returns.Table.Columns != nil {
-				s := make([]FunctionColumn, len(r.Returns.Table.Columns))
-				for i, v := range r.Returns.Table.Columns {
-					s[i] = FunctionColumn{
-						ColumnName:     v.ColumnName,
-						ColumnDataType: v.ColumnDataType,
-					}
+	}
+	if r.Returns.Table != nil {
+		opts.Returns.Table = &FunctionReturnsTable{}
+		if r.Returns.Table.Columns != nil {
+			s := make([]FunctionColumn, len(r.Returns.Table.Columns))
+			for i, v := range r.Returns.Table.Columns {
+				s[i] = FunctionColumn{
+					ColumnName:     v.ColumnName,
+					ColumnDataType: v.ColumnDataType,
 				}
-				opts.Returns.Table.Columns = s
 			}
+			opts.Returns.Table.Columns = s
 		}
 	}
 	if r.Imports != nil {
@@ -164,22 +176,23 @@ func (r *CreateForJavascriptFunctionRequest) toOpts() *CreateForJavascriptFuncti
 		}
 		opts.Arguments = s
 	}
-	if r.Returns != nil {
-		opts.Returns = &FunctionReturns{
-			ResultDataType: r.Returns.ResultDataType,
+	opts.Returns = FunctionReturns{}
+	if r.Returns.ResultDataType != nil {
+		opts.Returns.ResultDataType = &FunctionReturnsResultDataType{
+			ResultDataType: r.Returns.ResultDataType.ResultDataType,
 		}
-		if r.Returns.Table != nil {
-			opts.Returns.Table = &FunctionReturnsTable{}
-			if r.Returns.Table.Columns != nil {
-				s := make([]FunctionColumn, len(r.Returns.Table.Columns))
-				for i, v := range r.Returns.Table.Columns {
-					s[i] = FunctionColumn{
-						ColumnName:     v.ColumnName,
-						ColumnDataType: v.ColumnDataType,
-					}
+	}
+	if r.Returns.Table != nil {
+		opts.Returns.Table = &FunctionReturnsTable{}
+		if r.Returns.Table.Columns != nil {
+			s := make([]FunctionColumn, len(r.Returns.Table.Columns))
+			for i, v := range r.Returns.Table.Columns {
+				s[i] = FunctionColumn{
+					ColumnName:     v.ColumnName,
+					ColumnDataType: v.ColumnDataType,
 				}
-				opts.Returns.Table.Columns = s
 			}
+			opts.Returns.Table.Columns = s
 		}
 	}
 	return opts
@@ -217,22 +230,23 @@ func (r *CreateForPythonFunctionRequest) toOpts() *CreateForPythonFunctionOption
 		}
 		opts.Arguments = s
 	}
-	if r.Returns != nil {
-		opts.Returns = &FunctionReturns{
-			ResultDataType: r.Returns.ResultDataType,
+	opts.Returns = FunctionReturns{}
+	if r.Returns.ResultDataType != nil {
+		opts.Returns.ResultDataType = &FunctionReturnsResultDataType{
+			ResultDataType: r.Returns.ResultDataType.ResultDataType,
 		}
-		if r.Returns.Table != nil {
-			opts.Returns.Table = &FunctionReturnsTable{}
-			if r.Returns.Table.Columns != nil {
-				s := make([]FunctionColumn, len(r.Returns.Table.Columns))
-				for i, v := range r.Returns.Table.Columns {
-					s[i] = FunctionColumn{
-						ColumnName:     v.ColumnName,
-						ColumnDataType: v.ColumnDataType,
-					}
+	}
+	if r.Returns.Table != nil {
+		opts.Returns.Table = &FunctionReturnsTable{}
+		if r.Returns.Table.Columns != nil {
+			s := make([]FunctionColumn, len(r.Returns.Table.Columns))
+			for i, v := range r.Returns.Table.Columns {
+				s[i] = FunctionColumn{
+					ColumnName:     v.ColumnName,
+					ColumnDataType: v.ColumnDataType,
 				}
-				opts.Returns.Table.Columns = s
 			}
+			opts.Returns.Table.Columns = s
 		}
 	}
 	if r.Imports != nil {
@@ -334,22 +348,23 @@ func (r *CreateForSQLFunctionRequest) toOpts() *CreateForSQLFunctionOptions {
 		}
 		opts.Arguments = s
 	}
-	if r.Returns != nil {
-		opts.Returns = &FunctionReturns{
-			ResultDataType: r.Returns.ResultDataType,
+	opts.Returns = FunctionReturns{}
+	if r.Returns.ResultDataType != nil {
+		opts.Returns.ResultDataType = &FunctionReturnsResultDataType{
+			ResultDataType: r.Returns.ResultDataType.ResultDataType,
 		}
-		if r.Returns.Table != nil {
-			opts.Returns.Table = &FunctionReturnsTable{}
-			if r.Returns.Table.Columns != nil {
-				s := make([]FunctionColumn, len(r.Returns.Table.Columns))
-				for i, v := range r.Returns.Table.Columns {
-					s[i] = FunctionColumn{
-						ColumnName:     v.ColumnName,
-						ColumnDataType: v.ColumnDataType,
-					}
+	}
+	if r.Returns.Table != nil {
+		opts.Returns.Table = &FunctionReturnsTable{}
+		if r.Returns.Table.Columns != nil {
+			s := make([]FunctionColumn, len(r.Returns.Table.Columns))
+			for i, v := range r.Returns.Table.Columns {
+				s[i] = FunctionColumn{
+					ColumnName:     v.ColumnName,
+					ColumnDataType: v.ColumnDataType,
 				}
-				opts.Returns.Table.Columns = s
 			}
+			opts.Returns.Table.Columns = s
 		}
 	}
 	return opts
@@ -393,8 +408,30 @@ func (r *ShowFunctionRequest) toOpts() *ShowFunctionOptions {
 }
 
 func (r functionRow) convert() *Function {
-	// TODO: Mapping
-	return &Function{}
+	e := &Function{
+		CreatedOn:          r.CreatedOn,
+		Name:               r.Name,
+		SchemaName:         r.SchemaName,
+		IsBuiltin:          r.IsBuiltin == "Y",
+		IsAggregate:        r.IsAggregate == "Y",
+		IsAnsi:             r.IsAnsi == "Y",
+		MinNumArguments:    r.MinNumArguments,
+		MaxNumArguments:    r.MaxNumArguments,
+		Arguments:          r.Arguments,
+		Description:        r.Description,
+		CatalogName:        r.CatalogName,
+		IsTableFunction:    r.IsTableFunction == "Y",
+		ValidForClustering: r.ValidForClustering == "Y",
+		IsExternalFunction: r.IsExternalFunction == "Y",
+		Language:           r.Language,
+	}
+	if r.IsSecure.Valid {
+		e.IsSecure = r.IsSecure.String == "Y"
+	}
+	if r.IsMemoizable.Valid {
+		e.IsMemoizable = r.IsMemoizable.String == "Y"
+	}
+	return e
 }
 
 func (r *DescribeFunctionRequest) toOpts() *DescribeFunctionOptions {
@@ -406,6 +443,8 @@ func (r *DescribeFunctionRequest) toOpts() *DescribeFunctionOptions {
 }
 
 func (r functionDetailRow) convert() *FunctionDetail {
-	// TODO: Mapping
-	return &FunctionDetail{}
+	return &FunctionDetail{
+		Property: r.Property,
+		Value:    r.Value,
+	}
 }
