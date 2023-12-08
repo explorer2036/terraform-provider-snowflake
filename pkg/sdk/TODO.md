@@ -82,10 +82,6 @@ if opts.FunctionDefinition == nil {
 	}
 }
 
-if opts.RenameTo != nil && !ValidObjectIdentifier(opts.RenameTo) {
-	errs = append(errs, errInvalidIdentifier("AlterFunctionOptions", "RenameTo"))
-}
-
 <!-- CreateForPythonFunctionOptions -->
 if opts.FunctionDefinition == nil {
 	if len(opts.Imports) == 0 {

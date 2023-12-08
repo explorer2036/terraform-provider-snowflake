@@ -155,7 +155,7 @@ type CreateForSQLFunctionOptions struct {
 	Secure                *bool                  `ddl:"keyword" sql:"SECURE"`
 	function              bool                   `ddl:"static" sql:"FUNCTION"`
 	name                  SchemaObjectIdentifier `ddl:"identifier"`
-	Arguments             []FunctionArgument     `ddl:"parameter,parentheses,no_equals"`
+	Arguments             []FunctionArgument     `ddl:"list,must_parentheses"`
 	CopyGrants            *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
 	Returns               FunctionReturns        `ddl:"keyword" sql:"RETURNS"`
 	ReturnNullValues      *ReturnNullValues      `ddl:"keyword"`
