@@ -9,6 +9,17 @@ func (v *procedures) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*
 	return collections.FindOne(procedures, func(r Procedure) bool { return r.Name == id.Name() })
 }
 
+Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
+
+func (v *procedures) Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error) {
+	opts := request.toOpts()
+	rows, err := validateAndQuery[procedureDetailRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	return convertRows[procedureDetailRow, ProcedureDetail](rows), nil
+}
+
 func (r procedureRow) convert() *Procedure {
 	e := &Procedure{
 		CreatedOn:          r.CreatedOn,
@@ -42,16 +53,16 @@ func (r procedureDetailRow) convert() *ProcedureDetail {
 
 <!-- CreateForJavaProcedureOptions and CreateForScalaProcedureOptions-->
 if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
-	errs = append(errs, errors.New("TARGET_PATH must be nil when AS is nil"))
+	errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
 }
 
-Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
 
-func (v *procedures) Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error) {
-	opts := request.toOpts()
-	rows, err := validateAndQuery[procedureDetailRow](v.client, ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-	return convertRows[procedureDetailRow, ProcedureDetail](rows), nil
+## procedures_gen.go
+type DropProcedureOptions struct {
+	drop              bool                   `ddl:"static" sql:"DROP"`
+	procedure         bool                   `ddl:"static" sql:"PROCEDURE"`
+	IfExists          *bool                  `ddl:"keyword" sql:"IF EXISTS"`
+	name              SchemaObjectIdentifier `ddl:"identifier"`
+	ArgumentDataTypes []DataType             `ddl:"keyword,must_parentheses"`
 }
+

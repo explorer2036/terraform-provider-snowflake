@@ -154,6 +154,11 @@ func (v *ListTransformer) NoParentheses() *ListTransformer {
 	return v
 }
 
+func (v *ListTransformer) MustParentheses() *ListTransformer {
+	v.parentheses = "must_parentheses"
+	return v
+}
+
 func (v *ListTransformer) NoEquals() *ListTransformer {
 	v.equals = "no_equals"
 	return v
