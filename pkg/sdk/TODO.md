@@ -43,6 +43,17 @@ func (r functionDetailRow) convert() *FunctionDetail {
 	}
 }
 
+Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error)
+
+func (v *functions) Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error) {
+	opts := request.toOpts()
+	rows, err := validateAndQuery[functionDetailRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	return convertRows[functionDetailRow, FunctionDetail](rows), nil
+}
+
 ## functions_validations_gen.go
 
 <!-- CreateForJavaFunctionOptions -->
@@ -80,15 +91,4 @@ if opts.FunctionDefinition == nil {
 	if len(opts.Imports) == 0 {
 		errs = append(errs, NewError("IMPORTS must not be empty when AS is nil"))
 	}
-}
-
-Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error)
-
-func (v *functions) Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error) {
-	opts := request.toOpts()
-	rows, err := validateAndQuery[functionDetailRow](v.client, ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-	return convertRows[functionDetailRow, FunctionDetail](rows), nil
 }

@@ -109,7 +109,7 @@ var FunctionsDef = g.NewInterface(
 		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		PredefinedQueryStructField("ReturnResultsBehavior", "*ReturnResultsBehavior", g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		PredefinedQueryStructField("FunctionDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS").Required()).
+		PredefinedQueryStructField("FunctionDefinition", "string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS").Required()).
 		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
 	"CreateForPython",
@@ -216,7 +216,7 @@ var FunctionsDef = g.NewInterface(
 		PredefinedQueryStructField("ReturnResultsBehavior", "*ReturnResultsBehavior", g.KeywordOptions()).
 		OptionalSQL("MEMOIZABLE").
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		PredefinedQueryStructField("FunctionDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS").Required()).
+		PredefinedQueryStructField("FunctionDefinition", "string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS").Required()).
 		WithValidation(g.ValidIdentifier, "name"),
 ).AlterOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-function",

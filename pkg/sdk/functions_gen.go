@@ -93,7 +93,7 @@ type CreateForJavascriptFunctionOptions struct {
 	NullInputBehavior     *NullInputBehavior     `ddl:"keyword"`
 	ReturnResultsBehavior *ReturnResultsBehavior `ddl:"keyword"`
 	Comment               *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	FunctionDefinition    *string                `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
+	FunctionDefinition    string                 `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
 }
 
 // CreateForPythonFunctionOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-function#python-handler.
@@ -162,7 +162,7 @@ type CreateForSQLFunctionOptions struct {
 	ReturnResultsBehavior *ReturnResultsBehavior `ddl:"keyword"`
 	Memoizable            *bool                  `ddl:"keyword" sql:"MEMOIZABLE"`
 	Comment               *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	FunctionDefinition    *string                `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
+	FunctionDefinition    string                 `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
 }
 
 // AlterFunctionOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-function.

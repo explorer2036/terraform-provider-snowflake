@@ -178,7 +178,7 @@ func (s *FunctionPackagesRequest) WithPackage(Package string) *FunctionPackagesR
 func NewCreateForJavascriptFunctionRequest(
 	name SchemaObjectIdentifier,
 	Returns FunctionReturnsRequest,
-	FunctionDefinition *string,
+	FunctionDefinition string,
 ) *CreateForJavascriptFunctionRequest {
 	s := CreateForJavascriptFunctionRequest{}
 	s.name = name
@@ -411,7 +411,7 @@ func (s *CreateForScalaFunctionRequest) WithFunctionDefinition(FunctionDefinitio
 func NewCreateForSQLFunctionRequest(
 	name SchemaObjectIdentifier,
 	Returns FunctionReturnsRequest,
-	FunctionDefinition *string,
+	FunctionDefinition string,
 ) *CreateForSQLFunctionRequest {
 	s := CreateForSQLFunctionRequest{}
 	s.name = name
