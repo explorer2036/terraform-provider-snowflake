@@ -13,6 +13,7 @@ var (
 	_ validatable = new(ShowProcedureOptions)
 	_ validatable = new(DescribeProcedureOptions)
 	_ validatable = new(CallProcedureOptions)
+	_ validatable = new(CreateAndCallForJavaProcedureOptions)
 )
 
 func (opts *CreateForJavaProcedureOptions) validate() error {
@@ -186,6 +187,39 @@ func (opts *CallProcedureOptions) validate() error {
 	}
 	if !exactlyOneValueSet(opts.Positions, opts.Names) {
 		errs = append(errs, errExactlyOneOf("CallProcedureOptions", "Positions", "Names"))
+	}
+	if valueSet(opts.ScriptingVariable) {
+		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
+			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
+		}
+	}
+	return JoinErrors(errs...)
+}
+
+func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
+	if opts == nil {
+		return ErrNilOptions
+	}
+	var errs []error
+	if !valueSet(opts.RuntimeVersion) {
+		errs = append(errs, errNotSet("CreateAndCallForJavaProcedureOptions", "RuntimeVersion"))
+	}
+	if !valueSet(opts.Handler) {
+		errs = append(errs, errNotSet("CreateAndCallForJavaProcedureOptions", "Handler"))
+	}
+	if !valueSet(opts.Packages) {
+		errs = append(errs, errNotSet("CreateAndCallForJavaProcedureOptions", "Packages"))
+	}
+	if !ValidObjectIdentifier(opts.ProcedureName) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	if !ValidObjectIdentifier(opts.name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	if valueSet(opts.Returns) {
+		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
+			errs = append(errs, errExactlyOneOf("CreateAndCallForJavaProcedureOptions.Returns", "ResultDataType", "Table"))
+		}
 	}
 	if valueSet(opts.ScriptingVariable) {
 		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {

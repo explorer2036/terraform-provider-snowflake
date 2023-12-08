@@ -17,6 +17,7 @@ type Procedures interface {
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Procedure, error)
 	Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
 	Call(ctx context.Context, request *CallProcedureRequest) error
+	CreateAndCallForJava(ctx context.Context, request *CreateAndCallForJavaProcedureRequest) error
 }
 
 // CreateForJavaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#java-handler.
@@ -265,4 +266,32 @@ type ProcedureCallArgumentPosition struct {
 type ProcedureCallArgumentName struct {
 	Name     string `ddl:"keyword,no_quotes"`
 	Position string `ddl:"parameter,no_quotes,arrow_equals"`
+}
+
+// CreateAndCallForJavaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala.
+type CreateAndCallForJavaProcedureOptions struct {
+	with                bool                            `ddl:"static" sql:"WITH"`
+	name                SchemaObjectIdentifier          `ddl:"identifier"`
+	asProcedure         bool                            `ddl:"static" sql:"AS PROCEDURE"`
+	Arguments           []ProcedureArgument             `ddl:"list,must_parentheses"`
+	Returns             ProcedureReturns                `ddl:"keyword" sql:"RETURNS"`
+	languageJava        bool                            `ddl:"static" sql:"LANGUAGE JAVA"`
+	RuntimeVersion      string                          `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
+	Packages            []ProcedurePackage              `ddl:"parameter,parentheses" sql:"PACKAGES"`
+	Imports             []ProcedureImport               `ddl:"parameter,parentheses" sql:"IMPORTS"`
+	Handler             string                          `ddl:"parameter,single_quotes" sql:"HANDLER"`
+	NullInputBehavior   *NullInputBehavior              `ddl:"keyword"`
+	ProcedureDefinition *string                         `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
+	WithClauses         []ProcedureWithClause           `ddl:"keyword"`
+	call                bool                            `ddl:"static" sql:"CALL"`
+	ProcedureName       SchemaObjectIdentifier          `ddl:"identifier"`
+	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,parentheses"`
+	Names               []ProcedureCallArgumentName     `ddl:"keyword,parentheses"`
+	ScriptingVariable   *string                         `ddl:"parameter,no_quotes,no_equals" sql:"INTO"`
+}
+
+type ProcedureWithClause struct {
+	CteName    SchemaObjectIdentifier `ddl:"identifier"`
+	CteColumns []string               `ddl:"keyword,parentheses"`
+	Statement  string                 `ddl:"parameter,no_quotes,no_equals" sql:"AS"`
 }

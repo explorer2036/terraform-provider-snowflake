@@ -551,3 +551,76 @@ func NewProcedureCallArgumentNameRequest(
 	s.Position = Position
 	return &s
 }
+
+func NewCreateAndCallForJavaProcedureRequest(
+	name SchemaObjectIdentifier,
+	Returns ProcedureReturnsRequest,
+	RuntimeVersion string,
+	Packages []ProcedurePackageRequest,
+	Handler string,
+	ProcedureName SchemaObjectIdentifier,
+) *CreateAndCallForJavaProcedureRequest {
+	s := CreateAndCallForJavaProcedureRequest{}
+	s.name = name
+	s.Returns = Returns
+	s.RuntimeVersion = RuntimeVersion
+	s.Packages = Packages
+	s.Handler = Handler
+	s.ProcedureName = ProcedureName
+	return &s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateAndCallForJavaProcedureRequest {
+	s.Arguments = Arguments
+	return s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateAndCallForJavaProcedureRequest {
+	s.Imports = Imports
+	return s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateAndCallForJavaProcedureRequest {
+	s.NullInputBehavior = NullInputBehavior
+	return s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateAndCallForJavaProcedureRequest {
+	s.ProcedureDefinition = ProcedureDefinition
+	return s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithWithClauses(WithClauses []ProcedureWithClauseRequest) *CreateAndCallForJavaProcedureRequest {
+	s.WithClauses = WithClauses
+	return s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForJavaProcedureRequest {
+	s.Positions = Positions
+	return s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForJavaProcedureRequest {
+	s.Names = Names
+	return s
+}
+
+func (s *CreateAndCallForJavaProcedureRequest) WithScriptingVariable(ScriptingVariable *string) *CreateAndCallForJavaProcedureRequest {
+	s.ScriptingVariable = ScriptingVariable
+	return s
+}
+
+func NewProcedureWithClauseRequest(
+	CteName SchemaObjectIdentifier,
+	Statement string,
+) *ProcedureWithClauseRequest {
+	s := ProcedureWithClauseRequest{}
+	s.CteName = CteName
+	s.Statement = Statement
+	return &s
+}
+
+func (s *ProcedureWithClauseRequest) WithCteColumns(CteColumns []string) *ProcedureWithClauseRequest {
+	s.CteColumns = CteColumns
+	return s
+}

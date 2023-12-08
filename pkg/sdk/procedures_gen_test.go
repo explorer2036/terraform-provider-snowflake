@@ -656,3 +656,99 @@ func TestProcedures_Call(t *testing.T) {
 		assertOptsValidAndSQLEquals(t, opts, `CALL %s ('Manitoba', 127.4) INTO :ret`, id.FullyQualifiedName())
 	})
 }
+
+func TestProcedures_CreateAndCallForJava(t *testing.T) {
+	id := RandomSchemaObjectIdentifier()
+
+	defaultOpts := func() *CreateAndCallForJavaProcedureOptions {
+		return &CreateAndCallForJavaProcedureOptions{
+			name: id,
+		}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *CreateAndCallForJavaProcedureOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewSchemaObjectIdentifier("", "", "")
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("validation: returns", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Returns = ProcedureReturns{}
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("CreateAndCallForJavaProcedureOptions.Returns", "ResultDataType", "Table"))
+	})
+
+	t.Run("validation: options are missing", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Returns = ProcedureReturns{
+			ResultDataType: &ProcedureReturnsResultDataType{
+				ResultDataType: DataTypeVARCHAR,
+			},
+		}
+		assertOptsInvalidJoinedErrors(t, opts, errNotSet("CreateAndCallForJavaProcedureOptions", "Handler"))
+		assertOptsInvalidJoinedErrors(t, opts, errNotSet("CreateAndCallForJavaProcedureOptions", "RuntimeVersion"))
+		assertOptsInvalidJoinedErrors(t, opts, errNotSet("CreateAndCallForJavaProcedureOptions", "Packages"))
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Arguments = []ProcedureArgument{
+			{
+				ArgName:     "id",
+				ArgDataType: DataTypeNumber,
+			},
+			{
+				ArgName:     "name",
+				ArgDataType: DataTypeVARCHAR,
+			},
+		}
+		opts.Returns = ProcedureReturns{
+			Table: &ProcedureReturnsTable{
+				Columns: []ProcedureColumn{
+					{
+						ColumnName:     "country_code",
+						ColumnDataType: DataTypeVARCHAR,
+					},
+				},
+			},
+		}
+		opts.RuntimeVersion = "1.8"
+		opts.Packages = []ProcedurePackage{
+			{
+				Package: "com.snowflake:snowpark:1.2.0",
+			},
+		}
+		opts.Imports = []ProcedureImport{
+			{
+				Import: "test_jar.jar",
+			},
+		}
+		opts.Handler = "TestFunc.echoVarchar"
+		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
+		opts.ProcedureDefinition = String("return id + name;")
+		cte := NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), "album_info_1976")
+		opts.WithClauses = []ProcedureWithClause{
+			{
+				CteName:    cte,
+				CteColumns: []string{"x", "y"},
+				Statement:  "(select m.album_ID, m.album_name, b.band_name from music_albums)",
+			},
+		}
+		opts.ProcedureName = id
+		opts.ScriptingVariable = String(":ret")
+		opts.Positions = []ProcedureCallArgumentPosition{
+			{
+				Position: "1",
+			},
+			{
+				Position: "rnd",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (id NUMBER, name VARCHAR) RETURNS TABLE (country_code VARCHAR) LANGUAGE JAVA RUNTIME_VERSION = '1.8' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('test_jar.jar') HANDLER = 'TestFunc.echoVarchar' STRICT AS 'return id + name;' %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1, rnd) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
+	})
+}

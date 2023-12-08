@@ -620,3 +620,57 @@ func TestInt_CallProcedure(t *testing.T) {
 		require.NoError(t, err)
 	})
 }
+
+func TestInt_CreateAndCallProcedures(t *testing.T) {
+	client := testClient(t)
+	ctx := testContext(t)
+
+	databaseTest, schemaTest := testDb(t), testSchema(t)
+
+	cleanupProcedureHandle := func(id sdk.SchemaObjectIdentifier, ats []sdk.DataType) func() {
+		return func() {
+			err := client.Procedures.Drop(ctx, sdk.NewDropProcedureRequest(id, ats))
+			if errors.Is(err, sdk.ErrObjectNotExistOrAuthorized) {
+				return
+			}
+			require.NoError(t, err)
+		}
+	}
+
+	t.Run("create and call procedure for Java: returns table", func(t *testing.T) {
+		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#omitting-return-column-names-and-types
+		name := "filter_by_role"
+		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+
+		definition := `
+import com.snowflake.snowpark_java.*;
+
+public class FilterClass {
+	public DataFrame filterByRole(Session session, String name, String role) {
+		DataFrame table = session.table(name);
+		DataFrame filteredRows = table.filter(Functions.col("role").equal_to(Functions.lit(role)));
+		return filteredRows;
+	}
+}`
+		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{})
+		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
+		arg1 := sdk.NewProcedureArgumentRequest("name", sdk.DataTypeVARCHAR)
+		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
+		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
+		positions := []sdk.ProcedureCallArgumentPositionRequest{
+			*sdk.NewProcedureCallArgumentPositionRequest("'employees'"),
+			*sdk.NewProcedureCallArgumentPositionRequest("'dev'"),
+		}
+		request := sdk.NewCreateAndCallForJavaProcedureRequest(id, *returns, "11", packages, "FilterClass.filterByRole", id).
+			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
+			WithProcedureDefinition(sdk.String(definition)).
+			WithPositions(positions)
+		err := client.Procedures.CreateAndCallForJava(ctx, request)
+		require.NoError(t, err)
+		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
+
+		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+		require.NoError(t, err)
+		require.GreaterOrEqual(t, len(procedures), 1)
+	})
+}
