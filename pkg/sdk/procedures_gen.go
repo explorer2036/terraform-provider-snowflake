@@ -16,6 +16,7 @@ type Procedures interface {
 	Show(ctx context.Context, request *ShowProcedureRequest) ([]Procedure, error)
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Procedure, error)
 	Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
+	Call(ctx context.Context, request *CallProcedureRequest) error
 }
 
 // CreateForJavaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-procedure#java-handler.
@@ -246,4 +247,22 @@ type procedureDetailRow struct {
 type ProcedureDetail struct {
 	Property string
 	Value    string
+}
+
+// CallProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call.
+type CallProcedureOptions struct {
+	call              bool                            `ddl:"static" sql:"CALL"`
+	name              SchemaObjectIdentifier          `ddl:"identifier"`
+	Positions         []ProcedureCallArgumentPosition `ddl:"keyword,parentheses"`
+	Names             []ProcedureCallArgumentName     `ddl:"keyword,parentheses"`
+	ScriptingVariable *string                         `ddl:"parameter,no_quotes,no_equals" sql:"INTO"`
+}
+
+type ProcedureCallArgumentPosition struct {
+	Position string `ddl:"keyword,no_quotes"`
+}
+
+type ProcedureCallArgumentName struct {
+	Name     string `ddl:"keyword,no_quotes"`
+	Position string `ddl:"parameter,no_quotes,arrow_equals"`
 }

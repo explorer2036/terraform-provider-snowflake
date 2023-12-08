@@ -585,3 +585,74 @@ func TestProcedures_Describe(t *testing.T) {
 		assertOptsValidAndSQLEquals(t, opts, `DESCRIBE PROCEDURE %s (VARCHAR, NUMBER)`, id.FullyQualifiedName())
 	})
 }
+
+func TestProcedures_Call(t *testing.T) {
+	id := RandomSchemaObjectIdentifier()
+
+	defaultOpts := func() *CallProcedureOptions {
+		return &CallProcedureOptions{
+			name: id,
+		}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		opts := (*CallProcedureOptions)(nil)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewSchemaObjectIdentifier("", "", "")
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Names = []ProcedureCallArgumentName{
+			{
+				Name:     "amount",
+				Position: "127.4",
+			},
+		}
+		opts.Positions = []ProcedureCallArgumentPosition{
+			{
+				Position: "'Manitoba'",
+			},
+		}
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("CallProcedureOptions", "Positions", "Names"))
+	})
+
+	t.Run("validation: scripting variable", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.ScriptingVariable = String("ret")
+		assertOptsInvalidJoinedErrors(t, opts, NewError("ScriptingVariable must start with ':'"))
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.ScriptingVariable = String(":ret")
+		opts.Names = []ProcedureCallArgumentName{
+			{
+				Name:     "province",
+				Position: "'Manitoba'",
+			},
+			{
+				Name:     "amount",
+				Position: "127.4",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `CALL %s (province => 'Manitoba', amount => 127.4) INTO :ret`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.ScriptingVariable = String(":ret")
+		opts.Positions = []ProcedureCallArgumentPosition{
+			{
+				Position: "'Manitoba'",
+			},
+			{
+				Position: "127.4",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `CALL %s ('Manitoba', 127.4) INTO :ret`, id.FullyQualifiedName())
+	})
+}

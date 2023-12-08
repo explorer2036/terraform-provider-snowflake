@@ -13,6 +13,13 @@ var procedureColumn = g.NewQueryStruct("ProcedureColumn").
 	Text("ColumnName", g.KeywordOptions().NoQuotes().Required()).
 	PredefinedQueryStructField("ColumnDataType", "DataType", g.KeywordOptions().NoQuotes().Required())
 
+var procedureCallArgumentPosition = g.NewQueryStruct("ProcedureCallArgumentPosition").
+	Text("Position", g.KeywordOptions().NoQuotes().Required())
+
+var procedureCallArgumentName = g.NewQueryStruct("ProcedureCallArgumentName").
+	Text("Name", g.KeywordOptions().NoQuotes().Required()).
+	PredefinedQueryStructField("Position", "string", g.ParameterOptions().ArrowEquals().NoQuotes().Required())
+
 var procedureReturns = g.NewQueryStruct("ProcedureReturns").
 	OptionalQueryStructField(
 		"ResultDataType",
@@ -321,4 +328,23 @@ var ProceduresDef = g.NewInterface(
 		Name().
 		PredefinedQueryStructField("ArgumentDataTypes", "[]DataType", g.KeywordOptions().Parentheses().Required()).
 		WithValidation(g.ValidIdentifier, "name"),
+).CustomOperation(
+	"Call",
+	"https://docs.snowflake.com/en/sql-reference/sql/call",
+	g.NewQueryStruct("Call").
+		SQL("CALL").
+		Name().
+		ListQueryStructField(
+			"Positions",
+			procedureCallArgumentPosition,
+			g.KeywordOptions().Parentheses(),
+		).
+		ListQueryStructField(
+			"Names",
+			procedureCallArgumentName,
+			g.KeywordOptions().Parentheses(),
+		).
+		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
+		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ExactlyOneValueSet, "Positions", "Names"),
 )

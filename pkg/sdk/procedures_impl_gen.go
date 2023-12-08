@@ -75,6 +75,11 @@ func (v *procedures) Describe(ctx context.Context, request *DescribeProcedureReq
 	return convertRows[procedureDetailRow, ProcedureDetail](rows), nil
 }
 
+func (v *procedures) Call(ctx context.Context, request *CallProcedureRequest) error {
+	opts := request.toOpts()
+	return validateAndExec(v.client, ctx, opts)
+}
+
 func (r *CreateForJavaProcedureRequest) toOpts() *CreateForJavaProcedureOptions {
 	opts := &CreateForJavaProcedureOptions{
 		OrReplace: r.OrReplace,
@@ -433,4 +438,32 @@ func (r procedureDetailRow) convert() *ProcedureDetail {
 		Property: r.Property,
 		Value:    r.Value,
 	}
+}
+
+func (r *CallProcedureRequest) toOpts() *CallProcedureOptions {
+	opts := &CallProcedureOptions{
+		name: r.name,
+
+		ScriptingVariable: r.ScriptingVariable,
+	}
+	if r.Positions != nil {
+		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
+		for i, v := range r.Positions {
+			s[i] = ProcedureCallArgumentPosition{
+				Position: v.Position,
+			}
+		}
+		opts.Positions = s
+	}
+	if r.Names != nil {
+		s := make([]ProcedureCallArgumentName, len(r.Names))
+		for i, v := range r.Names {
+			s[i] = ProcedureCallArgumentName{
+				Name:     v.Name,
+				Position: v.Position,
+			}
+		}
+		opts.Names = s
+	}
+	return opts
 }

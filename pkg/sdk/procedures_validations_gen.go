@@ -1,5 +1,7 @@
 package sdk
 
+import "strings"
+
 var (
 	_ validatable = new(CreateForJavaProcedureOptions)
 	_ validatable = new(CreateForJavaScriptProcedureOptions)
@@ -10,6 +12,7 @@ var (
 	_ validatable = new(DropProcedureOptions)
 	_ validatable = new(ShowProcedureOptions)
 	_ validatable = new(DescribeProcedureOptions)
+	_ validatable = new(CallProcedureOptions)
 )
 
 func (opts *CreateForJavaProcedureOptions) validate() error {
@@ -169,6 +172,25 @@ func (opts *DescribeProcedureOptions) validate() error {
 	var errs []error
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	return JoinErrors(errs...)
+}
+
+func (opts *CallProcedureOptions) validate() error {
+	if opts == nil {
+		return ErrNilOptions
+	}
+	var errs []error
+	if !ValidObjectIdentifier(opts.name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	if !exactlyOneValueSet(opts.Positions, opts.Names) {
+		errs = append(errs, errExactlyOneOf("CallProcedureOptions", "Positions", "Names"))
+	}
+	if valueSet(opts.ScriptingVariable) {
+		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
+			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
+		}
 	}
 	return JoinErrors(errs...)
 }

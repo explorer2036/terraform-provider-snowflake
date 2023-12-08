@@ -12,6 +12,7 @@ var (
 	_ optionsProvider[DropProcedureOptions]                = new(DropProcedureRequest)
 	_ optionsProvider[ShowProcedureOptions]                = new(ShowProcedureRequest)
 	_ optionsProvider[DescribeProcedureOptions]            = new(DescribeProcedureRequest)
+	_ optionsProvider[CallProcedureOptions]                = new(CallProcedureRequest)
 )
 
 type CreateForJavaProcedureRequest struct {
@@ -166,4 +167,20 @@ type ShowProcedureRequest struct {
 type DescribeProcedureRequest struct {
 	name              SchemaObjectIdentifier // required
 	ArgumentDataTypes []DataType             // required
+}
+
+type CallProcedureRequest struct {
+	name              SchemaObjectIdentifier // required
+	Positions         []ProcedureCallArgumentPositionRequest
+	Names             []ProcedureCallArgumentNameRequest
+	ScriptingVariable *string
+}
+
+type ProcedureCallArgumentPositionRequest struct {
+	Position string // required
+}
+
+type ProcedureCallArgumentNameRequest struct {
+	Name     string // required
+	Position string // required
 }

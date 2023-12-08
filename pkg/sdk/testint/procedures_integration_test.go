@@ -555,3 +555,68 @@ func TestInt_OtherProcedureFunctions(t *testing.T) {
 		require.NoError(t, err)
 	})
 }
+
+func TestInt_CallProcedure(t *testing.T) {
+	client := testClient(t)
+	ctx := testContext(t)
+
+	databaseTest, schemaTest := testDb(t), testSchema(t)
+
+	cleanupProcedureHandle := func(id sdk.SchemaObjectIdentifier, ats []sdk.DataType) func() {
+		return func() {
+			err := client.Procedures.Drop(ctx, sdk.NewDropProcedureRequest(id, ats))
+			if errors.Is(err, sdk.ErrObjectNotExistOrAuthorized) {
+				return
+			}
+			require.NoError(t, err)
+		}
+	}
+
+	createProcedureForSQLHandle := func(t *testing.T, cleanup bool) *sdk.Procedure {
+		t.Helper()
+
+		definition := `
+	BEGIN
+		RETURN message;
+	END;`
+		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, random.String())
+		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
+		returns := sdk.NewProcedureSQLReturnsRequest().WithResultDataType(dt).WithNotNull(sdk.Bool(true))
+		argument := sdk.NewProcedureArgumentRequest("message", sdk.DataTypeVARCHAR)
+		request := sdk.NewCreateForSQLProcedureRequest(id, *returns, definition).
+			WithSecure(sdk.Bool(true)).
+			WithOrReplace(sdk.Bool(true)).
+			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
+			WithExecuteAs(sdk.ExecuteAsPointer(sdk.ExecuteAsCaller))
+		err := client.Procedures.CreateForSQL(ctx, request)
+		require.NoError(t, err)
+		if cleanup {
+			t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
+		}
+		procedure, err := client.Procedures.ShowByID(ctx, id)
+		require.NoError(t, err)
+		return procedure
+	}
+
+	t.Run("call procedure for SQL: argument positions", func(t *testing.T) {
+		f := createProcedureForSQLHandle(t, true)
+		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, f.Name)
+
+		positions := []sdk.ProcedureCallArgumentPositionRequest{
+			*sdk.NewProcedureCallArgumentPositionRequest("'Goodbye'"),
+		}
+		err := client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithPositions(positions))
+		require.NoError(t, err)
+	})
+
+	t.Run("call procedure for SQL: argument names", func(t *testing.T) {
+		f := createProcedureForSQLHandle(t, true)
+		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, f.Name)
+
+		names := []sdk.ProcedureCallArgumentNameRequest{
+			*sdk.NewProcedureCallArgumentNameRequest("message", "'Goodbye'"),
+		}
+		err := client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithNames(names))
+		require.NoError(t, err)
+	})
+}

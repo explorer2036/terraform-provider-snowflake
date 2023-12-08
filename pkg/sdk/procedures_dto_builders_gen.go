@@ -510,3 +510,44 @@ func NewDescribeProcedureRequest(
 	s.ArgumentDataTypes = ArgumentDataTypes
 	return &s
 }
+
+func NewCallProcedureRequest(
+	name SchemaObjectIdentifier,
+) *CallProcedureRequest {
+	s := CallProcedureRequest{}
+	s.name = name
+	return &s
+}
+
+func (s *CallProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CallProcedureRequest {
+	s.Positions = Positions
+	return s
+}
+
+func (s *CallProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CallProcedureRequest {
+	s.Names = Names
+	return s
+}
+
+func (s *CallProcedureRequest) WithScriptingVariable(ScriptingVariable *string) *CallProcedureRequest {
+	s.ScriptingVariable = ScriptingVariable
+	return s
+}
+
+func NewProcedureCallArgumentPositionRequest(
+	Position string,
+) *ProcedureCallArgumentPositionRequest {
+	s := ProcedureCallArgumentPositionRequest{}
+	s.Position = Position
+	return &s
+}
+
+func NewProcedureCallArgumentNameRequest(
+	Name string,
+	Position string,
+) *ProcedureCallArgumentNameRequest {
+	s := ProcedureCallArgumentNameRequest{}
+	s.Name = Name
+	s.Position = Position
+	return &s
+}

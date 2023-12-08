@@ -9,8 +9,6 @@ func (v *procedures) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*
 	return collections.FindOne(procedures, func(r Procedure) bool { return r.Name == id.Name() })
 }
 
-Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
-
 func (v *procedures) Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error) {
 	opts := request.toOpts()
 	rows, err := validateAndQuery[procedureDetailRow](v.client, ctx, opts)
@@ -56,8 +54,18 @@ if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
 	errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
 }
 
+<!-- CallProcedureOptions -->
+if valueSet(opts.ScriptingVariable) {
+	if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
+		errs = append(errs, NewError("ScriptingVariable must start with ':'"))
+	}
+}
+
 
 ## procedures_gen.go
+
+Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
+
 type DropProcedureOptions struct {
 	drop              bool                   `ddl:"static" sql:"DROP"`
 	procedure         bool                   `ddl:"static" sql:"PROCEDURE"`
