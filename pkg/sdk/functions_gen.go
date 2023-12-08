@@ -27,7 +27,7 @@ type CreateForJavaFunctionOptions struct {
 	function                   bool                      `ddl:"static" sql:"FUNCTION"`
 	IfNotExists                *bool                     `ddl:"keyword" sql:"IF NOT EXISTS"`
 	name                       SchemaObjectIdentifier    `ddl:"identifier"`
-	Arguments                  []FunctionArgument        `ddl:"parameter,parentheses,no_equals"`
+	Arguments                  []FunctionArgument        `ddl:"list,must_parentheses"`
 	CopyGrants                 *bool                     `ddl:"keyword" sql:"COPY GRANTS"`
 	Returns                    FunctionReturns           `ddl:"keyword" sql:"RETURNS"`
 	ReturnNullValues           *ReturnNullValues         `ddl:"keyword"`
@@ -85,7 +85,7 @@ type CreateForJavascriptFunctionOptions struct {
 	Secure                *bool                  `ddl:"keyword" sql:"SECURE"`
 	function              bool                   `ddl:"static" sql:"FUNCTION"`
 	name                  SchemaObjectIdentifier `ddl:"identifier"`
-	Arguments             []FunctionArgument     `ddl:"parameter,parentheses,no_equals"`
+	Arguments             []FunctionArgument     `ddl:"list,must_parentheses"`
 	CopyGrants            *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
 	Returns               FunctionReturns        `ddl:"keyword" sql:"RETURNS"`
 	ReturnNullValues      *ReturnNullValues      `ddl:"keyword"`
@@ -105,7 +105,7 @@ type CreateForPythonFunctionOptions struct {
 	function                   bool                      `ddl:"static" sql:"FUNCTION"`
 	IfNotExists                *bool                     `ddl:"keyword" sql:"IF NOT EXISTS"`
 	name                       SchemaObjectIdentifier    `ddl:"identifier"`
-	Arguments                  []FunctionArgument        `ddl:"parameter,parentheses,no_equals"`
+	Arguments                  []FunctionArgument        `ddl:"list,must_parentheses"`
 	CopyGrants                 *bool                     `ddl:"keyword" sql:"COPY GRANTS"`
 	Returns                    FunctionReturns           `ddl:"keyword" sql:"RETURNS"`
 	ReturnNullValues           *ReturnNullValues         `ddl:"keyword"`
@@ -131,7 +131,7 @@ type CreateForScalaFunctionOptions struct {
 	function              bool                   `ddl:"static" sql:"FUNCTION"`
 	IfNotExists           *bool                  `ddl:"keyword" sql:"IF NOT EXISTS"`
 	name                  SchemaObjectIdentifier `ddl:"identifier"`
-	Arguments             []FunctionArgument     `ddl:"parameter,parentheses,no_equals"`
+	Arguments             []FunctionArgument     `ddl:"list,must_parentheses"`
 	CopyGrants            *bool                  `ddl:"keyword" sql:"COPY GRANTS"`
 	ResultDataType        DataType               `ddl:"parameter,no_equals" sql:"RETURNS"`
 	ReturnNullValues      *ReturnNullValues      `ddl:"keyword"`
