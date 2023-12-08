@@ -32,8 +32,8 @@ var functionReturns = g.NewQueryStruct("FunctionReturns").
 	).WithValidation(g.ExactlyOneValueSet, "ResultDataType", "Table")
 
 var (
-	functionImports  = g.NewQueryStruct("FunctionImports").Text("Import", g.KeywordOptions().SingleQuotes())
-	functionPackages = g.NewQueryStruct("FunctionPackages").Text("Package", g.KeywordOptions().SingleQuotes())
+	functionImports  = g.NewQueryStruct("FunctionImport").Text("Import", g.KeywordOptions().SingleQuotes())
+	functionPackages = g.NewQueryStruct("FunctionPackage").Text("Package", g.KeywordOptions().SingleQuotes())
 )
 
 var FunctionsDef = g.NewInterface(

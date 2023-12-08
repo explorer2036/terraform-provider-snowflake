@@ -43,8 +43,6 @@ func (r functionDetailRow) convert() *FunctionDetail {
 	}
 }
 
-Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error)
-
 func (v *functions) Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error) {
 	opts := request.toOpts()
 	rows, err := validateAndQuery[functionDetailRow](v.client, ctx, opts)
@@ -52,6 +50,18 @@ func (v *functions) Describe(ctx context.Context, request *DescribeFunctionReque
 		return nil, err
 	}
 	return convertRows[functionDetailRow, FunctionDetail](rows), nil
+}
+
+## functions_gen.go
+
+Describe(ctx context.Context, request *DescribeFunctionRequest) ([]FunctionDetail, error)
+
+type DropFunctionOptions struct {
+	drop              bool                   `ddl:"static" sql:"DROP"`
+	function          bool                   `ddl:"static" sql:"FUNCTION"`
+	IfExists          *bool                  `ddl:"keyword" sql:"IF EXISTS"`
+	name              SchemaObjectIdentifier `ddl:"identifier"`
+	ArgumentDataTypes []DataType             `ddl:"keyword,must_parentheses"`
 }
 
 ## functions_validations_gen.go

@@ -35,7 +35,7 @@ func TestFunctions_CreateForJava(t *testing.T) {
 	t.Run("validation: function definition", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.TargetPath = String("@~/testfunc.jar")
-		opts.Packages = []FunctionPackages{
+		opts.Packages = []FunctionPackage{
 			{
 				Package: "com.snowflake:snowpark:1.2.0",
 			},
@@ -91,12 +91,12 @@ func TestFunctions_CreateForJava(t *testing.T) {
 		opts.ReturnResultsBehavior = ReturnResultsBehaviorPointer(ReturnResultsBehaviorImmutable)
 		opts.RuntimeVersion = String("2.0")
 		opts.Comment = String("comment")
-		opts.Imports = []FunctionImports{
+		opts.Imports = []FunctionImport{
 			{
 				Import: "@~/my_decrement_udf_package_dir/my_decrement_udf_jar.jar",
 			},
 		}
-		opts.Packages = []FunctionPackages{
+		opts.Packages = []FunctionPackage{
 			{
 				Package: "com.snowflake:snowpark:1.2.0",
 			},
@@ -223,7 +223,7 @@ func TestFunctions_CreateForPython(t *testing.T) {
 
 	t.Run("validation: function definition", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.Packages = []FunctionPackages{
+		opts.Packages = []FunctionPackage{
 			{
 				Package: "com.snowflake:snowpark:1.2.0",
 			},
@@ -254,7 +254,7 @@ func TestFunctions_CreateForPython(t *testing.T) {
 		opts.ReturnResultsBehavior = ReturnResultsBehaviorPointer(ReturnResultsBehaviorImmutable)
 		opts.RuntimeVersion = "3.8"
 		opts.Comment = String("comment")
-		opts.Imports = []FunctionImports{
+		opts.Imports = []FunctionImport{
 			{
 				Import: "numpy",
 			},
@@ -262,7 +262,7 @@ func TestFunctions_CreateForPython(t *testing.T) {
 				Import: "pandas",
 			},
 		}
-		opts.Packages = []FunctionPackages{
+		opts.Packages = []FunctionPackage{
 			{
 				Package: "numpy",
 			},
@@ -312,7 +312,7 @@ func TestFunctions_CreateForScala(t *testing.T) {
 	t.Run("validation: function definition", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.TargetPath = String("@~/testfunc.jar")
-		opts.Packages = []FunctionPackages{
+		opts.Packages = []FunctionPackage{
 			{
 				Package: "com.snowflake:snowpark:1.2.0",
 			},
@@ -347,7 +347,7 @@ func TestFunctions_CreateForScala(t *testing.T) {
 		opts.ReturnResultsBehavior = ReturnResultsBehaviorPointer(ReturnResultsBehaviorImmutable)
 		opts.RuntimeVersion = String("2.0")
 		opts.Comment = String("comment")
-		opts.Imports = []FunctionImports{
+		opts.Imports = []FunctionImport{
 			{
 				Import: "@udf_libs/echohandler.jar",
 			},

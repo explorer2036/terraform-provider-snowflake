@@ -36,8 +36,8 @@ type CreateForJavaFunctionOptions struct {
 	ReturnResultsBehavior      *ReturnResultsBehavior    `ddl:"keyword"`
 	RuntimeVersion             *string                   `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
 	Comment                    *string                   `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	Imports                    []FunctionImports         `ddl:"parameter,parentheses" sql:"IMPORTS"`
-	Packages                   []FunctionPackages        `ddl:"parameter,parentheses" sql:"PACKAGES"`
+	Imports                    []FunctionImport          `ddl:"parameter,parentheses" sql:"IMPORTS"`
+	Packages                   []FunctionPackage         `ddl:"parameter,parentheses" sql:"PACKAGES"`
 	Handler                    string                    `ddl:"parameter,single_quotes" sql:"HANDLER"`
 	ExternalAccessIntegrations []AccountObjectIdentifier `ddl:"parameter,parentheses" sql:"EXTERNAL_ACCESS_INTEGRATIONS"`
 	Secrets                    []Secret                  `ddl:"parameter,parentheses" sql:"SECRETS"`
@@ -69,11 +69,11 @@ type FunctionColumn struct {
 	ColumnDataType DataType `ddl:"keyword,no_quotes"`
 }
 
-type FunctionImports struct {
+type FunctionImport struct {
 	Import string `ddl:"keyword,single_quotes"`
 }
 
-type FunctionPackages struct {
+type FunctionPackage struct {
 	Package string `ddl:"keyword,single_quotes"`
 }
 
@@ -114,8 +114,8 @@ type CreateForPythonFunctionOptions struct {
 	ReturnResultsBehavior      *ReturnResultsBehavior    `ddl:"keyword"`
 	RuntimeVersion             string                    `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
 	Comment                    *string                   `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	Imports                    []FunctionImports         `ddl:"parameter,parentheses" sql:"IMPORTS"`
-	Packages                   []FunctionPackages        `ddl:"parameter,parentheses" sql:"PACKAGES"`
+	Imports                    []FunctionImport          `ddl:"parameter,parentheses" sql:"IMPORTS"`
+	Packages                   []FunctionPackage         `ddl:"parameter,parentheses" sql:"PACKAGES"`
 	Handler                    string                    `ddl:"parameter,single_quotes" sql:"HANDLER"`
 	ExternalAccessIntegrations []AccountObjectIdentifier `ddl:"parameter,parentheses" sql:"EXTERNAL_ACCESS_INTEGRATIONS"`
 	Secrets                    []Secret                  `ddl:"parameter,parentheses" sql:"SECRETS"`
@@ -140,8 +140,8 @@ type CreateForScalaFunctionOptions struct {
 	ReturnResultsBehavior *ReturnResultsBehavior `ddl:"keyword"`
 	RuntimeVersion        *string                `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
 	Comment               *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
-	Imports               []FunctionImports      `ddl:"parameter,parentheses" sql:"IMPORTS"`
-	Packages              []FunctionPackages     `ddl:"parameter,parentheses" sql:"PACKAGES"`
+	Imports               []FunctionImport       `ddl:"parameter,parentheses" sql:"IMPORTS"`
+	Packages              []FunctionPackage      `ddl:"parameter,parentheses" sql:"PACKAGES"`
 	Handler               string                 `ddl:"parameter,single_quotes" sql:"HANDLER"`
 	TargetPath            *string                `ddl:"parameter,single_quotes" sql:"TARGET_PATH"`
 	FunctionDefinition    *string                `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
@@ -191,7 +191,7 @@ type DropFunctionOptions struct {
 	function          bool                   `ddl:"static" sql:"FUNCTION"`
 	IfExists          *bool                  `ddl:"keyword" sql:"IF EXISTS"`
 	name              SchemaObjectIdentifier `ddl:"identifier"`
-	ArgumentDataTypes []DataType             `ddl:"keyword,parentheses"`
+	ArgumentDataTypes []DataType             `ddl:"keyword,must_parentheses"`
 }
 
 // ShowFunctionOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-user-functions.

@@ -35,11 +35,11 @@ func TestInt_CreateFunctions(t *testing.T) {
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
 		definition := `
-	class TestFunc {
-		public static String echoVarchar(String x) {
-			return x;
-		}
-	}`
+		class TestFunc {
+			public static String echoVarchar(String x) {
+				return x;
+			}
+		}`
 		target := fmt.Sprintf("@~/tf-%d.jar", time.Now().Unix())
 		dt := sdk.NewFunctionReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
 		returns := sdk.NewFunctionReturnsRequest().WithResultDataType(dt)
@@ -65,15 +65,15 @@ func TestInt_CreateFunctions(t *testing.T) {
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
 		definition := `
-	if (D <= 0) {
-		return 1;
-	} else {
-		var result = 1;
-		for (var i = 2; i <= D; i++) {
-			result = result * i;
-		}
-		return result;
-	}`
+		if (D <= 0) {
+			return 1;
+		} else {
+			var result = 1;
+			for (var i = 2; i <= D; i++) {
+				result = result * i;
+			}
+			return result;
+		}`
 
 		dt := sdk.NewFunctionReturnsResultDataTypeRequest(sdk.DataTypeFloat)
 		returns := sdk.NewFunctionReturnsRequest().WithResultDataType(dt)
@@ -121,11 +121,11 @@ def dump(i):
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
 		definition := `
-	class Echo {
-		def echoVarchar(x : String): String = {
-			return x
-		}
-	}`
+		class Echo {
+			def echoVarchar(x : String): String = {
+				return x
+			}
+		}`
 
 		argument := sdk.NewFunctionArgumentRequest("x", sdk.DataTypeVARCHAR)
 		request := sdk.NewCreateForScalaFunctionRequest(id, sdk.DataTypeVARCHAR, "Echo.echoVarchar").
@@ -179,7 +179,7 @@ def dump(i):
 			WithComment(sdk.String("comment"))
 		err := client.Functions.CreateForSQL(ctx, request)
 		require.NoError(t, err)
-		t.Cleanup(cleanupFunctionHandle(id, []sdk.DataType{sdk.DataTypeFloat}))
+		t.Cleanup(cleanupFunctionHandle(id, nil))
 
 		function, err := client.Functions.ShowByID(ctx, id)
 		require.NoError(t, err)
