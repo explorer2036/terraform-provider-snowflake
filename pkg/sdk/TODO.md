@@ -54,7 +54,7 @@ if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
 	errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
 }
 
-<!-- CallProcedureOptions and CreateAndCallForJavaProcedureOptions -->
+<!-- CallProcedureOptions and CreateAndCallForJavaProcedureOptions and CreateAndCallForSQLProcedureOptions -->
 if valueSet(opts.ScriptingVariable) {
 	if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
 		errs = append(errs, NewError("ScriptingVariable must start with ':'"))

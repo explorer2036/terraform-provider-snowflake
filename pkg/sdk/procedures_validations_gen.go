@@ -1,7 +1,5 @@
 package sdk
 
-import "strings"
-
 var (
 	_ validatable = new(CreateForJavaProcedureOptions)
 	_ validatable = new(CreateForJavaScriptProcedureOptions)
@@ -14,6 +12,7 @@ var (
 	_ validatable = new(DescribeProcedureOptions)
 	_ validatable = new(CallProcedureOptions)
 	_ validatable = new(CreateAndCallForJavaProcedureOptions)
+	_ validatable = new(CreateAndCallForSQLProcedureOptions)
 )
 
 func (opts *CreateForJavaProcedureOptions) validate() error {
@@ -188,11 +187,6 @@ func (opts *CallProcedureOptions) validate() error {
 	if !exactlyOneValueSet(opts.Positions, opts.Names) {
 		errs = append(errs, errExactlyOneOf("CallProcedureOptions", "Positions", "Names"))
 	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
-		}
-	}
 	return JoinErrors(errs...)
 }
 
@@ -213,7 +207,7 @@ func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !ValidObjectIdentifier(opts.name) {
+	if !ValidObjectIdentifier(opts.Name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
 	if valueSet(opts.Returns) {
@@ -221,9 +215,26 @@ func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
 			errs = append(errs, errExactlyOneOf("CreateAndCallForJavaProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
 	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
+	return JoinErrors(errs...)
+}
+
+func (opts *CreateAndCallForSQLProcedureOptions) validate() error {
+	if opts == nil {
+		return ErrNilOptions
+	}
+	var errs []error
+	if !valueSet(opts.ProcedureDefinition) {
+		errs = append(errs, errNotSet("CreateAndCallForSQLProcedureOptions", "ProcedureDefinition"))
+	}
+	if !ValidObjectIdentifier(opts.ProcedureName) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	if !ValidObjectIdentifier(opts.Name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	if valueSet(opts.Returns) {
+		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
+			errs = append(errs, errExactlyOneOf("CreateAndCallForSQLProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
 	}
 	return JoinErrors(errs...)

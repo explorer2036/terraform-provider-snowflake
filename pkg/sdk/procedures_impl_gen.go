@@ -85,6 +85,11 @@ func (v *procedures) CreateAndCallForJava(ctx context.Context, request *CreateAn
 	return validateAndExec(v.client, ctx, opts)
 }
 
+func (v *procedures) CreateAndCallForSQL(ctx context.Context, request *CreateAndCallForSQLProcedureRequest) error {
+	opts := request.toOpts()
+	return validateAndExec(v.client, ctx, opts)
+}
+
 func (r *CreateForJavaProcedureRequest) toOpts() *CreateForJavaProcedureOptions {
 	opts := &CreateForJavaProcedureOptions{
 		OrReplace: r.OrReplace,
@@ -475,7 +480,7 @@ func (r *CallProcedureRequest) toOpts() *CallProcedureOptions {
 
 func (r *CreateAndCallForJavaProcedureRequest) toOpts() *CreateAndCallForJavaProcedureOptions {
 	opts := &CreateAndCallForJavaProcedureOptions{
-		name: r.name,
+		Name: r.Name,
 
 		RuntimeVersion: r.RuntimeVersion,
 
@@ -536,6 +541,82 @@ func (r *CreateAndCallForJavaProcedureRequest) toOpts() *CreateAndCallForJavaPro
 			}
 		}
 		opts.Imports = s
+	}
+	if r.WithClauses != nil {
+		s := make([]ProcedureWithClause, len(r.WithClauses))
+		for i, v := range r.WithClauses {
+			s[i] = ProcedureWithClause{
+				CteName:    v.CteName,
+				CteColumns: v.CteColumns,
+				Statement:  v.Statement,
+			}
+		}
+		opts.WithClauses = s
+	}
+	if r.Positions != nil {
+		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
+		for i, v := range r.Positions {
+			s[i] = ProcedureCallArgumentPosition{
+				Position: v.Position,
+			}
+		}
+		opts.Positions = s
+	}
+	if r.Names != nil {
+		s := make([]ProcedureCallArgumentName, len(r.Names))
+		for i, v := range r.Names {
+			s[i] = ProcedureCallArgumentName{
+				Name:     v.Name,
+				Position: v.Position,
+			}
+		}
+		opts.Names = s
+	}
+	return opts
+}
+
+func (r *CreateAndCallForSQLProcedureRequest) toOpts() *CreateAndCallForSQLProcedureOptions {
+	opts := &CreateAndCallForSQLProcedureOptions{
+		Name: r.Name,
+
+		NullInputBehavior:   r.NullInputBehavior,
+		ProcedureDefinition: r.ProcedureDefinition,
+
+		ProcedureName: r.ProcedureName,
+
+		ScriptingVariable: r.ScriptingVariable,
+	}
+	if r.Arguments != nil {
+		s := make([]ProcedureArgument, len(r.Arguments))
+		for i, v := range r.Arguments {
+			s[i] = ProcedureArgument{
+				ArgName:      v.ArgName,
+				ArgDataType:  v.ArgDataType,
+				DefaultValue: v.DefaultValue,
+			}
+		}
+		opts.Arguments = s
+	}
+	opts.Returns = ProcedureReturns{}
+	if r.Returns.ResultDataType != nil {
+		opts.Returns.ResultDataType = &ProcedureReturnsResultDataType{
+			ResultDataType: r.Returns.ResultDataType.ResultDataType,
+			Null:           r.Returns.ResultDataType.Null,
+			NotNull:        r.Returns.ResultDataType.NotNull,
+		}
+	}
+	if r.Returns.Table != nil {
+		opts.Returns.Table = &ProcedureReturnsTable{}
+		if r.Returns.Table.Columns != nil {
+			s := make([]ProcedureColumn, len(r.Returns.Table.Columns))
+			for i, v := range r.Returns.Table.Columns {
+				s[i] = ProcedureColumn{
+					ColumnName:     v.ColumnName,
+					ColumnDataType: v.ColumnDataType,
+				}
+			}
+			opts.Returns.Table.Columns = s
+		}
 	}
 	if r.WithClauses != nil {
 		s := make([]ProcedureWithClause, len(r.WithClauses))

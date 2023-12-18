@@ -553,15 +553,15 @@ func NewProcedureCallArgumentNameRequest(
 }
 
 func NewCreateAndCallForJavaProcedureRequest(
-	name SchemaObjectIdentifier,
+	Name AccountObjectIdentifier,
 	Returns ProcedureReturnsRequest,
 	RuntimeVersion string,
 	Packages []ProcedurePackageRequest,
 	Handler string,
-	ProcedureName SchemaObjectIdentifier,
+	ProcedureName AccountObjectIdentifier,
 ) *CreateAndCallForJavaProcedureRequest {
 	s := CreateAndCallForJavaProcedureRequest{}
-	s.name = name
+	s.Name = Name
 	s.Returns = Returns
 	s.RuntimeVersion = RuntimeVersion
 	s.Packages = Packages
@@ -622,5 +622,49 @@ func NewProcedureWithClauseRequest(
 
 func (s *ProcedureWithClauseRequest) WithCteColumns(CteColumns []string) *ProcedureWithClauseRequest {
 	s.CteColumns = CteColumns
+	return s
+}
+
+func NewCreateAndCallForSQLProcedureRequest(
+	Name AccountObjectIdentifier,
+	Returns ProcedureReturnsRequest,
+	ProcedureDefinition string,
+	ProcedureName AccountObjectIdentifier,
+) *CreateAndCallForSQLProcedureRequest {
+	s := CreateAndCallForSQLProcedureRequest{}
+	s.Name = Name
+	s.Returns = Returns
+	s.ProcedureDefinition = ProcedureDefinition
+	s.ProcedureName = ProcedureName
+	return &s
+}
+
+func (s *CreateAndCallForSQLProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateAndCallForSQLProcedureRequest {
+	s.Arguments = Arguments
+	return s
+}
+
+func (s *CreateAndCallForSQLProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateAndCallForSQLProcedureRequest {
+	s.NullInputBehavior = NullInputBehavior
+	return s
+}
+
+func (s *CreateAndCallForSQLProcedureRequest) WithWithClauses(WithClauses []ProcedureWithClauseRequest) *CreateAndCallForSQLProcedureRequest {
+	s.WithClauses = WithClauses
+	return s
+}
+
+func (s *CreateAndCallForSQLProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForSQLProcedureRequest {
+	s.Positions = Positions
+	return s
+}
+
+func (s *CreateAndCallForSQLProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForSQLProcedureRequest {
+	s.Names = Names
+	return s
+}
+
+func (s *CreateAndCallForSQLProcedureRequest) WithScriptingVariable(ScriptingVariable *string) *CreateAndCallForSQLProcedureRequest {
+	s.ScriptingVariable = ScriptingVariable
 	return s
 }

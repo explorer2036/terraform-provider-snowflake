@@ -14,6 +14,7 @@ var (
 	_ optionsProvider[DescribeProcedureOptions]             = new(DescribeProcedureRequest)
 	_ optionsProvider[CallProcedureOptions]                 = new(CallProcedureRequest)
 	_ optionsProvider[CreateAndCallForJavaProcedureOptions] = new(CreateAndCallForJavaProcedureRequest)
+	_ optionsProvider[CreateAndCallForSQLProcedureOptions]  = new(CreateAndCallForSQLProcedureRequest)
 )
 
 type CreateForJavaProcedureRequest struct {
@@ -187,7 +188,7 @@ type ProcedureCallArgumentNameRequest struct {
 }
 
 type CreateAndCallForJavaProcedureRequest struct {
-	name                SchemaObjectIdentifier // required
+	Name                AccountObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	Returns             ProcedureReturnsRequest   // required
 	RuntimeVersion      string                    // required
@@ -197,7 +198,7 @@ type CreateAndCallForJavaProcedureRequest struct {
 	NullInputBehavior   *NullInputBehavior
 	ProcedureDefinition *string
 	WithClauses         []ProcedureWithClauseRequest
-	ProcedureName       SchemaObjectIdentifier // required
+	ProcedureName       AccountObjectIdentifier // required
 	Positions           []ProcedureCallArgumentPositionRequest
 	Names               []ProcedureCallArgumentNameRequest
 	ScriptingVariable   *string
@@ -207,4 +208,17 @@ type ProcedureWithClauseRequest struct {
 	CteName    SchemaObjectIdentifier // required
 	CteColumns []string
 	Statement  string // required
+}
+
+type CreateAndCallForSQLProcedureRequest struct {
+	Name                AccountObjectIdentifier // required
+	Arguments           []ProcedureArgumentRequest
+	Returns             ProcedureReturnsRequest // required
+	NullInputBehavior   *NullInputBehavior
+	ProcedureDefinition string // required
+	WithClauses         []ProcedureWithClauseRequest
+	ProcedureName       AccountObjectIdentifier // required
+	Positions           []ProcedureCallArgumentPositionRequest
+	Names               []ProcedureCallArgumentNameRequest
+	ScriptingVariable   *string
 }
