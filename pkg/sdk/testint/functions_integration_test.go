@@ -14,6 +14,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+/*
+todo: add tests for:
+  - creating functions with different languages (java, javascript, python, scala, sql) from stages  using [ TARGET_PATH = '<stage_path_and_file_name_to_write>' ]
+  - execute and execute-immediate for scripting https://docs.snowflake.com/en/sql-reference/sql/execute-immediate
+*/
+
 func TestInt_CreateFunctions(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
