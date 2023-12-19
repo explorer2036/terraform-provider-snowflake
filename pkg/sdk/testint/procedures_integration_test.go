@@ -575,8 +575,6 @@ func TestInt_CallProcedure(t *testing.T) {
 	createTableHandle := func(t *testing.T, table sdk.SchemaObjectIdentifier) {
 		t.Helper()
 
-		// CREATE OR REPLACE TABLE employees(id NUMBER, name VARCHAR, role VARCHAR);
-		// INSERT INTO employees (id, name, role) VALUES (1, 'Alice', 'op'), (2, 'Bob', 'dev'), (3, 'Cindy', 'dev');
 		_, err := client.ExecForTests(ctx, fmt.Sprintf(`CREATE OR REPLACE TABLE %s (id NUMBER, name VARCHAR, role VARCHAR)`, table.FullyQualifiedName()))
 		require.NoError(t, err)
 		_, err = client.ExecForTests(ctx, fmt.Sprintf(`INSERT INTO %s (id, name, role) VALUES (1, 'Alice', 'op'), (2, 'Bob', 'dev'), (3, 'Cindy', 'dev')`, table.FullyQualifiedName()))
@@ -779,75 +777,80 @@ def filter_by_role(session, name, role):
 	})
 }
 
-// func TestInt_CreateAndCallProcedures(t *testing.T) {
-// 	client := testClient(t)
-// 	ctx := testContext(t)
+func TestInt_CreateAndCallProcedures(t *testing.T) {
+	client := testClient(t)
+	ctx := testContext(t)
 
-// 	databaseTest, schemaTest := testDb(t), testSchema(t)
-// 	cleanupProcedureHandle := func(name string, ats []sdk.DataType) func() {
-// 		return func() {
-// 			_, err := client.ExecForTests(ctx, fmt.Sprintf("DROP PROCEDURE %s (VARCHAR)", name))
-// 			require.NoError(t, err)
-// 		}
-// 	}
+	databaseTest, schemaTest := testDb(t), testSchema(t)
+	createTableHandle := func(t *testing.T, table sdk.SchemaObjectIdentifier) {
+		t.Helper()
 
-// 	t.Run("create and call procedure for SQL: argument positions", func(t *testing.T) {
-// 		definition := `
-// 	BEGIN
-// 		RETURN message;
-// 	END;`
+		_, err := client.ExecForTests(ctx, fmt.Sprintf(`CREATE OR REPLACE TABLE %s (id NUMBER, name VARCHAR, role VARCHAR)`, table.FullyQualifiedName()))
+		require.NoError(t, err)
+		_, err = client.ExecForTests(ctx, fmt.Sprintf(`INSERT INTO %s (id, name, role) VALUES (1, 'Alice', 'op'), (2, 'Bob', 'dev'), (3, 'Cindy', 'dev')`, table.FullyQualifiedName()))
+		require.NoError(t, err)
+		t.Cleanup(func() {
+			_, err := client.ExecForTests(ctx, fmt.Sprintf(`DROP TABLE %s`, table.FullyQualifiedName()))
+			require.NoError(t, err)
+		})
+	}
 
-// 		name := random.StringN(4)
-// 		id := fmt.Sprintf(`"%s"`, name)
-// 		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
-// 		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
-// 		argument := sdk.NewProcedureArgumentRequest("message", sdk.DataTypeVARCHAR)
-// 		positions := []sdk.ProcedureCallArgumentPositionRequest{
-// 			*sdk.NewProcedureCallArgumentPositionRequest("'hi'"),
-// 		}
-// 		request := sdk.NewCreateAndCallForSQLProcedureRequest(id, *returns, definition, id).
-// 			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
-// 			WithPositions(positions)
-// 		err := client.Procedures.CreateAndCallForSQL(ctx, request)
-// 		require.NoError(t, err)
-// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
-// 	})
+	// create a employees table
+	tid := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, "employees")
+	createTableHandle(t, tid)
 
-// 	t.Run("create and call procedure for Java: returns table", func(t *testing.T) {
-// 		// https: // docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#omitting-return-column-names-and-types
-// 		id := sdk.NewAccountObjectIdentifier("filter_by_role")
+	// t.Run("create and call procedure for SQL: argument positions", func(t *testing.T) {
+	// 	definition := `
+	// BEGIN
+	// 	RETURN message;
+	// END;`
 
-// 		definition := `
-// 	import com.snowflake.snowpark_java.*;
-// 	public class Filter {
-// 		public DataFrame filterByRole(Session session, String tableName, String role) {
-// 			DataFrame table = session.table(tableName);
-// 			DataFrame filteredRows = table.filter(Functions.col("role").equal_to(Functions.lit(role)));
-// 			return filteredRows;
-// 		}
-// 	}`
-// 		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
-// 		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
-// 		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
-// 		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
-// 		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
-// 		arg1 := sdk.NewProcedureArgumentRequest("name", sdk.DataTypeVARCHAR)
-// 		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
-// 		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
-// 		positions := []sdk.ProcedureCallArgumentPositionRequest{
-// 			*sdk.NewProcedureCallArgumentPositionRequest("'employees'"),
-// 			*sdk.NewProcedureCallArgumentPositionRequest("'dev'"),
-// 		}
-// 		request := sdk.NewCreateAndCallForJavaProcedureRequest(id, *returns, "11", packages, "Filter.filterByRole", id).
-// 			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
-// 			WithProcedureDefinition(sdk.String(definition)).
-// 			WithPositions(positions)
-// 		err := client.Procedures.CreateAndCallForJava(ctx, request)
-// 		require.NoError(t, err)
-// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
+	// 	name := random.StringN(4)
+	// 	id := fmt.Sprintf(`"%s"`, name)
+	// 	dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
+	// 	returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
+	// 	argument := sdk.NewProcedureArgumentRequest("message", sdk.DataTypeVARCHAR)
+	// 	positions := []sdk.ProcedureCallArgumentPositionRequest{
+	// 		*sdk.NewProcedureCallArgumentPositionRequest("'hi'"),
+	// 	}
+	// 	request := sdk.NewCreateAndCallForSQLProcedureRequest(id, *returns, definition, id).
+	// 		WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
+	// 		WithPositions(positions)
+	// 	err := client.Procedures.CreateAndCallForSQL(ctx, request)
+	// 	require.NoError(t, err)
+	// 	t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
+	// })
 
-// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-// 		require.NoError(t, err)
-// 		require.GreaterOrEqual(t, len(procedures), 1)
-// 	})
-// }
+	t.Run("create and call procedure for Java: returns table", func(t *testing.T) {
+		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#omitting-return-column-names-and-types
+		name := sdk.NewAccountObjectIdentifier("filter_by_role")
+
+		definition := `
+	import com.snowflake.snowpark_java.*;
+	public class Filter {
+		public DataFrame filterByRole(Session session, String name, String role) {
+			DataFrame table = session.table(name);
+			DataFrame filteredRows = table.filter(Functions.col("role").equal_to(Functions.lit(role)));
+			return filteredRows;
+		}
+	}`
+		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
+		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
+		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
+		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
+		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
+		arg1 := sdk.NewProcedureArgumentRequest("name", sdk.DataTypeVARCHAR)
+		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
+		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
+		positions := []sdk.ProcedureCallArgumentPositionRequest{
+			*sdk.NewProcedureCallArgumentPositionRequest(fmt.Sprintf(`'%s'`, tid.FullyQualifiedName())),
+			*sdk.NewProcedureCallArgumentPositionRequest("'dev'"),
+		}
+		request := sdk.NewCreateAndCallForJavaProcedureRequest(name, *returns, "11", packages, "Filter.filterByRole", name).
+			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
+			WithProcedureDefinition(sdk.String(definition)).
+			WithPositions(positions)
+		err := client.Procedures.CreateAndCallForJava(ctx, request)
+		require.NoError(t, err)
+	})
+}

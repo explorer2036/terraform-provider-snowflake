@@ -658,11 +658,11 @@ func TestProcedures_Call(t *testing.T) {
 }
 
 func TestProcedures_CreateAndCallForJava(t *testing.T) {
-	id := RandomSchemaObjectIdentifier()
+	id := RandomAccountObjectIdentifier()
 
 	defaultOpts := func() *CreateAndCallForJavaProcedureOptions {
 		return &CreateAndCallForJavaProcedureOptions{
-			name: id,
+			Name: id,
 		}
 	}
 
@@ -673,7 +673,7 @@ func TestProcedures_CreateAndCallForJava(t *testing.T) {
 
 	t.Run("validation: incorrect identifier", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.name = NewSchemaObjectIdentifier("", "", "")
+		opts.Name = NewAccountObjectIdentifier("")
 		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
@@ -731,7 +731,7 @@ func TestProcedures_CreateAndCallForJava(t *testing.T) {
 		opts.Handler = "TestFunc.echoVarchar"
 		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.ProcedureDefinition = String("return id + name;")
-		cte := NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), "album_info_1976")
+		cte := NewSchemaObjectIdentifier(random.StringN(4), random.StringN(4), "album_info_1976")
 		opts.WithClauses = []ProcedureWithClause{
 			{
 				CteName:    cte,

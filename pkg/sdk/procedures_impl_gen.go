@@ -480,7 +480,7 @@ func (r *CallProcedureRequest) toOpts() *CallProcedureOptions {
 
 func (r *CreateAndCallForJavaProcedureRequest) toOpts() *CreateAndCallForJavaProcedureOptions {
 	opts := &CreateAndCallForJavaProcedureOptions{
-		name: r.name,
+		Name: r.Name,
 
 		RuntimeVersion: r.RuntimeVersion,
 
@@ -577,7 +577,7 @@ func (r *CreateAndCallForJavaProcedureRequest) toOpts() *CreateAndCallForJavaPro
 
 func (r *CreateAndCallForSQLProcedureRequest) toOpts() *CreateAndCallForSQLProcedureOptions {
 	opts := &CreateAndCallForSQLProcedureOptions{
-		name: r.name,
+		Name: r.Name,
 
 		NullInputBehavior:   r.NullInputBehavior,
 		ProcedureDefinition: r.ProcedureDefinition,

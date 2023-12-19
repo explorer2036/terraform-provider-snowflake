@@ -188,7 +188,7 @@ type ProcedureCallArgumentNameRequest struct {
 }
 
 type CreateAndCallForJavaProcedureRequest struct {
-	name                SchemaObjectIdentifier // required
+	Name                AccountObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	Returns             ProcedureReturnsRequest   // required
 	RuntimeVersion      string                    // required
@@ -198,7 +198,7 @@ type CreateAndCallForJavaProcedureRequest struct {
 	NullInputBehavior   *NullInputBehavior
 	ProcedureDefinition *string
 	WithClauses         []ProcedureWithClauseRequest
-	ProcedureName       SchemaObjectIdentifier // required
+	ProcedureName       AccountObjectIdentifier // required
 	Positions           []ProcedureCallArgumentPositionRequest
 	Names               []ProcedureCallArgumentNameRequest
 	ScriptingVariable   *string
@@ -211,13 +211,13 @@ type ProcedureWithClauseRequest struct {
 }
 
 type CreateAndCallForSQLProcedureRequest struct {
-	name                SchemaObjectIdentifier // required
+	Name                AccountObjectIdentifier // required
 	Arguments           []ProcedureArgumentRequest
 	Returns             ProcedureReturnsRequest // required
 	NullInputBehavior   *NullInputBehavior
 	ProcedureDefinition string // required
 	WithClauses         []ProcedureWithClauseRequest
-	ProcedureName       SchemaObjectIdentifier // required
+	ProcedureName       AccountObjectIdentifier // required
 	Positions           []ProcedureCallArgumentPositionRequest
 	Names               []ProcedureCallArgumentNameRequest
 	ScriptingVariable   *string

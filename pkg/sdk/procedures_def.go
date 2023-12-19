@@ -358,7 +358,7 @@ var ProceduresDef = g.NewInterface(
 	"https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala",
 	g.NewQueryStruct("CreateAndCallForJava").
 		SQL("WITH").
-		Name().
+		Identifier("Name", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
 		SQL("AS PROCEDURE").
 		ListQueryStructField(
 			"Arguments",
@@ -391,7 +391,7 @@ var ProceduresDef = g.NewInterface(
 			g.KeywordOptions(),
 		).
 		SQL("CALL").
-		Identifier("ProcedureName", g.KindOfT[SchemaObjectIdentifier](), g.IdentifierOptions().Required()).
+		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
 		ListQueryStructField(
 			"Positions",
 			procedureCallArgumentPosition,
@@ -407,13 +407,68 @@ var ProceduresDef = g.NewInterface(
 		WithValidation(g.ValidateValueSet, "Handler").
 		WithValidation(g.ValidateValueSet, "Packages").
 		WithValidation(g.ValidIdentifier, "ProcedureName").
-		WithValidation(g.ValidIdentifier, "name"),
+		WithValidation(g.ValidIdentifier, "Name"),
+).CustomOperation(
+	"CreateAndCallForScala",
+	"https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala",
+	g.NewQueryStruct("CreateAndCallForScala").
+		SQL("WITH").
+		Identifier("Name", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
+		SQL("AS PROCEDURE").
+		ListQueryStructField(
+			"Arguments",
+			procedureArgument,
+			g.ListOptions().MustParentheses(),
+		).
+		QueryStructField(
+			"Returns",
+			procedureReturns,
+			g.KeywordOptions().SQL("RETURNS").Required(),
+		).
+		SQL("LANGUAGE SCALA").
+		TextAssignment("RUNTIME_VERSION", g.ParameterOptions().SingleQuotes().Required()).
+		ListQueryStructField(
+			"Packages",
+			procedurePackage,
+			g.ParameterOptions().Parentheses().SQL("PACKAGES").Required(),
+		).
+		ListQueryStructField(
+			"Imports",
+			procedureImport,
+			g.ParameterOptions().Parentheses().SQL("IMPORTS"),
+		).
+		TextAssignment("HANDLER", g.ParameterOptions().SingleQuotes().Required()).
+		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
+		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")).
+		ListQueryStructField(
+			"WithClauses",
+			procedureWithClause,
+			g.KeywordOptions(),
+		).
+		SQL("CALL").
+		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
+		ListQueryStructField(
+			"Positions",
+			procedureCallArgumentPosition,
+			g.KeywordOptions().Parentheses(),
+		).
+		ListQueryStructField(
+			"Names",
+			procedureCallArgumentName,
+			g.KeywordOptions().Parentheses(),
+		).
+		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
+		WithValidation(g.ValidateValueSet, "RuntimeVersion").
+		WithValidation(g.ValidateValueSet, "Handler").
+		WithValidation(g.ValidateValueSet, "Packages").
+		WithValidation(g.ValidIdentifier, "ProcedureName").
+		WithValidation(g.ValidIdentifier, "Name"),
 ).CustomOperation(
 	"CreateAndCallForSQL",
 	"https://docs.snowflake.com/en/sql-reference/sql/call-with#snowflake-scripting",
 	g.NewQueryStruct("CreateAndCallForSQL").
 		SQL("WITH").
-		Name().
+		Identifier("Name", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
 		SQL("AS PROCEDURE").
 		ListQueryStructField(
 			"Arguments",
@@ -434,7 +489,7 @@ var ProceduresDef = g.NewInterface(
 			g.KeywordOptions(),
 		).
 		SQL("CALL").
-		Identifier("ProcedureName", g.KindOfT[SchemaObjectIdentifier](), g.IdentifierOptions().Required()).
+		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
 		ListQueryStructField(
 			"Positions",
 			procedureCallArgumentPosition,
@@ -448,5 +503,5 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
 		WithValidation(g.ValidateValueSet, "ProcedureDefinition").
 		WithValidation(g.ValidIdentifier, "ProcedureName").
-		WithValidation(g.ValidIdentifier, "name"),
+		WithValidation(g.ValidIdentifier, "Name"),
 )

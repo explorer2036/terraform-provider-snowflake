@@ -214,7 +214,7 @@ func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !ValidObjectIdentifier(opts.name) {
+	if !ValidObjectIdentifier(opts.Name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
 	if valueSet(opts.Returns) {
@@ -241,7 +241,7 @@ func (opts *CreateAndCallForSQLProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !ValidObjectIdentifier(opts.name) {
+	if !ValidObjectIdentifier(opts.Name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
 	if valueSet(opts.Returns) {
