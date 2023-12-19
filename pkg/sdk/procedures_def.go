@@ -358,7 +358,7 @@ var ProceduresDef = g.NewInterface(
 	"https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala",
 	g.NewQueryStruct("CreateAndCallForJava").
 		SQL("WITH").
-		Identifier("Name", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
+		Name().
 		SQL("AS PROCEDURE").
 		ListQueryStructField(
 			"Arguments",
@@ -413,7 +413,7 @@ var ProceduresDef = g.NewInterface(
 	"https://docs.snowflake.com/en/sql-reference/sql/call-with#snowflake-scripting",
 	g.NewQueryStruct("CreateAndCallForSQL").
 		SQL("WITH").
-		Identifier("Name", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
+		Name().
 		SQL("AS PROCEDURE").
 		ListQueryStructField(
 			"Arguments",

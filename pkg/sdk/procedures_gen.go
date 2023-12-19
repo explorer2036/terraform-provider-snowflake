@@ -1,9 +1,6 @@
 package sdk
 
-import (
-	"context"
-	"database/sql"
-)
+import "context"
 
 type Procedures interface {
 	CreateForJava(ctx context.Context, request *CreateForJavaProcedureRequest) error
@@ -15,7 +12,7 @@ type Procedures interface {
 	Drop(ctx context.Context, request *DropProcedureRequest) error
 	Show(ctx context.Context, request *ShowProcedureRequest) ([]Procedure, error)
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Procedure, error)
-	Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
+	Describe(ctx context.Context, id SchemaObjectIdentifier) ([]ProcedureDetail, error)
 	Call(ctx context.Context, request *CallProcedureRequest) error
 	CreateAndCallForJava(ctx context.Context, request *CreateAndCallForJavaProcedureRequest) error
 	CreateAndCallForSQL(ctx context.Context, request *CreateAndCallForSQLProcedureRequest) error
@@ -188,7 +185,7 @@ type DropProcedureOptions struct {
 	procedure         bool                   `ddl:"static" sql:"PROCEDURE"`
 	IfExists          *bool                  `ddl:"keyword" sql:"IF EXISTS"`
 	name              SchemaObjectIdentifier `ddl:"identifier"`
-	ArgumentDataTypes []DataType             `ddl:"keyword,must_parentheses"`
+	ArgumentDataTypes []DataType             `ddl:"keyword,parentheses"`
 }
 
 // ShowProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-procedures.
@@ -272,7 +269,7 @@ type ProcedureCallArgumentName struct {
 // CreateAndCallForJavaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala.
 type CreateAndCallForJavaProcedureOptions struct {
 	with                bool                            `ddl:"static" sql:"WITH"`
-	Name                AccountObjectIdentifier         `ddl:"identifier"`
+	name                SchemaObjectIdentifier          `ddl:"identifier"`
 	asProcedure         bool                            `ddl:"static" sql:"AS PROCEDURE"`
 	Arguments           []ProcedureArgument             `ddl:"list,must_parentheses"`
 	Returns             ProcedureReturns                `ddl:"keyword" sql:"RETURNS"`
@@ -300,7 +297,7 @@ type ProcedureWithClause struct {
 // CreateAndCallForSQLProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#snowflake-scripting.
 type CreateAndCallForSQLProcedureOptions struct {
 	with                bool                            `ddl:"static" sql:"WITH"`
-	Name                AccountObjectIdentifier         `ddl:"identifier"`
+	name                SchemaObjectIdentifier          `ddl:"identifier"`
 	asProcedure         bool                            `ddl:"static" sql:"AS PROCEDURE"`
 	Arguments           []ProcedureArgument             `ddl:"list,must_parentheses"`
 	Returns             ProcedureReturns                `ddl:"keyword" sql:"RETURNS"`

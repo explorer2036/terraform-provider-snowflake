@@ -37,9 +37,6 @@ func (opts *CreateForJavaProcedureOptions) validate() error {
 			errs = append(errs, errExactlyOneOf("CreateForJavaProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
 	}
-	if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
-		errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
-	}
 	return JoinErrors(errs...)
 }
 
@@ -103,9 +100,6 @@ func (opts *CreateForScalaProcedureOptions) validate() error {
 		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
 			errs = append(errs, errExactlyOneOf("CreateForScalaProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
-	}
-	if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
-		errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
 	}
 	return JoinErrors(errs...)
 }

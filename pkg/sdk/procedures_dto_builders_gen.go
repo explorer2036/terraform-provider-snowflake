@@ -553,7 +553,7 @@ func NewProcedureCallArgumentNameRequest(
 }
 
 func NewCreateAndCallForJavaProcedureRequest(
-	Name AccountObjectIdentifier,
+	name SchemaObjectIdentifier,
 	Returns ProcedureReturnsRequest,
 	RuntimeVersion string,
 	Packages []ProcedurePackageRequest,
@@ -561,7 +561,7 @@ func NewCreateAndCallForJavaProcedureRequest(
 	ProcedureName AccountObjectIdentifier,
 ) *CreateAndCallForJavaProcedureRequest {
 	s := CreateAndCallForJavaProcedureRequest{}
-	s.Name = Name
+	s.name = name
 	s.Returns = Returns
 	s.RuntimeVersion = RuntimeVersion
 	s.Packages = Packages
@@ -626,13 +626,13 @@ func (s *ProcedureWithClauseRequest) WithCteColumns(CteColumns []string) *Proced
 }
 
 func NewCreateAndCallForSQLProcedureRequest(
-	Name AccountObjectIdentifier,
+	name SchemaObjectIdentifier,
 	Returns ProcedureReturnsRequest,
 	ProcedureDefinition string,
 	ProcedureName AccountObjectIdentifier,
 ) *CreateAndCallForSQLProcedureRequest {
 	s := CreateAndCallForSQLProcedureRequest{}
-	s.Name = Name
+	s.name = name
 	s.Returns = Returns
 	s.ProcedureDefinition = ProcedureDefinition
 	s.ProcedureName = ProcedureName
