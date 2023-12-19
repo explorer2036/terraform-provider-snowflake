@@ -198,7 +198,7 @@ type CreateAndCallForJavaProcedureRequest struct {
 	NullInputBehavior   *NullInputBehavior
 	ProcedureDefinition *string
 	WithClauses         []ProcedureWithClauseRequest
-	ProcedureName       AccountObjectIdentifier // required
+	ProcedureName       SchemaObjectIdentifier // required
 	Positions           []ProcedureCallArgumentPositionRequest
 	Names               []ProcedureCallArgumentNameRequest
 	ScriptingVariable   *string
@@ -217,7 +217,7 @@ type CreateAndCallForSQLProcedureRequest struct {
 	NullInputBehavior   *NullInputBehavior
 	ProcedureDefinition string // required
 	WithClauses         []ProcedureWithClauseRequest
-	ProcedureName       AccountObjectIdentifier // required
+	ProcedureName       SchemaObjectIdentifier // required
 	Positions           []ProcedureCallArgumentPositionRequest
 	Names               []ProcedureCallArgumentNameRequest
 	ScriptingVariable   *string

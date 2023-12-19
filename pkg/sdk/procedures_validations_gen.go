@@ -1,5 +1,7 @@
 package sdk
 
+import "strings"
+
 var (
 	_ validatable = new(CreateForJavaProcedureOptions)
 	_ validatable = new(CreateForJavaScriptProcedureOptions)
@@ -36,6 +38,9 @@ func (opts *CreateForJavaProcedureOptions) validate() error {
 		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
 			errs = append(errs, errExactlyOneOf("CreateForJavaProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
+	}
+	if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
+		errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
 	}
 	return JoinErrors(errs...)
 }
@@ -100,6 +105,9 @@ func (opts *CreateForScalaProcedureOptions) validate() error {
 		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
 			errs = append(errs, errExactlyOneOf("CreateForScalaProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
+	}
+	if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
+		errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
 	}
 	return JoinErrors(errs...)
 }
@@ -181,6 +189,11 @@ func (opts *CallProcedureOptions) validate() error {
 	if !exactlyOneValueSet(opts.Positions, opts.Names) {
 		errs = append(errs, errExactlyOneOf("CallProcedureOptions", "Positions", "Names"))
 	}
+	if valueSet(opts.ScriptingVariable) {
+		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
+			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
+		}
+	}
 	return JoinErrors(errs...)
 }
 
@@ -201,12 +214,17 @@ func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !ValidObjectIdentifier(opts.Name) {
+	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
 	if valueSet(opts.Returns) {
 		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
 			errs = append(errs, errExactlyOneOf("CreateAndCallForJavaProcedureOptions.Returns", "ResultDataType", "Table"))
+		}
+	}
+	if valueSet(opts.ScriptingVariable) {
+		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
+			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
 		}
 	}
 	return JoinErrors(errs...)
@@ -223,12 +241,17 @@ func (opts *CreateAndCallForSQLProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !ValidObjectIdentifier(opts.Name) {
+	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
 	if valueSet(opts.Returns) {
 		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
 			errs = append(errs, errExactlyOneOf("CreateAndCallForSQLProcedureOptions.Returns", "ResultDataType", "Table"))
+		}
+	}
+	if valueSet(opts.ScriptingVariable) {
+		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
+			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
 		}
 	}
 	return JoinErrors(errs...)

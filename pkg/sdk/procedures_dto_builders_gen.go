@@ -558,7 +558,7 @@ func NewCreateAndCallForJavaProcedureRequest(
 	RuntimeVersion string,
 	Packages []ProcedurePackageRequest,
 	Handler string,
-	ProcedureName AccountObjectIdentifier,
+	ProcedureName SchemaObjectIdentifier,
 ) *CreateAndCallForJavaProcedureRequest {
 	s := CreateAndCallForJavaProcedureRequest{}
 	s.name = name
@@ -629,7 +629,7 @@ func NewCreateAndCallForSQLProcedureRequest(
 	name SchemaObjectIdentifier,
 	Returns ProcedureReturnsRequest,
 	ProcedureDefinition string,
-	ProcedureName AccountObjectIdentifier,
+	ProcedureName SchemaObjectIdentifier,
 ) *CreateAndCallForSQLProcedureRequest {
 	s := CreateAndCallForSQLProcedureRequest{}
 	s.name = name

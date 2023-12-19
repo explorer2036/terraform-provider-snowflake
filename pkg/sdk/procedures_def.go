@@ -391,7 +391,7 @@ var ProceduresDef = g.NewInterface(
 			g.KeywordOptions(),
 		).
 		SQL("CALL").
-		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
+		Identifier("ProcedureName", g.KindOfT[SchemaObjectIdentifier](), g.IdentifierOptions().Required()).
 		ListQueryStructField(
 			"Positions",
 			procedureCallArgumentPosition,
@@ -407,7 +407,7 @@ var ProceduresDef = g.NewInterface(
 		WithValidation(g.ValidateValueSet, "Handler").
 		WithValidation(g.ValidateValueSet, "Packages").
 		WithValidation(g.ValidIdentifier, "ProcedureName").
-		WithValidation(g.ValidIdentifier, "Name"),
+		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
 	"CreateAndCallForSQL",
 	"https://docs.snowflake.com/en/sql-reference/sql/call-with#snowflake-scripting",
@@ -434,7 +434,7 @@ var ProceduresDef = g.NewInterface(
 			g.KeywordOptions(),
 		).
 		SQL("CALL").
-		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
+		Identifier("ProcedureName", g.KindOfT[SchemaObjectIdentifier](), g.IdentifierOptions().Required()).
 		ListQueryStructField(
 			"Positions",
 			procedureCallArgumentPosition,
@@ -448,5 +448,5 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
 		WithValidation(g.ValidateValueSet, "ProcedureDefinition").
 		WithValidation(g.ValidIdentifier, "ProcedureName").
-		WithValidation(g.ValidIdentifier, "Name"),
+		WithValidation(g.ValidIdentifier, "name"),
 )
