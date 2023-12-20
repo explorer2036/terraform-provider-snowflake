@@ -18,6 +18,9 @@ type Procedures interface {
 	Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
 	Call(ctx context.Context, request *CallProcedureRequest) error
 	CreateAndCallForJava(ctx context.Context, request *CreateAndCallForJavaProcedureRequest) error
+	CreateAndCallForScala(ctx context.Context, request *CreateAndCallForScalaProcedureRequest) error
+	CreateAndCallForJavaScript(ctx context.Context, request *CreateAndCallForJavaScriptProcedureRequest) error
+	CreateAndCallForPython(ctx context.Context, request *CreateAndCallForPythonProcedureRequest) error
 	CreateAndCallForSQL(ctx context.Context, request *CreateAndCallForSQLProcedureRequest) error
 }
 
@@ -171,7 +174,7 @@ type AlterProcedureOptions struct {
 	procedure         bool                    `ddl:"static" sql:"PROCEDURE"`
 	IfExists          *bool                   `ddl:"keyword" sql:"IF EXISTS"`
 	name              SchemaObjectIdentifier  `ddl:"identifier"`
-	ArgumentDataTypes []DataType              `ddl:"keyword,parentheses"`
+	ArgumentDataTypes []DataType              `ddl:"keyword,must_parentheses"`
 	RenameTo          *SchemaObjectIdentifier `ddl:"identifier" sql:"RENAME TO"`
 	SetComment        *string                 `ddl:"parameter,single_quotes" sql:"SET COMMENT"`
 	SetLogLevel       *string                 `ddl:"parameter,single_quotes" sql:"SET LOG_LEVEL"`
@@ -238,7 +241,7 @@ type DescribeProcedureOptions struct {
 	describe          bool                   `ddl:"static" sql:"DESCRIBE"`
 	procedure         bool                   `ddl:"static" sql:"PROCEDURE"`
 	name              SchemaObjectIdentifier `ddl:"identifier"`
-	ArgumentDataTypes []DataType             `ddl:"keyword,parentheses"`
+	ArgumentDataTypes []DataType             `ddl:"keyword,must_parentheses"`
 }
 
 type procedureDetailRow struct {
@@ -278,7 +281,7 @@ type CreateAndCallForJavaProcedureOptions struct {
 	Returns             ProcedureReturns                `ddl:"keyword" sql:"RETURNS"`
 	languageJava        bool                            `ddl:"static" sql:"LANGUAGE JAVA"`
 	RuntimeVersion      string                          `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
-	Packages            []ProcedurePackage              `ddl:"parameter,parentheses" sql:"PACKAGES"`
+	Packages            []ProcedurePackage              `ddl:"parameter,must_parentheses" sql:"PACKAGES"`
 	Imports             []ProcedureImport               `ddl:"parameter,parentheses" sql:"IMPORTS"`
 	Handler             string                          `ddl:"parameter,single_quotes" sql:"HANDLER"`
 	NullInputBehavior   *NullInputBehavior              `ddl:"keyword"`
@@ -286,8 +289,8 @@ type CreateAndCallForJavaProcedureOptions struct {
 	WithClauses         []ProcedureWithClause           `ddl:"keyword"`
 	call                bool                            `ddl:"static" sql:"CALL"`
 	ProcedureName       AccountObjectIdentifier         `ddl:"identifier"`
-	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,parentheses"`
-	Names               []ProcedureCallArgumentName     `ddl:"keyword,parentheses"`
+	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,must_parentheses"`
+	Names               []ProcedureCallArgumentName     `ddl:"keyword,must_parentheses"`
 	ScriptingVariable   *string                         `ddl:"parameter,no_quotes,no_equals" sql:"INTO"`
 }
 
@@ -295,6 +298,69 @@ type ProcedureWithClause struct {
 	CteName    SchemaObjectIdentifier `ddl:"identifier"`
 	CteColumns []string               `ddl:"keyword,parentheses"`
 	Statement  string                 `ddl:"parameter,no_quotes,no_equals" sql:"AS"`
+}
+
+// CreateAndCallForScalaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala.
+type CreateAndCallForScalaProcedureOptions struct {
+	with                bool                            `ddl:"static" sql:"WITH"`
+	Name                AccountObjectIdentifier         `ddl:"identifier"`
+	asProcedure         bool                            `ddl:"static" sql:"AS PROCEDURE"`
+	Arguments           []ProcedureArgument             `ddl:"list,must_parentheses"`
+	Returns             ProcedureReturns                `ddl:"keyword" sql:"RETURNS"`
+	languageScala       bool                            `ddl:"static" sql:"LANGUAGE SCALA"`
+	RuntimeVersion      string                          `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
+	Packages            []ProcedurePackage              `ddl:"parameter,must_parentheses" sql:"PACKAGES"`
+	Imports             []ProcedureImport               `ddl:"parameter,parentheses" sql:"IMPORTS"`
+	Handler             string                          `ddl:"parameter,single_quotes" sql:"HANDLER"`
+	NullInputBehavior   *NullInputBehavior              `ddl:"keyword"`
+	ProcedureDefinition *string                         `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
+	WithClauses         []ProcedureWithClause           `ddl:"keyword"`
+	call                bool                            `ddl:"static" sql:"CALL"`
+	ProcedureName       AccountObjectIdentifier         `ddl:"identifier"`
+	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,must_parentheses"`
+	Names               []ProcedureCallArgumentName     `ddl:"keyword,parentheses"`
+	ScriptingVariable   *string                         `ddl:"parameter,no_quotes,no_equals" sql:"INTO"`
+}
+
+// CreateAndCallForJavaScriptProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#javascript.
+type CreateAndCallForJavaScriptProcedureOptions struct {
+	with                bool                            `ddl:"static" sql:"WITH"`
+	Name                AccountObjectIdentifier         `ddl:"identifier"`
+	asProcedure         bool                            `ddl:"static" sql:"AS PROCEDURE"`
+	Arguments           []ProcedureArgument             `ddl:"list,must_parentheses"`
+	ResultDataType      DataType                        `ddl:"parameter,no_equals" sql:"RETURNS"`
+	NotNull             *bool                           `ddl:"keyword" sql:"NOT NULL"`
+	languageJavascript  bool                            `ddl:"static" sql:"LANGUAGE JAVASCRIPT"`
+	NullInputBehavior   *NullInputBehavior              `ddl:"keyword"`
+	ProcedureDefinition string                          `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
+	WithClauses         []ProcedureWithClause           `ddl:"keyword"`
+	call                bool                            `ddl:"static" sql:"CALL"`
+	ProcedureName       AccountObjectIdentifier         `ddl:"identifier"`
+	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,must_parentheses"`
+	Names               []ProcedureCallArgumentName     `ddl:"keyword,parentheses"`
+	ScriptingVariable   *string                         `ddl:"parameter,no_quotes,no_equals" sql:"INTO"`
+}
+
+// CreateAndCallForPythonProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#python.
+type CreateAndCallForPythonProcedureOptions struct {
+	with                bool                            `ddl:"static" sql:"WITH"`
+	Name                AccountObjectIdentifier         `ddl:"identifier"`
+	asProcedure         bool                            `ddl:"static" sql:"AS PROCEDURE"`
+	Arguments           []ProcedureArgument             `ddl:"list,must_parentheses"`
+	Returns             ProcedureReturns                `ddl:"keyword" sql:"RETURNS"`
+	languagePython      bool                            `ddl:"static" sql:"LANGUAGE PYTHON"`
+	RuntimeVersion      string                          `ddl:"parameter,single_quotes" sql:"RUNTIME_VERSION"`
+	Packages            []ProcedurePackage              `ddl:"parameter,must_parentheses" sql:"PACKAGES"`
+	Imports             []ProcedureImport               `ddl:"parameter,parentheses" sql:"IMPORTS"`
+	Handler             string                          `ddl:"parameter,single_quotes" sql:"HANDLER"`
+	NullInputBehavior   *NullInputBehavior              `ddl:"keyword"`
+	ProcedureDefinition *string                         `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
+	WithClauses         []ProcedureWithClause           `ddl:"keyword"`
+	call                bool                            `ddl:"static" sql:"CALL"`
+	ProcedureName       AccountObjectIdentifier         `ddl:"identifier"`
+	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,must_parentheses"`
+	Names               []ProcedureCallArgumentName     `ddl:"keyword,parentheses"`
+	ScriptingVariable   *string                         `ddl:"parameter,no_quotes,no_equals" sql:"INTO"`
 }
 
 // CreateAndCallForSQLProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#snowflake-scripting.
@@ -310,7 +376,7 @@ type CreateAndCallForSQLProcedureOptions struct {
 	WithClauses         []ProcedureWithClause           `ddl:"keyword"`
 	call                bool                            `ddl:"static" sql:"CALL"`
 	ProcedureName       AccountObjectIdentifier         `ddl:"identifier"`
-	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,parentheses"`
+	Positions           []ProcedureCallArgumentPosition `ddl:"keyword,must_parentheses"`
 	Names               []ProcedureCallArgumentName     `ddl:"keyword,parentheses"`
 	ScriptingVariable   *string                         `ddl:"parameter,no_quotes,no_equals" sql:"INTO"`
 }

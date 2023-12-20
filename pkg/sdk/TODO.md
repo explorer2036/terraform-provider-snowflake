@@ -54,7 +54,7 @@ if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
 	errs = append(errs, NewError("TARGET_PATH must be nil when AS is nil"))
 }
 
-<!-- CallProcedureOptions and CreateAndCallForJavaProcedureOptions and CreateAndCallForSQLProcedureOptions -->
+<!-- Call and CreateAndCall functions -->
 if valueSet(opts.ScriptingVariable) {
 	if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
 		errs = append(errs, NewError("ScriptingVariable must start with ':'"))
@@ -65,12 +65,3 @@ if valueSet(opts.ScriptingVariable) {
 ## procedures_gen.go
 
 Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
-
-type DropProcedureOptions struct {
-	drop              bool                   `ddl:"static" sql:"DROP"`
-	procedure         bool                   `ddl:"static" sql:"PROCEDURE"`
-	IfExists          *bool                  `ddl:"keyword" sql:"IF EXISTS"`
-	name              SchemaObjectIdentifier `ddl:"identifier"`
-	ArgumentDataTypes []DataType             `ddl:"keyword,must_parentheses"`
-}
-

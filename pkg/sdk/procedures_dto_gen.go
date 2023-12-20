@@ -3,18 +3,21 @@ package sdk
 //go:generate go run ./dto-builder-generator/main.go
 
 var (
-	_ optionsProvider[CreateForJavaProcedureOptions]        = new(CreateForJavaProcedureRequest)
-	_ optionsProvider[CreateForJavaScriptProcedureOptions]  = new(CreateForJavaScriptProcedureRequest)
-	_ optionsProvider[CreateForPythonProcedureOptions]      = new(CreateForPythonProcedureRequest)
-	_ optionsProvider[CreateForScalaProcedureOptions]       = new(CreateForScalaProcedureRequest)
-	_ optionsProvider[CreateForSQLProcedureOptions]         = new(CreateForSQLProcedureRequest)
-	_ optionsProvider[AlterProcedureOptions]                = new(AlterProcedureRequest)
-	_ optionsProvider[DropProcedureOptions]                 = new(DropProcedureRequest)
-	_ optionsProvider[ShowProcedureOptions]                 = new(ShowProcedureRequest)
-	_ optionsProvider[DescribeProcedureOptions]             = new(DescribeProcedureRequest)
-	_ optionsProvider[CallProcedureOptions]                 = new(CallProcedureRequest)
-	_ optionsProvider[CreateAndCallForJavaProcedureOptions] = new(CreateAndCallForJavaProcedureRequest)
-	_ optionsProvider[CreateAndCallForSQLProcedureOptions]  = new(CreateAndCallForSQLProcedureRequest)
+	_ optionsProvider[CreateForJavaProcedureOptions]              = new(CreateForJavaProcedureRequest)
+	_ optionsProvider[CreateForJavaScriptProcedureOptions]        = new(CreateForJavaScriptProcedureRequest)
+	_ optionsProvider[CreateForPythonProcedureOptions]            = new(CreateForPythonProcedureRequest)
+	_ optionsProvider[CreateForScalaProcedureOptions]             = new(CreateForScalaProcedureRequest)
+	_ optionsProvider[CreateForSQLProcedureOptions]               = new(CreateForSQLProcedureRequest)
+	_ optionsProvider[AlterProcedureOptions]                      = new(AlterProcedureRequest)
+	_ optionsProvider[DropProcedureOptions]                       = new(DropProcedureRequest)
+	_ optionsProvider[ShowProcedureOptions]                       = new(ShowProcedureRequest)
+	_ optionsProvider[DescribeProcedureOptions]                   = new(DescribeProcedureRequest)
+	_ optionsProvider[CallProcedureOptions]                       = new(CallProcedureRequest)
+	_ optionsProvider[CreateAndCallForJavaProcedureOptions]       = new(CreateAndCallForJavaProcedureRequest)
+	_ optionsProvider[CreateAndCallForScalaProcedureOptions]      = new(CreateAndCallForScalaProcedureRequest)
+	_ optionsProvider[CreateAndCallForJavaScriptProcedureOptions] = new(CreateAndCallForJavaScriptProcedureRequest)
+	_ optionsProvider[CreateAndCallForPythonProcedureOptions]     = new(CreateAndCallForPythonProcedureRequest)
+	_ optionsProvider[CreateAndCallForSQLProcedureOptions]        = new(CreateAndCallForSQLProcedureRequest)
 )
 
 type CreateForJavaProcedureRequest struct {
@@ -208,6 +211,54 @@ type ProcedureWithClauseRequest struct {
 	CteName    SchemaObjectIdentifier // required
 	CteColumns []string
 	Statement  string // required
+}
+
+type CreateAndCallForScalaProcedureRequest struct {
+	Name                AccountObjectIdentifier // required
+	Arguments           []ProcedureArgumentRequest
+	Returns             ProcedureReturnsRequest   // required
+	RuntimeVersion      string                    // required
+	Packages            []ProcedurePackageRequest // required
+	Imports             []ProcedureImportRequest
+	Handler             string // required
+	NullInputBehavior   *NullInputBehavior
+	ProcedureDefinition *string
+	WithClauses         []ProcedureWithClauseRequest
+	ProcedureName       AccountObjectIdentifier // required
+	Positions           []ProcedureCallArgumentPositionRequest
+	Names               []ProcedureCallArgumentNameRequest
+	ScriptingVariable   *string
+}
+
+type CreateAndCallForJavaScriptProcedureRequest struct {
+	Name                AccountObjectIdentifier // required
+	Arguments           []ProcedureArgumentRequest
+	ResultDataType      DataType // required
+	NotNull             *bool
+	NullInputBehavior   *NullInputBehavior
+	ProcedureDefinition string // required
+	WithClauses         []ProcedureWithClauseRequest
+	ProcedureName       AccountObjectIdentifier // required
+	Positions           []ProcedureCallArgumentPositionRequest
+	Names               []ProcedureCallArgumentNameRequest
+	ScriptingVariable   *string
+}
+
+type CreateAndCallForPythonProcedureRequest struct {
+	Name                AccountObjectIdentifier // required
+	Arguments           []ProcedureArgumentRequest
+	Returns             ProcedureReturnsRequest   // required
+	RuntimeVersion      string                    // required
+	Packages            []ProcedurePackageRequest // required
+	Imports             []ProcedureImportRequest
+	Handler             string // required
+	NullInputBehavior   *NullInputBehavior
+	ProcedureDefinition *string
+	WithClauses         []ProcedureWithClauseRequest
+	ProcedureName       AccountObjectIdentifier // required
+	Positions           []ProcedureCallArgumentPositionRequest
+	Names               []ProcedureCallArgumentNameRequest
+	ScriptingVariable   *string
 }
 
 type CreateAndCallForSQLProcedureRequest struct {

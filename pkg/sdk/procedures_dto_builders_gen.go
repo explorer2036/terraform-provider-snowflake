@@ -625,6 +625,171 @@ func (s *ProcedureWithClauseRequest) WithCteColumns(CteColumns []string) *Proced
 	return s
 }
 
+func NewCreateAndCallForScalaProcedureRequest(
+	Name AccountObjectIdentifier,
+	Returns ProcedureReturnsRequest,
+	RuntimeVersion string,
+	Packages []ProcedurePackageRequest,
+	Handler string,
+	ProcedureName AccountObjectIdentifier,
+) *CreateAndCallForScalaProcedureRequest {
+	s := CreateAndCallForScalaProcedureRequest{}
+	s.Name = Name
+	s.Returns = Returns
+	s.RuntimeVersion = RuntimeVersion
+	s.Packages = Packages
+	s.Handler = Handler
+	s.ProcedureName = ProcedureName
+	return &s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateAndCallForScalaProcedureRequest {
+	s.Arguments = Arguments
+	return s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateAndCallForScalaProcedureRequest {
+	s.Imports = Imports
+	return s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateAndCallForScalaProcedureRequest {
+	s.NullInputBehavior = NullInputBehavior
+	return s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateAndCallForScalaProcedureRequest {
+	s.ProcedureDefinition = ProcedureDefinition
+	return s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithWithClauses(WithClauses []ProcedureWithClauseRequest) *CreateAndCallForScalaProcedureRequest {
+	s.WithClauses = WithClauses
+	return s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForScalaProcedureRequest {
+	s.Positions = Positions
+	return s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForScalaProcedureRequest {
+	s.Names = Names
+	return s
+}
+
+func (s *CreateAndCallForScalaProcedureRequest) WithScriptingVariable(ScriptingVariable *string) *CreateAndCallForScalaProcedureRequest {
+	s.ScriptingVariable = ScriptingVariable
+	return s
+}
+
+func NewCreateAndCallForJavaScriptProcedureRequest(
+	Name AccountObjectIdentifier,
+	ResultDataType DataType,
+	ProcedureDefinition string,
+	ProcedureName AccountObjectIdentifier,
+) *CreateAndCallForJavaScriptProcedureRequest {
+	s := CreateAndCallForJavaScriptProcedureRequest{}
+	s.Name = Name
+	s.ResultDataType = ResultDataType
+	s.ProcedureDefinition = ProcedureDefinition
+	s.ProcedureName = ProcedureName
+	return &s
+}
+
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateAndCallForJavaScriptProcedureRequest {
+	s.Arguments = Arguments
+	return s
+}
+
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithNotNull(NotNull *bool) *CreateAndCallForJavaScriptProcedureRequest {
+	s.NotNull = NotNull
+	return s
+}
+
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateAndCallForJavaScriptProcedureRequest {
+	s.NullInputBehavior = NullInputBehavior
+	return s
+}
+
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithWithClauses(WithClauses []ProcedureWithClauseRequest) *CreateAndCallForJavaScriptProcedureRequest {
+	s.WithClauses = WithClauses
+	return s
+}
+
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForJavaScriptProcedureRequest {
+	s.Positions = Positions
+	return s
+}
+
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForJavaScriptProcedureRequest {
+	s.Names = Names
+	return s
+}
+
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithScriptingVariable(ScriptingVariable *string) *CreateAndCallForJavaScriptProcedureRequest {
+	s.ScriptingVariable = ScriptingVariable
+	return s
+}
+
+func NewCreateAndCallForPythonProcedureRequest(
+	Name AccountObjectIdentifier,
+	Returns ProcedureReturnsRequest,
+	RuntimeVersion string,
+	Packages []ProcedurePackageRequest,
+	Handler string,
+	ProcedureName AccountObjectIdentifier,
+) *CreateAndCallForPythonProcedureRequest {
+	s := CreateAndCallForPythonProcedureRequest{}
+	s.Name = Name
+	s.Returns = Returns
+	s.RuntimeVersion = RuntimeVersion
+	s.Packages = Packages
+	s.Handler = Handler
+	s.ProcedureName = ProcedureName
+	return &s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithArguments(Arguments []ProcedureArgumentRequest) *CreateAndCallForPythonProcedureRequest {
+	s.Arguments = Arguments
+	return s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithImports(Imports []ProcedureImportRequest) *CreateAndCallForPythonProcedureRequest {
+	s.Imports = Imports
+	return s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithNullInputBehavior(NullInputBehavior *NullInputBehavior) *CreateAndCallForPythonProcedureRequest {
+	s.NullInputBehavior = NullInputBehavior
+	return s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithProcedureDefinition(ProcedureDefinition *string) *CreateAndCallForPythonProcedureRequest {
+	s.ProcedureDefinition = ProcedureDefinition
+	return s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithWithClauses(WithClauses []ProcedureWithClauseRequest) *CreateAndCallForPythonProcedureRequest {
+	s.WithClauses = WithClauses
+	return s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForPythonProcedureRequest {
+	s.Positions = Positions
+	return s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForPythonProcedureRequest {
+	s.Names = Names
+	return s
+}
+
+func (s *CreateAndCallForPythonProcedureRequest) WithScriptingVariable(ScriptingVariable *string) *CreateAndCallForPythonProcedureRequest {
+	s.ScriptingVariable = ScriptingVariable
+	return s
+}
+
 func NewCreateAndCallForSQLProcedureRequest(
 	Name AccountObjectIdentifier,
 	Returns ProcedureReturnsRequest,
