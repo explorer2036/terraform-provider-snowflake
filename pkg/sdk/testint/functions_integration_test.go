@@ -202,7 +202,7 @@ func TestInt_OtherFunctions(t *testing.T) {
 	tagTest, tagCleanup := createTag(t, client, databaseTest, schemaTest)
 	t.Cleanup(tagCleanup)
 
-	assertFunction := func(t *testing.T, id sdk.SchemaObjectIdentifier, secure bool, arguments bool) {
+	assertFunction := func(t *testing.T, id sdk.SchemaObjectIdentifier, secure bool, withArguments bool) {
 		t.Helper()
 
 		function, err := client.Functions.ShowByID(ctx, id)
@@ -213,7 +213,7 @@ func TestInt_OtherFunctions(t *testing.T) {
 		assert.Equal(t, false, function.IsBuiltin)
 		assert.Equal(t, false, function.IsAggregate)
 		assert.Equal(t, false, function.IsAnsi)
-		if arguments {
+		if withArguments {
 			assert.Equal(t, 1, function.MinNumArguments)
 			assert.Equal(t, 1, function.MaxNumArguments)
 		} else {
