@@ -55,12 +55,9 @@ if opts.ProcedureDefinition == nil && opts.TargetPath != nil {
 }
 
 <!-- Call and CreateAndCall functions -->
-if valueSet(opts.ScriptingVariable) {
-	if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-		errs = append(errs, NewError("ScriptingVariable must start with ':'"))
-	}
+if valueSet(opts.Positions) && valueSet(opts.Names) {
+	errs = append(errs, errOneOf("CallProcedureOptions", "Positions", "Names"))
 }
-
 
 ## procedures_gen.go
 

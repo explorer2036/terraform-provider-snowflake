@@ -606,53 +606,20 @@ func TestProcedures_Call(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
-	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+	t.Run("no arguments", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.Names = []ProcedureCallArgumentName{
-			{
-				Name:     "amount",
-				Position: "127.4",
-			},
-		}
-		opts.Positions = []ProcedureCallArgumentPosition{
-			{
-				Position: "'Manitoba'",
-			},
-		}
-		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("CallProcedureOptions", "Positions", "Names"))
-	})
-
-	t.Run("validation: scripting variable", func(t *testing.T) {
-		opts := defaultOpts()
-		opts.ScriptingVariable = String("ret")
-		assertOptsInvalidJoinedErrors(t, opts, NewError("ScriptingVariable must start with ':'"))
+		assertOptsValidAndSQLEquals(t, opts, `CALL %s ()`, id.FullyQualifiedName())
 	})
 
 	t.Run("all options", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.ScriptingVariable = String(":ret")
-		opts.Names = []ProcedureCallArgumentName{
-			{
-				Name:     "province",
-				Position: "'Manitoba'",
-			},
-			{
-				Name:     "amount",
-				Position: "127.4",
-			},
-		}
+		opts.CallArguments = []string{"province => 'Manitoba'", "amount => 127.4"}
 		assertOptsValidAndSQLEquals(t, opts, `CALL %s (province => 'Manitoba', amount => 127.4) INTO :ret`, id.FullyQualifiedName())
 
 		opts = defaultOpts()
 		opts.ScriptingVariable = String(":ret")
-		opts.Positions = []ProcedureCallArgumentPosition{
-			{
-				Position: "'Manitoba'",
-			},
-			{
-				Position: "127.4",
-			},
-		}
+		opts.CallArguments = []string{"'Manitoba'", "127.4"}
 		assertOptsValidAndSQLEquals(t, opts, `CALL %s ('Manitoba', 127.4) INTO :ret`, id.FullyQualifiedName())
 	})
 }
@@ -741,14 +708,7 @@ func TestProcedures_CreateAndCallForJava(t *testing.T) {
 		}
 		opts.ProcedureName = id
 		opts.ScriptingVariable = String(":ret")
-		opts.Positions = []ProcedureCallArgumentPosition{
-			{
-				Position: "1",
-			},
-			{
-				Position: "rnd",
-			},
-		}
+		opts.CallArguments = []string{"1", "rnd"}
 		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (id NUMBER, name VARCHAR) RETURNS TABLE (country_code VARCHAR) LANGUAGE JAVA RUNTIME_VERSION = '1.8' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('test_jar.jar') HANDLER = 'TestFunc.echoVarchar' STRICT AS 'return id + name;' %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1, rnd) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
 	})
 }

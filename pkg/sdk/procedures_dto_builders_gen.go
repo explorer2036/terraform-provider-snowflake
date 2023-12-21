@@ -519,37 +519,14 @@ func NewCallProcedureRequest(
 	return &s
 }
 
-func (s *CallProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CallProcedureRequest {
-	s.Positions = Positions
-	return s
-}
-
-func (s *CallProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CallProcedureRequest {
-	s.Names = Names
+func (s *CallProcedureRequest) WithCallArguments(CallArguments []string) *CallProcedureRequest {
+	s.CallArguments = CallArguments
 	return s
 }
 
 func (s *CallProcedureRequest) WithScriptingVariable(ScriptingVariable *string) *CallProcedureRequest {
 	s.ScriptingVariable = ScriptingVariable
 	return s
-}
-
-func NewProcedureCallArgumentPositionRequest(
-	Position string,
-) *ProcedureCallArgumentPositionRequest {
-	s := ProcedureCallArgumentPositionRequest{}
-	s.Position = Position
-	return &s
-}
-
-func NewProcedureCallArgumentNameRequest(
-	Name string,
-	Position string,
-) *ProcedureCallArgumentNameRequest {
-	s := ProcedureCallArgumentNameRequest{}
-	s.Name = Name
-	s.Position = Position
-	return &s
 }
 
 func NewCreateAndCallForJavaProcedureRequest(
@@ -595,13 +572,8 @@ func (s *CreateAndCallForJavaProcedureRequest) WithWithClauses(WithClauses []Pro
 	return s
 }
 
-func (s *CreateAndCallForJavaProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForJavaProcedureRequest {
-	s.Positions = Positions
-	return s
-}
-
-func (s *CreateAndCallForJavaProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForJavaProcedureRequest {
-	s.Names = Names
+func (s *CreateAndCallForJavaProcedureRequest) WithCallArguments(CallArguments []string) *CreateAndCallForJavaProcedureRequest {
+	s.CallArguments = CallArguments
 	return s
 }
 
@@ -668,13 +640,8 @@ func (s *CreateAndCallForScalaProcedureRequest) WithWithClauses(WithClauses []Pr
 	return s
 }
 
-func (s *CreateAndCallForScalaProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForScalaProcedureRequest {
-	s.Positions = Positions
-	return s
-}
-
-func (s *CreateAndCallForScalaProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForScalaProcedureRequest {
-	s.Names = Names
+func (s *CreateAndCallForScalaProcedureRequest) WithCallArguments(CallArguments []string) *CreateAndCallForScalaProcedureRequest {
+	s.CallArguments = CallArguments
 	return s
 }
 
@@ -717,13 +684,8 @@ func (s *CreateAndCallForJavaScriptProcedureRequest) WithWithClauses(WithClauses
 	return s
 }
 
-func (s *CreateAndCallForJavaScriptProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForJavaScriptProcedureRequest {
-	s.Positions = Positions
-	return s
-}
-
-func (s *CreateAndCallForJavaScriptProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForJavaScriptProcedureRequest {
-	s.Names = Names
+func (s *CreateAndCallForJavaScriptProcedureRequest) WithCallArguments(CallArguments []string) *CreateAndCallForJavaScriptProcedureRequest {
+	s.CallArguments = CallArguments
 	return s
 }
 
@@ -775,13 +737,8 @@ func (s *CreateAndCallForPythonProcedureRequest) WithWithClauses(WithClauses []P
 	return s
 }
 
-func (s *CreateAndCallForPythonProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForPythonProcedureRequest {
-	s.Positions = Positions
-	return s
-}
-
-func (s *CreateAndCallForPythonProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForPythonProcedureRequest {
-	s.Names = Names
+func (s *CreateAndCallForPythonProcedureRequest) WithCallArguments(CallArguments []string) *CreateAndCallForPythonProcedureRequest {
+	s.CallArguments = CallArguments
 	return s
 }
 
@@ -819,13 +776,8 @@ func (s *CreateAndCallForSQLProcedureRequest) WithWithClauses(WithClauses []Proc
 	return s
 }
 
-func (s *CreateAndCallForSQLProcedureRequest) WithPositions(Positions []ProcedureCallArgumentPositionRequest) *CreateAndCallForSQLProcedureRequest {
-	s.Positions = Positions
-	return s
-}
-
-func (s *CreateAndCallForSQLProcedureRequest) WithNames(Names []ProcedureCallArgumentNameRequest) *CreateAndCallForSQLProcedureRequest {
-	s.Names = Names
+func (s *CreateAndCallForSQLProcedureRequest) WithCallArguments(CallArguments []string) *CreateAndCallForSQLProcedureRequest {
+	s.CallArguments = CallArguments
 	return s
 }
 

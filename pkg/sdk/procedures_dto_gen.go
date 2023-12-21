@@ -176,18 +176,8 @@ type DescribeProcedureRequest struct {
 
 type CallProcedureRequest struct {
 	name              SchemaObjectIdentifier // required
-	Positions         []ProcedureCallArgumentPositionRequest
-	Names             []ProcedureCallArgumentNameRequest
+	CallArguments     []string
 	ScriptingVariable *string
-}
-
-type ProcedureCallArgumentPositionRequest struct {
-	Position string // required
-}
-
-type ProcedureCallArgumentNameRequest struct {
-	Name     string // required
-	Position string // required
 }
 
 type CreateAndCallForJavaProcedureRequest struct {
@@ -202,8 +192,7 @@ type CreateAndCallForJavaProcedureRequest struct {
 	ProcedureDefinition *string
 	WithClauses         []ProcedureWithClauseRequest
 	ProcedureName       AccountObjectIdentifier // required
-	Positions           []ProcedureCallArgumentPositionRequest
-	Names               []ProcedureCallArgumentNameRequest
+	CallArguments       []string
 	ScriptingVariable   *string
 }
 
@@ -225,8 +214,7 @@ type CreateAndCallForScalaProcedureRequest struct {
 	ProcedureDefinition *string
 	WithClauses         []ProcedureWithClauseRequest
 	ProcedureName       AccountObjectIdentifier // required
-	Positions           []ProcedureCallArgumentPositionRequest
-	Names               []ProcedureCallArgumentNameRequest
+	CallArguments       []string
 	ScriptingVariable   *string
 }
 
@@ -239,8 +227,7 @@ type CreateAndCallForJavaScriptProcedureRequest struct {
 	ProcedureDefinition string // required
 	WithClauses         []ProcedureWithClauseRequest
 	ProcedureName       AccountObjectIdentifier // required
-	Positions           []ProcedureCallArgumentPositionRequest
-	Names               []ProcedureCallArgumentNameRequest
+	CallArguments       []string
 	ScriptingVariable   *string
 }
 
@@ -256,8 +243,7 @@ type CreateAndCallForPythonProcedureRequest struct {
 	ProcedureDefinition *string
 	WithClauses         []ProcedureWithClauseRequest
 	ProcedureName       AccountObjectIdentifier // required
-	Positions           []ProcedureCallArgumentPositionRequest
-	Names               []ProcedureCallArgumentNameRequest
+	CallArguments       []string
 	ScriptingVariable   *string
 }
 
@@ -269,7 +255,6 @@ type CreateAndCallForSQLProcedureRequest struct {
 	ProcedureDefinition string // required
 	WithClauses         []ProcedureWithClauseRequest
 	ProcedureName       AccountObjectIdentifier // required
-	Positions           []ProcedureCallArgumentPositionRequest
-	Names               []ProcedureCallArgumentNameRequest
+	CallArguments       []string
 	ScriptingVariable   *string
 }

@@ -467,28 +467,9 @@ func (r procedureDetailRow) convert() *ProcedureDetail {
 
 func (r *CallProcedureRequest) toOpts() *CallProcedureOptions {
 	opts := &CallProcedureOptions{
-		name: r.name,
-
+		name:              r.name,
+		CallArguments:     r.CallArguments,
 		ScriptingVariable: r.ScriptingVariable,
-	}
-	if r.Positions != nil {
-		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
-		for i, v := range r.Positions {
-			s[i] = ProcedureCallArgumentPosition{
-				Position: v.Position,
-			}
-		}
-		opts.Positions = s
-	}
-	if r.Names != nil {
-		s := make([]ProcedureCallArgumentName, len(r.Names))
-		for i, v := range r.Names {
-			s[i] = ProcedureCallArgumentName{
-				Name:     v.Name,
-				Position: v.Position,
-			}
-		}
-		opts.Names = s
 	}
 	return opts
 }
@@ -503,8 +484,8 @@ func (r *CreateAndCallForJavaProcedureRequest) toOpts() *CreateAndCallForJavaPro
 		NullInputBehavior:   r.NullInputBehavior,
 		ProcedureDefinition: r.ProcedureDefinition,
 
-		ProcedureName: r.ProcedureName,
-
+		ProcedureName:     r.ProcedureName,
+		CallArguments:     r.CallArguments,
 		ScriptingVariable: r.ScriptingVariable,
 	}
 	if r.Arguments != nil {
@@ -567,25 +548,6 @@ func (r *CreateAndCallForJavaProcedureRequest) toOpts() *CreateAndCallForJavaPro
 			}
 		}
 		opts.WithClauses = s
-	}
-	if r.Positions != nil {
-		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
-		for i, v := range r.Positions {
-			s[i] = ProcedureCallArgumentPosition{
-				Position: v.Position,
-			}
-		}
-		opts.Positions = s
-	}
-	if r.Names != nil {
-		s := make([]ProcedureCallArgumentName, len(r.Names))
-		for i, v := range r.Names {
-			s[i] = ProcedureCallArgumentName{
-				Name:     v.Name,
-				Position: v.Position,
-			}
-		}
-		opts.Names = s
 	}
 	return opts
 }
@@ -600,8 +562,8 @@ func (r *CreateAndCallForScalaProcedureRequest) toOpts() *CreateAndCallForScalaP
 		NullInputBehavior:   r.NullInputBehavior,
 		ProcedureDefinition: r.ProcedureDefinition,
 
-		ProcedureName: r.ProcedureName,
-
+		ProcedureName:     r.ProcedureName,
+		CallArguments:     r.CallArguments,
 		ScriptingVariable: r.ScriptingVariable,
 	}
 	if r.Arguments != nil {
@@ -665,25 +627,6 @@ func (r *CreateAndCallForScalaProcedureRequest) toOpts() *CreateAndCallForScalaP
 		}
 		opts.WithClauses = s
 	}
-	if r.Positions != nil {
-		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
-		for i, v := range r.Positions {
-			s[i] = ProcedureCallArgumentPosition{
-				Position: v.Position,
-			}
-		}
-		opts.Positions = s
-	}
-	if r.Names != nil {
-		s := make([]ProcedureCallArgumentName, len(r.Names))
-		for i, v := range r.Names {
-			s[i] = ProcedureCallArgumentName{
-				Name:     v.Name,
-				Position: v.Position,
-			}
-		}
-		opts.Names = s
-	}
 	return opts
 }
 
@@ -696,8 +639,8 @@ func (r *CreateAndCallForJavaScriptProcedureRequest) toOpts() *CreateAndCallForJ
 		NullInputBehavior:   r.NullInputBehavior,
 		ProcedureDefinition: r.ProcedureDefinition,
 
-		ProcedureName: r.ProcedureName,
-
+		ProcedureName:     r.ProcedureName,
+		CallArguments:     r.CallArguments,
 		ScriptingVariable: r.ScriptingVariable,
 	}
 	if r.Arguments != nil {
@@ -721,25 +664,6 @@ func (r *CreateAndCallForJavaScriptProcedureRequest) toOpts() *CreateAndCallForJ
 			}
 		}
 		opts.WithClauses = s
-	}
-	if r.Positions != nil {
-		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
-		for i, v := range r.Positions {
-			s[i] = ProcedureCallArgumentPosition{
-				Position: v.Position,
-			}
-		}
-		opts.Positions = s
-	}
-	if r.Names != nil {
-		s := make([]ProcedureCallArgumentName, len(r.Names))
-		for i, v := range r.Names {
-			s[i] = ProcedureCallArgumentName{
-				Name:     v.Name,
-				Position: v.Position,
-			}
-		}
-		opts.Names = s
 	}
 	return opts
 }
@@ -754,8 +678,8 @@ func (r *CreateAndCallForPythonProcedureRequest) toOpts() *CreateAndCallForPytho
 		NullInputBehavior:   r.NullInputBehavior,
 		ProcedureDefinition: r.ProcedureDefinition,
 
-		ProcedureName: r.ProcedureName,
-
+		ProcedureName:     r.ProcedureName,
+		CallArguments:     r.CallArguments,
 		ScriptingVariable: r.ScriptingVariable,
 	}
 	if r.Arguments != nil {
@@ -819,25 +743,6 @@ func (r *CreateAndCallForPythonProcedureRequest) toOpts() *CreateAndCallForPytho
 		}
 		opts.WithClauses = s
 	}
-	if r.Positions != nil {
-		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
-		for i, v := range r.Positions {
-			s[i] = ProcedureCallArgumentPosition{
-				Position: v.Position,
-			}
-		}
-		opts.Positions = s
-	}
-	if r.Names != nil {
-		s := make([]ProcedureCallArgumentName, len(r.Names))
-		for i, v := range r.Names {
-			s[i] = ProcedureCallArgumentName{
-				Name:     v.Name,
-				Position: v.Position,
-			}
-		}
-		opts.Names = s
-	}
 	return opts
 }
 
@@ -848,8 +753,8 @@ func (r *CreateAndCallForSQLProcedureRequest) toOpts() *CreateAndCallForSQLProce
 		NullInputBehavior:   r.NullInputBehavior,
 		ProcedureDefinition: r.ProcedureDefinition,
 
-		ProcedureName: r.ProcedureName,
-
+		ProcedureName:     r.ProcedureName,
+		CallArguments:     r.CallArguments,
 		ScriptingVariable: r.ScriptingVariable,
 	}
 	if r.Arguments != nil {
@@ -894,25 +799,6 @@ func (r *CreateAndCallForSQLProcedureRequest) toOpts() *CreateAndCallForSQLProce
 			}
 		}
 		opts.WithClauses = s
-	}
-	if r.Positions != nil {
-		s := make([]ProcedureCallArgumentPosition, len(r.Positions))
-		for i, v := range r.Positions {
-			s[i] = ProcedureCallArgumentPosition{
-				Position: v.Position,
-			}
-		}
-		opts.Positions = s
-	}
-	if r.Names != nil {
-		s := make([]ProcedureCallArgumentName, len(r.Names))
-		for i, v := range r.Names {
-			s[i] = ProcedureCallArgumentName{
-				Name:     v.Name,
-				Position: v.Position,
-			}
-		}
-		opts.Names = s
 	}
 	return opts
 }

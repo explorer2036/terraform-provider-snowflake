@@ -1,7 +1,5 @@
 package sdk
 
-import "strings"
-
 var (
 	_ validatable = new(CreateForJavaProcedureOptions)
 	_ validatable = new(CreateForJavaScriptProcedureOptions)
@@ -189,14 +187,6 @@ func (opts *CallProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !anyValueSet(opts.Positions, opts.Names) {
-		errs = append(errs, errAtLeastOneOf("CallProcedureOptions", "Positions", "Names"))
-	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
-		}
-	}
 	return JoinErrors(errs...)
 }
 
@@ -205,9 +195,6 @@ func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
-	if !anyValueSet(opts.Positions, opts.Names) {
-		errs = append(errs, errAtLeastOneOf("CreateAndCallForJavaProcedureOptions", "Positions", "Names"))
-	}
 	if !valueSet(opts.RuntimeVersion) {
 		errs = append(errs, errNotSet("CreateAndCallForJavaProcedureOptions", "RuntimeVersion"))
 	}
@@ -228,11 +215,6 @@ func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
 			errs = append(errs, errExactlyOneOf("CreateAndCallForJavaProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
 	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
-		}
-	}
 	return JoinErrors(errs...)
 }
 
@@ -241,9 +223,6 @@ func (opts *CreateAndCallForScalaProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
-	if !anyValueSet(opts.Positions, opts.Names) {
-		errs = append(errs, errAtLeastOneOf("CreateAndCallForScalaProcedureOptions", "Positions", "Names"))
-	}
 	if !valueSet(opts.RuntimeVersion) {
 		errs = append(errs, errNotSet("CreateAndCallForScalaProcedureOptions", "RuntimeVersion"))
 	}
@@ -264,11 +243,6 @@ func (opts *CreateAndCallForScalaProcedureOptions) validate() error {
 			errs = append(errs, errExactlyOneOf("CreateAndCallForScalaProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
 	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
-		}
-	}
 	return JoinErrors(errs...)
 }
 
@@ -277,9 +251,6 @@ func (opts *CreateAndCallForJavaScriptProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
-	if !anyValueSet(opts.Positions, opts.Names) {
-		errs = append(errs, errAtLeastOneOf("CreateAndCallForJavaScriptProcedureOptions", "Positions", "Names"))
-	}
 	if !valueSet(opts.ProcedureDefinition) {
 		errs = append(errs, errNotSet("CreateAndCallForJavaScriptProcedureOptions", "ProcedureDefinition"))
 	}
@@ -289,11 +260,6 @@ func (opts *CreateAndCallForJavaScriptProcedureOptions) validate() error {
 	if !ValidObjectIdentifier(opts.Name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
-		}
-	}
 	return JoinErrors(errs...)
 }
 
@@ -302,9 +268,6 @@ func (opts *CreateAndCallForPythonProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
-	if !anyValueSet(opts.Positions, opts.Names) {
-		errs = append(errs, errAtLeastOneOf("CreateAndCallForPythonProcedureOptions", "Positions", "Names"))
-	}
 	if !valueSet(opts.RuntimeVersion) {
 		errs = append(errs, errNotSet("CreateAndCallForPythonProcedureOptions", "RuntimeVersion"))
 	}
@@ -325,11 +288,6 @@ func (opts *CreateAndCallForPythonProcedureOptions) validate() error {
 			errs = append(errs, errExactlyOneOf("CreateAndCallForPythonProcedureOptions.Returns", "ResultDataType", "Table"))
 		}
 	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
-		}
-	}
 	return JoinErrors(errs...)
 }
 
@@ -338,9 +296,6 @@ func (opts *CreateAndCallForSQLProcedureOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
-	if !anyValueSet(opts.Positions, opts.Names) {
-		errs = append(errs, errAtLeastOneOf("CreateAndCallForSQLProcedureOptions", "Positions", "Names"))
-	}
 	if !valueSet(opts.ProcedureDefinition) {
 		errs = append(errs, errNotSet("CreateAndCallForSQLProcedureOptions", "ProcedureDefinition"))
 	}
@@ -353,11 +308,6 @@ func (opts *CreateAndCallForSQLProcedureOptions) validate() error {
 	if valueSet(opts.Returns) {
 		if !exactlyOneValueSet(opts.Returns.ResultDataType, opts.Returns.Table) {
 			errs = append(errs, errExactlyOneOf("CreateAndCallForSQLProcedureOptions.Returns", "ResultDataType", "Table"))
-		}
-	}
-	if valueSet(opts.ScriptingVariable) {
-		if !strings.HasPrefix(*opts.ScriptingVariable, ":") {
-			errs = append(errs, NewError("ScriptingVariable must start with ':'"))
 		}
 	}
 	return JoinErrors(errs...)

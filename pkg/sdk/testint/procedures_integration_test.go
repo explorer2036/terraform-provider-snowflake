@@ -593,9 +593,9 @@ func TestInt_CallProcedure(t *testing.T) {
 		t.Helper()
 
 		definition := `
-	BEGIN
-		RETURN message;
-	END;`
+		BEGIN
+			RETURN message;
+		END;`
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, random.StringN(4))
 		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
 		returns := sdk.NewProcedureSQLReturnsRequest().WithResultDataType(dt).WithNotNull(sdk.Bool(true))
@@ -618,22 +618,14 @@ func TestInt_CallProcedure(t *testing.T) {
 	t.Run("call procedure for SQL: argument positions", func(t *testing.T) {
 		f := createProcedureForSQLHandle(t, true)
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, f.Name)
-
-		positions := []sdk.ProcedureCallArgumentPositionRequest{
-			*sdk.NewProcedureCallArgumentPositionRequest("'hi'"),
-		}
-		err := client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithPositions(positions))
+		err := client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments([]string{"'hi'"}))
 		require.NoError(t, err)
 	})
 
 	t.Run("call procedure for SQL: argument names", func(t *testing.T) {
 		f := createProcedureForSQLHandle(t, true)
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, f.Name)
-
-		names := []sdk.ProcedureCallArgumentNameRequest{
-			*sdk.NewProcedureCallArgumentNameRequest("message", "'hi'"),
-		}
-		err := client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithNames(names))
+		err := client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments([]string{"message => 'hi'"}))
 		require.NoError(t, err)
 	})
 
@@ -667,11 +659,8 @@ func TestInt_CallProcedure(t *testing.T) {
 		require.NoError(t, err)
 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		positions := []sdk.ProcedureCallArgumentPositionRequest{
-			*sdk.NewProcedureCallArgumentPositionRequest(fmt.Sprintf(`'%s'`, tid.FullyQualifiedName())),
-			*sdk.NewProcedureCallArgumentPositionRequest("'dev'"),
-		}
-		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithPositions(positions))
+		arguments := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(arguments))
 		require.NoError(t, err)
 	})
 
@@ -704,11 +693,8 @@ func TestInt_CallProcedure(t *testing.T) {
 		require.NoError(t, err)
 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		positions := []sdk.ProcedureCallArgumentPositionRequest{
-			*sdk.NewProcedureCallArgumentPositionRequest(fmt.Sprintf(`'%s'`, tid.FullyQualifiedName())),
-			*sdk.NewProcedureCallArgumentPositionRequest("'dev'"),
-		}
-		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithPositions(positions))
+		arguments := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(arguments))
 		require.NoError(t, err)
 	})
 
@@ -738,10 +724,21 @@ func TestInt_CallProcedure(t *testing.T) {
 		require.NoError(t, err)
 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeFloat}))
 
-		positions := []sdk.ProcedureCallArgumentPositionRequest{
-			*sdk.NewProcedureCallArgumentPositionRequest("5.14::FLOAT"),
-		}
-		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithPositions(positions))
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments([]string{"5.14::FLOAT"}))
+		require.NoError(t, err)
+	})
+
+	t.Run("call procedure for Javascript: no arguments", func(t *testing.T) {
+		name := "sp_pi"
+		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+
+		definition := `return 3.1415926;`
+		request := sdk.NewCreateForJavaScriptProcedureRequest(id, sdk.DataTypeFloat, definition).WithNotNull(sdk.Bool(true)).WithOrReplace(sdk.Bool(true))
+		err := client.Procedures.CreateForJavaScript(ctx, request)
+		require.NoError(t, err)
+		t.Cleanup(cleanupProcedureHandle(id, nil))
+
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id))
 		require.NoError(t, err)
 	})
 
@@ -767,12 +764,9 @@ def filter_by_role(session, name, role):
 		require.NoError(t, err)
 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		positions := []sdk.ProcedureCallArgumentPositionRequest{
-			*sdk.NewProcedureCallArgumentPositionRequest(fmt.Sprintf(`'%s'`, tid.FullyQualifiedName())),
-			*sdk.NewProcedureCallArgumentPositionRequest("'dev'"),
-		}
+		arguments := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
 		id = sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, "filterByRole")
-		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithPositions(positions))
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(arguments))
 		require.NoError(t, err)
 	})
 }

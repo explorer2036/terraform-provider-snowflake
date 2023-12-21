@@ -13,13 +13,6 @@ var procedureColumn = g.NewQueryStruct("ProcedureColumn").
 	Text("ColumnName", g.KeywordOptions().NoQuotes().Required()).
 	PredefinedQueryStructField("ColumnDataType", "DataType", g.KeywordOptions().NoQuotes().Required())
 
-var procedureCallArgumentPosition = g.NewQueryStruct("ProcedureCallArgumentPosition").
-	Text("Position", g.KeywordOptions().NoQuotes().Required())
-
-var procedureCallArgumentName = g.NewQueryStruct("ProcedureCallArgumentName").
-	Text("Name", g.KeywordOptions().NoQuotes().Required()).
-	PredefinedQueryStructField("Position", "string", g.ParameterOptions().ArrowEquals().NoQuotes().Required())
-
 var procedureReturns = g.NewQueryStruct("ProcedureReturns").
 	OptionalQueryStructField(
 		"ResultDataType",
@@ -340,19 +333,9 @@ var ProceduresDef = g.NewInterface(
 	g.NewQueryStruct("Call").
 		SQL("CALL").
 		Name().
-		ListQueryStructField(
-			"Positions",
-			procedureCallArgumentPosition,
-			g.KeywordOptions().Parentheses(),
-		).
-		ListQueryStructField(
-			"Names",
-			procedureCallArgumentName,
-			g.KeywordOptions().Parentheses(),
-		).
+		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
-		WithValidation(g.ValidIdentifier, "name").
-		WithValidation(g.AtLeastOneValueSet, "Positions", "Names"),
+		WithValidation(g.ValidIdentifier, "name"),
 ).CustomOperation(
 	"CreateAndCallForJava",
 	"https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala",
@@ -392,18 +375,8 @@ var ProceduresDef = g.NewInterface(
 		).
 		SQL("CALL").
 		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
-		ListQueryStructField(
-			"Positions",
-			procedureCallArgumentPosition,
-			g.KeywordOptions().MustParentheses(),
-		).
-		ListQueryStructField(
-			"Names",
-			procedureCallArgumentName,
-			g.KeywordOptions().MustParentheses(),
-		).
+		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
-		WithValidation(g.AtLeastOneValueSet, "Positions", "Names").
 		WithValidation(g.ValidateValueSet, "RuntimeVersion").
 		WithValidation(g.ValidateValueSet, "Handler").
 		WithValidation(g.ValidateValueSet, "Packages").
@@ -448,18 +421,8 @@ var ProceduresDef = g.NewInterface(
 		).
 		SQL("CALL").
 		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
-		ListQueryStructField(
-			"Positions",
-			procedureCallArgumentPosition,
-			g.KeywordOptions().MustParentheses(),
-		).
-		ListQueryStructField(
-			"Names",
-			procedureCallArgumentName,
-			g.KeywordOptions().Parentheses(),
-		).
+		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
-		WithValidation(g.AtLeastOneValueSet, "Positions", "Names").
 		WithValidation(g.ValidateValueSet, "RuntimeVersion").
 		WithValidation(g.ValidateValueSet, "Handler").
 		WithValidation(g.ValidateValueSet, "Packages").
@@ -489,18 +452,8 @@ var ProceduresDef = g.NewInterface(
 		).
 		SQL("CALL").
 		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
-		ListQueryStructField(
-			"Positions",
-			procedureCallArgumentPosition,
-			g.KeywordOptions().MustParentheses(),
-		).
-		ListQueryStructField(
-			"Names",
-			procedureCallArgumentName,
-			g.KeywordOptions().Parentheses(),
-		).
+		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
-		WithValidation(g.AtLeastOneValueSet, "Positions", "Names").
 		WithValidation(g.ValidateValueSet, "ProcedureDefinition").
 		WithValidation(g.ValidIdentifier, "ProcedureName").
 		WithValidation(g.ValidIdentifier, "Name"),
@@ -543,18 +496,8 @@ var ProceduresDef = g.NewInterface(
 		).
 		SQL("CALL").
 		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
-		ListQueryStructField(
-			"Positions",
-			procedureCallArgumentPosition,
-			g.KeywordOptions().MustParentheses(),
-		).
-		ListQueryStructField(
-			"Names",
-			procedureCallArgumentName,
-			g.KeywordOptions().Parentheses(),
-		).
+		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
-		WithValidation(g.AtLeastOneValueSet, "Positions", "Names").
 		WithValidation(g.ValidateValueSet, "RuntimeVersion").
 		WithValidation(g.ValidateValueSet, "Handler").
 		WithValidation(g.ValidateValueSet, "Packages").
@@ -587,18 +530,8 @@ var ProceduresDef = g.NewInterface(
 		).
 		SQL("CALL").
 		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
-		ListQueryStructField(
-			"Positions",
-			procedureCallArgumentPosition,
-			g.KeywordOptions().MustParentheses(),
-		).
-		ListQueryStructField(
-			"Names",
-			procedureCallArgumentName,
-			g.KeywordOptions().Parentheses(),
-		).
+		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
-		WithValidation(g.AtLeastOneValueSet, "Positions", "Names").
 		WithValidation(g.ValidateValueSet, "ProcedureDefinition").
 		WithValidation(g.ValidIdentifier, "ProcedureName").
 		WithValidation(g.ValidIdentifier, "Name"),
