@@ -45,9 +45,6 @@ func cleanup() {
 	if itc.schemaCleanup != nil {
 		defer itc.schemaCleanup()
 	}
-	if itc.warehouseCleanup != nil {
-		defer itc.warehouseCleanup()
-	}
 }
 
 type integrationTestContext struct {
