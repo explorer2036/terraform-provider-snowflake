@@ -241,7 +241,7 @@ def joblib_multiprocessing(session, i):
 			WithProcedureDefinition(sdk.String(definition))
 		err := client.Procedures.CreateForPython(ctx, request)
 		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{"string"}))
+		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{"INT"}))
 
 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
 		require.NoError(t, err)
@@ -907,7 +907,7 @@ func TestInt_CreateAndCallProcedures(t *testing.T) {
 		require.NoError(t, err)
 	})
 
-	t.Run("call procedure for Python: returns table", func(t *testing.T) {
+	t.Run("create and call procedure for Python: returns table", func(t *testing.T) {
 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-python#omitting-return-column-names-and-types
 		name := sdk.NewAccountObjectIdentifier("filterByRole")
 		definition := `
