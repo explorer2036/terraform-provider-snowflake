@@ -928,4 +928,38 @@ def filter_by_role(session, name, role):
 		err := client.Procedures.CreateAndCallForPython(ctx, request)
 		require.NoError(t, err)
 	})
+
+	t.Run("create and call procedure for Java: returns table and with clause", func(t *testing.T) {
+		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#omitting-return-column-names-and-types
+		name := sdk.NewAccountObjectIdentifier("filter_by_role")
+		definition := `
+		import com.snowflake.snowpark_java.*;
+		public class Filter {
+			public DataFrame filterByRole(Session session, String name, String role) {
+				DataFrame table = session.table(name);
+				DataFrame filteredRows = table.filter(Functions.col("role").equal_to(Functions.lit(role)));
+				return filteredRows;
+			}
+		}`
+		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
+		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
+		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
+		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
+		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
+		arg1 := sdk.NewProcedureArgumentRequest("name", sdk.DataTypeVARCHAR)
+		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
+		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
+
+		ca := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
+		cte := sdk.NewAccountObjectIdentifier("records")
+		statement := fmt.Sprintf(`(SELECT name, role FROM %s WHERE name = 'Bob')`, tid.FullyQualifiedName())
+		clause := sdk.NewProcedureWithClauseRequest(cte, statement).WithCteColumns([]string{"name", "role"})
+		request := sdk.NewCreateAndCallForJavaProcedureRequest(name, *returns, "11", packages, "Filter.filterByRole", name).
+			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
+			WithProcedureDefinition(sdk.String(definition)).
+			WithWithClause(clause).
+			WithCallArguments(ca)
+		err := client.Procedures.CreateAndCallForJava(ctx, request)
+		require.NoError(t, err)
+	})
 }

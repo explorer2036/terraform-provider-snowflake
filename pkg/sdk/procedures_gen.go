@@ -276,7 +276,7 @@ type CreateAndCallForJavaProcedureOptions struct {
 	Handler             string                  `ddl:"parameter,single_quotes" sql:"HANDLER"`
 	NullInputBehavior   *NullInputBehavior      `ddl:"keyword"`
 	ProcedureDefinition *string                 `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
-	WithClauses         []ProcedureWithClause   `ddl:"keyword"`
+	WithClause          *ProcedureWithClause    `ddl:"keyword"`
 	call                bool                    `ddl:"static" sql:"CALL"`
 	ProcedureName       AccountObjectIdentifier `ddl:"identifier"`
 	CallArguments       []string                `ddl:"keyword,must_parentheses"`
@@ -284,9 +284,10 @@ type CreateAndCallForJavaProcedureOptions struct {
 }
 
 type ProcedureWithClause struct {
-	CteName    SchemaObjectIdentifier `ddl:"identifier"`
-	CteColumns []string               `ddl:"keyword,parentheses"`
-	Statement  string                 `ddl:"parameter,no_quotes,no_equals" sql:"AS"`
+	prefix     bool                    `ddl:"static" sql:","`
+	CteName    AccountObjectIdentifier `ddl:"identifier"`
+	CteColumns []string                `ddl:"keyword,parentheses"`
+	Statement  string                  `ddl:"parameter,no_quotes,no_equals" sql:"AS"`
 }
 
 // CreateAndCallForScalaProcedureOptions is based on https://docs.snowflake.com/en/sql-reference/sql/call-with#java-and-scala.

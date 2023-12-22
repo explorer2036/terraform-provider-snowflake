@@ -740,18 +740,16 @@ func TestProcedures_CreateAndCallForJava(t *testing.T) {
 		opts.Handler = "TestFunc.echoVarchar"
 		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.ProcedureDefinition = String("return id + name;")
-		cte := NewSchemaObjectIdentifier(random.StringN(4), random.StringN(4), "album_info_1976")
-		opts.WithClauses = []ProcedureWithClause{
-			{
-				CteName:    cte,
-				CteColumns: []string{"x", "y"},
-				Statement:  "(select m.album_ID, m.album_name, b.band_name from music_albums)",
-			},
+		cte := NewAccountObjectIdentifier("album_info_1976")
+		opts.WithClause = &ProcedureWithClause{
+			CteName:    cte,
+			CteColumns: []string{"x", "y"},
+			Statement:  "(select m.album_ID, m.album_name, b.band_name from music_albums)",
 		}
 		opts.ProcedureName = id
 		opts.ScriptingVariable = String(":ret")
 		opts.CallArguments = []string{"1", "rnd"}
-		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (id NUMBER, name VARCHAR) RETURNS TABLE (country_code VARCHAR) LANGUAGE JAVA RUNTIME_VERSION = '1.8' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('test_jar.jar') HANDLER = 'TestFunc.echoVarchar' STRICT AS 'return id + name;' %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1, rnd) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (id NUMBER, name VARCHAR) RETURNS TABLE (country_code VARCHAR) LANGUAGE JAVA RUNTIME_VERSION = '1.8' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('test_jar.jar') HANDLER = 'TestFunc.echoVarchar' STRICT AS 'return id + name;' , %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1, rnd) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
 	})
 }
 
@@ -859,7 +857,7 @@ func TestProcedures_CreateAndCallForScala(t *testing.T) {
 		opts.Handler = "TestFunc.echoVarchar"
 		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.ProcedureDefinition = String("return id + name;")
-		cte := NewSchemaObjectIdentifier(random.StringN(4), random.StringN(4), "album_info_1976")
+		cte := NewAccountObjectIdentifier("album_info_1976")
 		opts.WithClauses = []ProcedureWithClause{
 			{
 				CteName:    cte,
@@ -870,7 +868,7 @@ func TestProcedures_CreateAndCallForScala(t *testing.T) {
 		opts.ProcedureName = id
 		opts.ScriptingVariable = String(":ret")
 		opts.CallArguments = []string{"1", "rnd"}
-		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (id NUMBER, name VARCHAR) RETURNS TABLE (country_code VARCHAR) LANGUAGE SCALA RUNTIME_VERSION = '2.12' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('test_jar.jar') HANDLER = 'TestFunc.echoVarchar' STRICT AS 'return id + name;' %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1, rnd) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (id NUMBER, name VARCHAR) RETURNS TABLE (country_code VARCHAR) LANGUAGE SCALA RUNTIME_VERSION = '2.12' PACKAGES = ('com.snowflake:snowpark:1.2.0') IMPORTS = ('test_jar.jar') HANDLER = 'TestFunc.echoVarchar' STRICT AS 'return id + name;' , %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1, rnd) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
 	})
 }
 
@@ -977,7 +975,7 @@ func TestProcedures_CreateAndCallForPython(t *testing.T) {
 		opts.Handler = "udf"
 		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.ProcedureDefinition = String("import numpy as np")
-		cte := NewSchemaObjectIdentifier(random.StringN(4), random.StringN(4), "album_info_1976")
+		cte := NewAccountObjectIdentifier("album_info_1976")
 		opts.WithClauses = []ProcedureWithClause{
 			{
 				CteName:    cte,
@@ -988,7 +986,7 @@ func TestProcedures_CreateAndCallForPython(t *testing.T) {
 		opts.ProcedureName = id
 		opts.ScriptingVariable = String(":ret")
 		opts.CallArguments = []string{"1"}
-		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (i int DEFAULT 1) RETURNS VARIANT NULL LANGUAGE PYTHON RUNTIME_VERSION = '3.8' PACKAGES = ('numpy', 'pandas') IMPORTS = ('numpy', 'pandas') HANDLER = 'udf' STRICT AS 'import numpy as np' %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (i int DEFAULT 1) RETURNS VARIANT NULL LANGUAGE PYTHON RUNTIME_VERSION = '3.8' PACKAGES = ('numpy', 'pandas') IMPORTS = ('numpy', 'pandas') HANDLER = 'udf' STRICT AS 'import numpy as np' , %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
 	})
 }
 
@@ -1039,7 +1037,7 @@ func TestProcedures_CreateAndCallForJavaScript(t *testing.T) {
 		opts.NotNull = Bool(true)
 		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.ProcedureDefinition = "return 1;"
-		cte := NewSchemaObjectIdentifier(random.StringN(4), random.StringN(4), "album_info_1976")
+		cte := NewAccountObjectIdentifier("album_info_1976")
 		opts.WithClauses = []ProcedureWithClause{
 			{
 				CteName:    cte,
@@ -1050,7 +1048,7 @@ func TestProcedures_CreateAndCallForJavaScript(t *testing.T) {
 		opts.ProcedureName = id
 		opts.ScriptingVariable = String(":ret")
 		opts.CallArguments = []string{"1"}
-		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (d DOUBLE DEFAULT 1.0) RETURNS DOUBLE NOT NULL LANGUAGE JAVASCRIPT STRICT AS 'return 1;' %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (d DOUBLE DEFAULT 1.0) RETURNS DOUBLE NOT NULL LANGUAGE JAVASCRIPT STRICT AS 'return 1;' , %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
 	})
 }
 
@@ -1130,7 +1128,7 @@ func TestProcedures_CreateAndCallForSQL(t *testing.T) {
 		}
 		opts.NullInputBehavior = NullInputBehaviorPointer(NullInputBehaviorStrict)
 		opts.ProcedureDefinition = "3.141592654::FLOAT"
-		cte := NewSchemaObjectIdentifier(random.StringN(4), random.StringN(4), "album_info_1976")
+		cte := NewAccountObjectIdentifier("album_info_1976")
 		opts.WithClauses = []ProcedureWithClause{
 			{
 				CteName:    cte,
@@ -1141,6 +1139,6 @@ func TestProcedures_CreateAndCallForSQL(t *testing.T) {
 		opts.ProcedureName = id
 		opts.ScriptingVariable = String(":ret")
 		opts.CallArguments = []string{"1"}
-		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (message VARCHAR DEFAULT 'test') RETURNS FLOAT LANGUAGE SQL STRICT AS '3.141592654::FLOAT' %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `WITH %s AS PROCEDURE (message VARCHAR DEFAULT 'test') RETURNS FLOAT LANGUAGE SQL STRICT AS '3.141592654::FLOAT' , %s (x, y) AS (select m.album_ID, m.album_name, b.band_name from music_albums) CALL %s (1) INTO :ret`, id.FullyQualifiedName(), cte.FullyQualifiedName(), id.FullyQualifiedName())
 	})
 }

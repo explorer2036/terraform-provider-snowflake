@@ -190,14 +190,14 @@ type CreateAndCallForJavaProcedureRequest struct {
 	Handler             string // required
 	NullInputBehavior   *NullInputBehavior
 	ProcedureDefinition *string
-	WithClauses         []ProcedureWithClauseRequest
+	WithClause          *ProcedureWithClauseRequest
 	ProcedureName       AccountObjectIdentifier // required
 	CallArguments       []string
 	ScriptingVariable   *string
 }
 
 type ProcedureWithClauseRequest struct {
-	CteName    SchemaObjectIdentifier // required
+	CteName    AccountObjectIdentifier // required
 	CteColumns []string
 	Statement  string // required
 }

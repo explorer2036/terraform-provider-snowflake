@@ -567,8 +567,8 @@ func (s *CreateAndCallForJavaProcedureRequest) WithProcedureDefinition(Procedure
 	return s
 }
 
-func (s *CreateAndCallForJavaProcedureRequest) WithWithClauses(WithClauses []ProcedureWithClauseRequest) *CreateAndCallForJavaProcedureRequest {
-	s.WithClauses = WithClauses
+func (s *CreateAndCallForJavaProcedureRequest) WithWithClause(WithClause *ProcedureWithClauseRequest) *CreateAndCallForJavaProcedureRequest {
+	s.WithClause = WithClause
 	return s
 }
 
@@ -583,7 +583,7 @@ func (s *CreateAndCallForJavaProcedureRequest) WithScriptingVariable(ScriptingVa
 }
 
 func NewProcedureWithClauseRequest(
-	CteName SchemaObjectIdentifier,
+	CteName AccountObjectIdentifier,
 	Statement string,
 ) *ProcedureWithClauseRequest {
 	s := ProcedureWithClauseRequest{}

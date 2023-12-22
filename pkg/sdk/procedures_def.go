@@ -57,9 +57,9 @@ var (
 	procedurePackage = g.NewQueryStruct("ProcedurePackage").Text("Package", g.KeywordOptions().SingleQuotes().Required())
 )
 
-// https://docs.snowflake.com/en/sql-reference/constructs/with
+// https://docs.snowflake.com/en/sql-reference/constructs/with and https://docs.snowflake.com/en/user-guide/queries-cte
 var procedureWithClause = g.NewQueryStruct("ProcedureWithClause").
-	Identifier("CteName", g.KindOfT[SchemaObjectIdentifier](), g.IdentifierOptions().Required()).
+	Identifier("CteName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
 	PredefinedQueryStructField("CteColumns", "[]string", g.KeywordOptions().Parentheses()).
 	PredefinedQueryStructField("Statement", "string", g.ParameterOptions().NoEquals().NoQuotes().SQL("AS").Required())
 
@@ -368,8 +368,8 @@ var ProceduresDef = g.NewInterface(
 		TextAssignment("HANDLER", g.ParameterOptions().SingleQuotes().Required()).
 		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		PredefinedQueryStructField("ProcedureDefinition", "*string", g.ParameterOptions().NoEquals().SingleQuotes().SQL("AS")).
-		ListQueryStructField(
-			"WithClauses",
+		OptionalQueryStructField(
+			"WithClause",
 			procedureWithClause,
 			g.KeywordOptions(),
 		).

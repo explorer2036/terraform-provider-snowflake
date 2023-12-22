@@ -538,16 +538,12 @@ func (r *CreateAndCallForJavaProcedureRequest) toOpts() *CreateAndCallForJavaPro
 		}
 		opts.Imports = s
 	}
-	if r.WithClauses != nil {
-		s := make([]ProcedureWithClause, len(r.WithClauses))
-		for i, v := range r.WithClauses {
-			s[i] = ProcedureWithClause{
-				CteName:    v.CteName,
-				CteColumns: v.CteColumns,
-				Statement:  v.Statement,
-			}
+	if r.WithClause != nil {
+		opts.WithClause = &ProcedureWithClause{
+			CteName:    r.WithClause.CteName,
+			CteColumns: r.WithClause.CteColumns,
+			Statement:  r.WithClause.Statement,
 		}
-		opts.WithClauses = s
 	}
 	return opts
 }

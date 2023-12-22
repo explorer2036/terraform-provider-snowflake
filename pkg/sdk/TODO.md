@@ -62,3 +62,10 @@ if valueSet(opts.Positions) && valueSet(opts.Names) {
 ## procedures_gen.go
 
 Describe(ctx context.Context, request *DescribeProcedureRequest) ([]ProcedureDetail, error)
+
+type ProcedureWithClause struct {
+	prefix     bool                    `ddl:"static" sql:","`
+	CteName    AccountObjectIdentifier `ddl:"identifier"`
+	CteColumns []string                `ddl:"keyword,parentheses"`
+	Statement  string                  `ddl:"parameter,no_quotes,no_equals" sql:"AS"`
+}
