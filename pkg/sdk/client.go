@@ -13,10 +13,14 @@ import (
 	"github.com/snowflakedb/gosnowflake"
 )
 
-var instrumentedSQL bool
+var (
+	instrumentedSQL         bool
+	gosnowflakeLoggingLevel string
+)
 
 func init() {
 	instrumentedSQL = os.Getenv("SF_TF_NO_INSTRUMENTED_SQL") == ""
+	gosnowflakeLoggingLevel = os.Getenv("SF_TF_GOSNOWFLAKE_LOG_LEVEL")
 }
 
 type Client struct {
@@ -45,6 +49,7 @@ type Client struct {
 	EventTables      EventTables
 	FailoverGroups   FailoverGroups
 	FileFormats      FileFormats
+	Functions        Functions
 	Grants           Grants
 	MaskingPolicies  MaskingPolicies
 	NetworkPolicies  NetworkPolicies
@@ -120,6 +125,10 @@ func NewClient(cfg *gosnowflake.Config) (*Client, error) {
 		driverName = "snowflake-instrumented"
 	}
 
+	if gosnowflakeLoggingLevel != "" {
+		cfg.Tracing = gosnowflakeLoggingLevel
+	}
+
 	dsn, err := gosnowflake.DSN(cfg)
 	if err != nil {
 		return nil, err
@@ -181,6 +190,7 @@ func (c *Client) initialize() {
 	c.EventTables = &eventTables{client: c}
 	c.FailoverGroups = &failoverGroups{client: c}
 	c.FileFormats = &fileFormats{client: c}
+	c.Functions = &functions{client: c}
 	c.Grants = &grants{client: c}
 	c.MaskingPolicies = &maskingPolicies{client: c}
 	c.NetworkPolicies = &networkPolicies{client: c}
