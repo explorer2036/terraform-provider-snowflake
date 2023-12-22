@@ -201,9 +201,6 @@ func (opts *CreateAndCallForJavaProcedureOptions) validate() error {
 	if !valueSet(opts.Handler) {
 		errs = append(errs, errNotSet("CreateAndCallForJavaProcedureOptions", "Handler"))
 	}
-	if !valueSet(opts.Packages) {
-		errs = append(errs, errNotSet("CreateAndCallForJavaProcedureOptions", "Packages"))
-	}
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
@@ -228,9 +225,6 @@ func (opts *CreateAndCallForScalaProcedureOptions) validate() error {
 	}
 	if !valueSet(opts.Handler) {
 		errs = append(errs, errNotSet("CreateAndCallForScalaProcedureOptions", "Handler"))
-	}
-	if !valueSet(opts.Packages) {
-		errs = append(errs, errNotSet("CreateAndCallForScalaProcedureOptions", "Packages"))
 	}
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
@@ -273,9 +267,6 @@ func (opts *CreateAndCallForPythonProcedureOptions) validate() error {
 	}
 	if !valueSet(opts.Handler) {
 		errs = append(errs, errNotSet("CreateAndCallForPythonProcedureOptions", "Handler"))
-	}
-	if !valueSet(opts.Packages) {
-		errs = append(errs, errNotSet("CreateAndCallForPythonProcedureOptions", "Packages"))
 	}
 	if !ValidObjectIdentifier(opts.ProcedureName) {
 		errs = append(errs, ErrInvalidObjectIdentifier)

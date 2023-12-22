@@ -659,8 +659,8 @@ func TestInt_CallProcedure(t *testing.T) {
 		require.NoError(t, err)
 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		arguments := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
-		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(arguments))
+		ca := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(ca))
 		require.NoError(t, err)
 	})
 
@@ -693,8 +693,8 @@ func TestInt_CallProcedure(t *testing.T) {
 		require.NoError(t, err)
 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		arguments := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
-		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(arguments))
+		ca := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(ca))
 		require.NoError(t, err)
 	})
 
@@ -764,9 +764,9 @@ def filter_by_role(session, name, role):
 		require.NoError(t, err)
 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		arguments := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
 		id = sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, "filterByRole")
-		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(arguments))
+		ca := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
+		err = client.Procedures.Call(ctx, sdk.NewCallProcedureRequest(id).WithCallArguments(ca))
 		require.NoError(t, err)
 	})
 }
@@ -836,14 +836,11 @@ func TestInt_CreateAndCallProcedures(t *testing.T) {
 		arg1 := sdk.NewProcedureArgumentRequest("name", sdk.DataTypeVARCHAR)
 		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
 		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
-		positions := []sdk.ProcedureCallArgumentPositionRequest{
-			*sdk.NewProcedureCallArgumentPositionRequest(fmt.Sprintf(`'%s'`, tid.FullyQualifiedName())),
-			*sdk.NewProcedureCallArgumentPositionRequest("'dev'"),
-		}
+		ca := []string{fmt.Sprintf(`'%s'`, tid.FullyQualifiedName()), "'dev'"}
 		request := sdk.NewCreateAndCallForJavaProcedureRequest(name, *returns, "11", packages, "Filter.filterByRole", name).
 			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
 			WithProcedureDefinition(sdk.String(definition)).
-			WithPositions(positions)
+			WithCallArguments(ca)
 		err := client.Procedures.CreateAndCallForJava(ctx, request)
 		require.NoError(t, err)
 	})
