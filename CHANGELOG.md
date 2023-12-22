@@ -1,5 +1,95 @@
 # Changelog
 
+## [0.82.0](https://github.com/Snowflake-Labs/terraform-provider-snowflake/compare/v0.81.0...v0.82.0) (2023-12-21)
+
+
+### 🎉 **What's new:**
+
+* add functions to sdk ([#2205](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2205)) ([e542b67](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/e542b67f761850e812114ce593fa5f6deca941cb))
+
+
+### 🔧 **Misc**
+
+* Add short scripts used to fetch all currently opened issues ([#2288](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2288)) ([0b5ce4e](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/0b5ce4eff21562406a473ba8d796804efb1bd94f))
+* Bump dependencies and fix linter complaints ([#2300](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2300)) ([124e862](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/124e862b406526e08d865e0f70414926e50f4d4d))
+
+
+### 🐛 **Bug fixes:**
+
+* Fix email notification integration ([#2292](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2292)) ([70edd3e](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/70edd3e5e010dcd2d2a6aa1bd1dd735a252d22c6))
+
+## [0.81.0](https://github.com/Snowflake-Labs/terraform-provider-snowflake/compare/v0.80.0...v0.81.0) (2023-12-20)
+
+
+### 🎉 **What's new:**
+
+* identifier validation ([#2269](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2269)) ([9687972](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/9687972fc673bb7b768f9b4100a6d2b67fc46e48))
+
+
+### 🔧 **Misc**
+
+* Allow setting gosnowflake logging level from environment variable ([#2285](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2285)) ([843e8fc](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/843e8fc8f8879fdb5b1148155e7e64174571e975))
+* Bump go to 1.21 ([#2267](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2267)) ([6b852c2](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/6b852c2ba6b1348ba83ec2e2190e8175371524be))
+
+
+### 🐛 **Bug fixes:**
+
+* Fix small issues ([#2287](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2287)) ([4e2613c](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/4e2613c82edc1e0f91fb0cb56dcaa977d412d785))
+
+## [0.80.0](https://github.com/Snowflake-Labs/terraform-provider-snowflake/compare/v0.79.1...v0.80.0) (2023-12-13)
+
+
+### 🎉 **What's new:**
+
+* Optional switch for instrumentedsql ([#2261](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2261)) ([9934a59](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/9934a59c5ee31dc292961806440427000ea41ea7))
+* Use external tables from SDK ([#2228](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2228)) ([6941023](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/6941023f95230a14f92dd099c1a6375129ee4bfb))
+
+
+### 🔧 **Misc**
+
+* Bump dependencies ([#2252](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2252)) ([581d75c](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/581d75c566ea758c5f888dedb101e6318d7c0cc3))
+
+
+### 🐛 **Bug fixes:**
+
+* Fix encode Snowflake ID for object identifiers ([#2256](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2256)) ([1c98a80](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/1c98a80bb1486a04ead57dd0d8abcf65e00ea86c))
+* for 1624 resource monitor timestamps are always considered to have changed ([#2214](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2214)) ([4d5d3ca](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/4d5d3ca4cfa3727240b05da9f5010b4fa908f695))
+
+## [0.79.1](https://github.com/Snowflake-Labs/terraform-provider-snowflake/compare/v0.79.0...v0.79.1) (2023-12-11)
+
+
+### 🐛 **Bug fixes:**
+
+* Add missing parameters ([#2250](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2250)) ([4f4c4a4](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/4f4c4a4fcb91725a55726c03429745bbf95fd642))
+
+## [0.79.0](https://github.com/Snowflake-Labs/terraform-provider-snowflake/compare/v0.78.0...v0.79.0) (2023-12-11)
+
+
+### 🎉 **What's new:**
+
+* add procedures to sdkv2 ([#2202](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2202)) ([6b563ac](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/6b563acef0f702fc6a366219afac602fa106129c))
+
+
+### 🔧 **Misc**
+
+* Propose additional debug logging ([#2243](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2243)) ([a0984cd](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/a0984cd355c2004cc245fbd4672967ba59cfb3c7))
+
+## [0.78.0](https://github.com/Snowflake-Labs/terraform-provider-snowflake/compare/v0.77.0...v0.78.0) (2023-12-08)
+
+
+### 🎉 **What's new:**
+
+* add event tables to sdk ([#2215](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2215)) ([66cc80a](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/66cc80a8cac24f4b7967986032b7da9e20bd4eab))
+* Add missing parameters to password policy resource ([#2231](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2231)) ([c189782](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/c189782bb7d117e27979c21dfea60ba733e996df))
+* Add tables to the SDK ([#2042](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2042)) ([c1700de](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/c1700de2a062852da7cb5e3cf3277cc19f6466d6))
+
+
+### 🐛 **Bug fixes:**
+
+* Fix some bugs ([#2234](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2234)) ([774a7db](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/774a7db1ae912843f83561c3cd810c31af242958))
+* schemas show by id ([#2238](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2238)) ([bd8fc5d](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/bd8fc5d1c9ad049ab76dbf5d689f5beb833a40ca))
+* snowpipe error integration ([#2227](https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2227)) ([0b388bf](https://github.com/Snowflake-Labs/terraform-provider-snowflake/commit/0b388bf79346cd4ddedaac99d4651390f1f93358))
+
 ## [0.77.0](https://github.com/Snowflake-Labs/terraform-provider-snowflake/compare/v0.76.0...v0.77.0) (2023-11-30)
 
 

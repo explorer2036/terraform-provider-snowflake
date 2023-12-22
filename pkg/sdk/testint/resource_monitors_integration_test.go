@@ -209,6 +209,7 @@ func TestInt_ResourceMonitorAlter(t *testing.T) {
 		resourceMonitor = &resourceMonitors[0]
 		assert.Equal(t, creditQuota, int(resourceMonitor.CreditQuota))
 	})
+
 	t.Run("when changing scheduling info", func(t *testing.T) {
 		resourceMonitor, resourceMonitorCleanup := createResourceMonitor(t, client)
 		t.Cleanup(resourceMonitorCleanup)
@@ -235,12 +236,46 @@ func TestInt_ResourceMonitorAlter(t *testing.T) {
 		assert.Equal(t, 1, len(resourceMonitors))
 		resourceMonitor = &resourceMonitors[0]
 		assert.Equal(t, *frequency, resourceMonitor.Frequency)
-		startTime, err := parseTimestampWithOffset(resourceMonitor.StartTime)
+		startTime := resourceMonitor.StartTime
 		require.NoError(t, err)
-		endTime, err := parseTimestampWithOffset(resourceMonitor.EndTime)
+		endTime := resourceMonitor.EndTime
 		require.NoError(t, err)
-		assert.Equal(t, startTimeStamp, startTime.Format("2006-01-01 15:04"))
-		assert.Equal(t, endTimeStamp, endTime.Format("2006-01-01 15:04"))
+		assert.Equal(t, startTimeStamp, startTime)
+		assert.Equal(t, endTimeStamp, endTime)
+	})
+
+	t.Run("all options together", func(t *testing.T) {
+		resourceMonitor, resourceMonitorCleanup := createResourceMonitor(t, client)
+		t.Cleanup(resourceMonitorCleanup)
+
+		newTriggers := make([]sdk.TriggerDefinition, 0)
+		newTriggers = append(newTriggers, sdk.TriggerDefinition{Threshold: 30, TriggerAction: sdk.TriggerActionNotify})
+
+		creditQuota := 100
+		alterOptions := &sdk.AlterResourceMonitorOptions{
+			Set: &sdk.ResourceMonitorSet{
+				CreditQuota: &creditQuota,
+			},
+			Triggers: newTriggers,
+			NotifyUsers: &sdk.NotifyUsers{
+				Users: []sdk.NotifiedUser{{Name: "ARTUR_SAWICKI"}},
+			},
+		}
+		err := client.ResourceMonitors.Alter(ctx, resourceMonitor.ID(), alterOptions)
+		require.NoError(t, err)
+		resourceMonitors, err := client.ResourceMonitors.Show(ctx, &sdk.ShowResourceMonitorOptions{
+			Like: &sdk.Like{
+				Pattern: sdk.String(resourceMonitor.Name),
+			},
+		})
+		require.NoError(t, err)
+		assert.Equal(t, 1, len(resourceMonitors))
+		resourceMonitor = &resourceMonitors[0]
+		assert.Equal(t, creditQuota, int(resourceMonitor.CreditQuota))
+		assert.Len(t, resourceMonitor.NotifyUsers, 1)
+		assert.Equal(t, "ARTUR_SAWICKI", resourceMonitor.NotifyUsers[0])
+		assert.Len(t, resourceMonitor.NotifyTriggers, 1)
+		assert.Equal(t, 30, resourceMonitor.NotifyTriggers[0])
 	})
 }
 

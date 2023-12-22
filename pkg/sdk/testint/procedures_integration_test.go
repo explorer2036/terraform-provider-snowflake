@@ -153,16 +153,16 @@ func TestInt_CreateProcedures(t *testing.T) {
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
 		definition := `
-				import java.io.InputStream
-				import java.nio.charset.StandardCharsets
-				import com.snowflake.snowpark_java.types.SnowflakeFile
-				import com.snowflake.snowpark_java.Session
-				object FileReader {
-					def execute(session: Session, fileName: String): String = {
-						var input: InputStream = SnowflakeFile.newInstance(fileName).getInputStream()
-						return new String(input.readAllBytes(), StandardCharsets.UTF_8)
-					}
-				}`
+		import java.io.InputStream
+		import java.nio.charset.StandardCharsets
+		import com.snowflake.snowpark_java.types.SnowflakeFile
+		import com.snowflake.snowpark_java.Session
+		object FileReader {
+			def execute(session: Session, fileName: String): String = {
+				var input: InputStream = SnowflakeFile.newInstance(fileName).getInputStream()
+				return new String(input.readAllBytes(), StandardCharsets.UTF_8)
+			}
+		}`
 		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
 		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
 		argument := sdk.NewProcedureArgumentRequest("input", sdk.DataTypeVARCHAR)
@@ -186,15 +186,15 @@ func TestInt_CreateProcedures(t *testing.T) {
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
 		definition := `
-				import com.snowflake.snowpark.functions._
-				import com.snowflake.snowpark._
-				object Filter {
-					def filterByRole(session: Session, tableName: String, role: String): DataFrame = {
-						val table = session.table(tableName)
-						val filteredRows = table.filter(col("role") === role)
-						return filteredRows
-					}
-				}`
+		import com.snowflake.snowpark.functions._
+		import com.snowflake.snowpark._
+		object Filter {
+			def filterByRole(session: Session, tableName: String, role: String): DataFrame = {
+				val table = session.table(tableName)
+				val filteredRows = table.filter(col("role") === role)
+				return filteredRows
+			}
+		}`
 		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
 		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
 		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
@@ -285,9 +285,9 @@ def filter_by_role(session, table_name, role):
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
 		definition := `
-				BEGIN
-					RETURN message;
-				END;`
+		BEGIN
+			RETURN message;
+		END;`
 
 		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
 		returns := sdk.NewProcedureSQLReturnsRequest().WithResultDataType(dt).WithNotNull(sdk.Bool(true))
@@ -309,11 +309,11 @@ def filter_by_role(session, table_name, role):
 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
 		definition := `
-				DECLARE
-					res RESULTSET DEFAULT (SELECT * FROM invoices WHERE id = :id);
-				BEGIN
-					RETURN TABLE(res);
-				END;`
+		DECLARE
+			res RESULTSET DEFAULT (SELECT * FROM invoices WHERE id = :id);
+		BEGIN
+			RETURN TABLE(res);
+		END;`
 		column1 := sdk.NewProcedureColumnRequest("id", "INTEGER")
 		column2 := sdk.NewProcedureColumnRequest("price", "NUMBER(12,2)")
 		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2})
