@@ -4,10 +4,41 @@ import g "github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/poc/gen
 
 //go:generate go run ./poc/main.go
 
+// https://medium.com/snowflake/hello-world-snowflake-native-apps-76e1ce82e1be
+
+var applicationPackageModifyReleaseDirective = g.NewQueryStruct("ModifyReleaseDirective").
+	Text("ReleaseDirective", g.KeywordOptions().NoQuotes().Required()).
+	TextAssignment("VERSION", g.ParameterOptions().NoQuotes().Required()).
+	NumberAssignment("PATCH", g.ParameterOptions().NoQuotes().Required())
+
+var applicationPackageSetReleaseDirective = g.NewQueryStruct("SetReleaseDirective").
+	Text("ReleaseDirective", g.KeywordOptions().NoQuotes().Required()).
+	PredefinedQueryStructField("Accounts", "[]string", g.ParameterOptions().MustParentheses().NoQuotes().Required().SQL("ACCOUNTS")).
+	TextAssignment("VERSION", g.ParameterOptions().NoQuotes().Required()).
+	NumberAssignment("PATCH", g.ParameterOptions().NoQuotes().Required())
+
+var applicationPackageSetDefaultReleaseDirective = g.NewQueryStruct("SetDefaultReleaseDirective").
+	TextAssignment("VERSION", g.ParameterOptions().NoQuotes().Required()).
+	NumberAssignment("PATCH", g.ParameterOptions().NoQuotes().Required())
+
+var applicationPackageSet = g.NewQueryStruct("ApplicationPackageSet").
+	OptionalNumberAssignment("DATA_RETENTION_TIME_IN_DAYS", g.ParameterOptions().NoQuotes()).
+	OptionalNumberAssignment("MAX_DATA_EXTENSION_TIME_IN_DAYS", g.ParameterOptions().NoQuotes()).
+	OptionalTextAssignment("DEFAULT_DDL_COLLATION", g.ParameterOptions().SingleQuotes()).
+	OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
+	PredefinedQueryStructField("Distribution", "*Distribution", g.ParameterOptions().SQL("DISTRIBUTION"))
+
+var applicationPackageUnset = g.NewQueryStruct("ApplicationPackageUnset").
+	OptionalSQL("DATA_RETENTION_TIME_IN_DAYS").
+	OptionalSQL("MAX_DATA_EXTENSION_TIME_IN_DAYS").
+	OptionalSQL("DEFAULT_DDL_COLLATION").
+	OptionalSQL("COMMENT").
+	OptionalSQL("DISTRIBUTION")
+
 var ApplicationPackagesDef = g.NewInterface(
 	"ApplicationPackages",
 	"ApplicationPackage",
-	g.KindOfT[SchemaObjectIdentifier](),
+	g.KindOfT[AccountObjectIdentifier](),
 ).CreateOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/create-application-package",
 	g.NewQueryStruct("CreateApplicationPackage").
@@ -29,16 +60,31 @@ var ApplicationPackagesDef = g.NewInterface(
 		SQL("APPLICATION PACKAGE").
 		IfExists().
 		Name().
-		OptionalNumberAssignment("SET DATA_RETENTION_TIME_IN_DAYS", g.ParameterOptions().NoQuotes()).
-		OptionalNumberAssignment("SET MAX_DATA_EXTENSION_TIME_IN_DAYS", g.ParameterOptions().NoQuotes()).
-		OptionalTextAssignment("SET DEFAULT_DDL_COLLATION", g.ParameterOptions().SingleQuotes()).
-		OptionalTextAssignment("SET COMMENT", g.ParameterOptions().SingleQuotes()).
-		OptionalTextAssignment("SET DISTRIBUTION", g.ParameterOptions().SingleQuotes()).
-		OptionalSQL("UNSET DATA_RETENTION_TIME_IN_DAYS").
-		OptionalSQL("UNSET MAX_DATA_EXTENSION_TIME_IN_DAYS").
-		OptionalSQL("UNSET DEFAULT_DDL_COLLATION").
-		OptionalSQL("UNSET COMMENT").
-		OptionalSQL("UNSET DISTRIBUTION").
+		OptionalQueryStructField(
+			"Set",
+			applicationPackageSet,
+			g.KeywordOptions().SQL("SET"),
+		).
+		OptionalQueryStructField(
+			"Unset",
+			applicationPackageUnset,
+			g.KeywordOptions().SQL("UNSET"),
+		).
+		OptionalQueryStructField(
+			"ModifyReleaseDirective",
+			applicationPackageModifyReleaseDirective,
+			g.KeywordOptions().SQL("MODIFY RELEASE DIRECTIVE"),
+		).
+		OptionalQueryStructField(
+			"SetDefaultReleaseDirective",
+			applicationPackageSetDefaultReleaseDirective,
+			g.KeywordOptions().SQL("SET DEFAULT RELEASE DIRECTIVE"),
+		).
+		OptionalQueryStructField(
+			"SetReleaseDirective",
+			applicationPackageSetReleaseDirective,
+			g.KeywordOptions().SQL("SET RELEASE DIRECTIVE"),
+		).
 		OptionalTextAssignment("UNSET RELEASE DIRECTIVE", g.ParameterOptions().NoEquals().NoQuotes()).
 		OptionalSetTags().
 		OptionalUnsetTags().
