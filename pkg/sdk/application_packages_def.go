@@ -17,9 +17,25 @@ var applicationPackageSetReleaseDirective = g.NewQueryStruct("SetReleaseDirectiv
 	TextAssignment("VERSION", g.ParameterOptions().NoQuotes().Required()).
 	NumberAssignment("PATCH", g.ParameterOptions().NoQuotes().Required())
 
+var applicationPackageUnsetReleaseDirective = g.NewQueryStruct("UnsetReleaseDirective").
+	Text("ReleaseDirective", g.KeywordOptions().NoQuotes().Required())
+
 var applicationPackageSetDefaultReleaseDirective = g.NewQueryStruct("SetDefaultReleaseDirective").
 	TextAssignment("VERSION", g.ParameterOptions().NoQuotes().Required()).
 	NumberAssignment("PATCH", g.ParameterOptions().NoQuotes().Required())
+
+var applicationPackageAddVersion = g.NewQueryStruct("AddVersion").
+	OptionalText("VersionIdentifier", g.KeywordOptions().NoQuotes()).
+	TextAssignment("USING", g.ParameterOptions().NoEquals().SingleQuotes().Required()).
+	OptionalTextAssignment("Label", g.ParameterOptions().SingleQuotes())
+
+var applicationPackageDropVersion = g.NewQueryStruct("DropVersion").
+	Text("VersionIdentifier", g.KeywordOptions().NoQuotes().Required())
+
+var applicationPackageAddPatchForVersion = g.NewQueryStruct("AddPatchForVersion").
+	OptionalText("VersionIdentifier", g.KeywordOptions().NoQuotes().Required()).
+	TextAssignment("USING", g.ParameterOptions().NoEquals().SingleQuotes().Required()).
+	OptionalTextAssignment("Label", g.ParameterOptions().SingleQuotes())
 
 var applicationPackageSet = g.NewQueryStruct("ApplicationPackageSet").
 	OptionalNumberAssignment("DATA_RETENTION_TIME_IN_DAYS", g.ParameterOptions().NoQuotes()).
@@ -85,10 +101,30 @@ var ApplicationPackagesDef = g.NewInterface(
 			applicationPackageSetReleaseDirective,
 			g.KeywordOptions().SQL("SET RELEASE DIRECTIVE"),
 		).
-		OptionalTextAssignment("UNSET RELEASE DIRECTIVE", g.ParameterOptions().NoEquals().NoQuotes()).
+		OptionalQueryStructField(
+			"UnsetReleaseDirective",
+			applicationPackageUnsetReleaseDirective,
+			g.KeywordOptions().SQL("UNSET RELEASE DIRECTIVE"),
+		).
+		OptionalQueryStructField(
+			"AddVersion",
+			applicationPackageAddVersion,
+			g.KeywordOptions().SQL("ADD VERSION"),
+		).
+		OptionalQueryStructField(
+			"DropVersion",
+			applicationPackageDropVersion,
+			g.KeywordOptions().SQL("DROP VERSION"),
+		).
+		OptionalQueryStructField(
+			"AddPatchForVersion",
+			applicationPackageAddPatchForVersion,
+			g.KeywordOptions().SQL("ADD PATCH FOR VERSION"),
+		).
 		OptionalSetTags().
 		OptionalUnsetTags().
-		WithValidation(g.ValidIdentifier, "name"),
+		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ExactlyOneValueSet, "Set", "Unset", "ModifyReleaseDirective", "SetDefaultReleaseDirective", "SetReleaseDirective", "UnsetReleaseDirective", "AddVersion", "DropVersion", "AddPatchForVersion", "SetTags", "UnsetTags"),
 ).DropOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/drop-application-package",
 	g.NewQueryStruct("DropApplicationPackage").
@@ -128,4 +164,4 @@ var ApplicationPackagesDef = g.NewInterface(
 		OptionalLike().
 		OptionalStartsWith().
 		OptionalLimit(),
-)
+).ShowByIdOperation()

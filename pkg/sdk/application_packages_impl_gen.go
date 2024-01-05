@@ -2,6 +2,8 @@ package sdk
 
 import (
 	"context"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
 
 var _ ApplicationPackages = (*applicationPackages)(nil)
@@ -35,6 +37,15 @@ func (v *applicationPackages) Show(ctx context.Context, request *ShowApplication
 	return resultList, nil
 }
 
+func (v *applicationPackages) ShowByID(ctx context.Context, id AccountObjectIdentifier) (*ApplicationPackage, error) {
+	request := NewShowApplicationPackageRequest().WithLike(&Like{String(id.Name())})
+	applicationPackages, err := v.Show(ctx, request)
+	if err != nil {
+		return nil, err
+	}
+	return collections.FindOne(applicationPackages, func(r ApplicationPackage) bool { return r.Name == id.Name() })
+}
+
 func (r *CreateApplicationPackageRequest) toOpts() *CreateApplicationPackageOptions {
 	opts := &CreateApplicationPackageOptions{
 		IfNotExists:                r.IfNotExists,
@@ -54,9 +65,8 @@ func (r *AlterApplicationPackageRequest) toOpts() *AlterApplicationPackageOption
 		IfExists: r.IfExists,
 		name:     r.name,
 
-		UnsetReleaseDirective: r.UnsetReleaseDirective,
-		SetTags:               r.SetTags,
-		UnsetTags:             r.UnsetTags,
+		SetTags:   r.SetTags,
+		UnsetTags: r.UnsetTags,
 	}
 	if r.Set != nil {
 		opts.Set = &ApplicationPackageSet{
@@ -95,6 +105,30 @@ func (r *AlterApplicationPackageRequest) toOpts() *AlterApplicationPackageOption
 			Accounts:         r.SetReleaseDirective.Accounts,
 			Version:          r.SetReleaseDirective.Version,
 			Patch:            r.SetReleaseDirective.Patch,
+		}
+	}
+	if r.UnsetReleaseDirective != nil {
+		opts.UnsetReleaseDirective = &UnsetReleaseDirective{
+			ReleaseDirective: r.UnsetReleaseDirective.ReleaseDirective,
+		}
+	}
+	if r.AddVersion != nil {
+		opts.AddVersion = &AddVersion{
+			VersionIdentifier: r.AddVersion.VersionIdentifier,
+			Using:             r.AddVersion.Using,
+			Label:             r.AddVersion.Label,
+		}
+	}
+	if r.DropVersion != nil {
+		opts.DropVersion = &DropVersion{
+			VersionIdentifier: r.DropVersion.VersionIdentifier,
+		}
+	}
+	if r.AddPatchForVersion != nil {
+		opts.AddPatchForVersion = &AddPatchForVersion{
+			VersionIdentifier: r.AddPatchForVersion.VersionIdentifier,
+			Using:             r.AddPatchForVersion.Using,
+			Label:             r.AddPatchForVersion.Label,
 		}
 	}
 	return opts

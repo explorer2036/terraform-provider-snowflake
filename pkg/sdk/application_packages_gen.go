@@ -10,6 +10,7 @@ type ApplicationPackages interface {
 	Alter(ctx context.Context, request *AlterApplicationPackageRequest) error
 	Drop(ctx context.Context, request *DropApplicationPackageRequest) error
 	Show(ctx context.Context, request *ShowApplicationPackageRequest) ([]ApplicationPackage, error)
+	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*ApplicationPackage, error)
 }
 
 // CreateApplicationPackageOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-application-package.
@@ -37,7 +38,10 @@ type AlterApplicationPackageOptions struct {
 	ModifyReleaseDirective     *ModifyReleaseDirective     `ddl:"keyword" sql:"MODIFY RELEASE DIRECTIVE"`
 	SetDefaultReleaseDirective *SetDefaultReleaseDirective `ddl:"keyword" sql:"SET DEFAULT RELEASE DIRECTIVE"`
 	SetReleaseDirective        *SetReleaseDirective        `ddl:"keyword" sql:"SET RELEASE DIRECTIVE"`
-	UnsetReleaseDirective      *string                     `ddl:"parameter,no_quotes,no_equals" sql:"UNSET RELEASE DIRECTIVE"`
+	UnsetReleaseDirective      *UnsetReleaseDirective      `ddl:"keyword" sql:"UNSET RELEASE DIRECTIVE"`
+	AddVersion                 *AddVersion                 `ddl:"keyword" sql:"ADD VERSION"`
+	DropVersion                *DropVersion                `ddl:"keyword" sql:"DROP VERSION"`
+	AddPatchForVersion         *AddPatchForVersion         `ddl:"keyword" sql:"ADD PATCH FOR VERSION"`
 	SetTags                    []TagAssociation            `ddl:"keyword" sql:"SET TAG"`
 	UnsetTags                  []ObjectIdentifier          `ddl:"keyword" sql:"UNSET TAG"`
 }
@@ -74,6 +78,26 @@ type SetReleaseDirective struct {
 	Accounts         []string `ddl:"parameter,no_quotes,must_parentheses" sql:"ACCOUNTS"`
 	Version          string   `ddl:"parameter,no_quotes" sql:"VERSION"`
 	Patch            int      `ddl:"parameter,no_quotes" sql:"PATCH"`
+}
+
+type UnsetReleaseDirective struct {
+	ReleaseDirective string `ddl:"keyword,no_quotes"`
+}
+
+type AddVersion struct {
+	VersionIdentifier *string `ddl:"keyword,no_quotes"`
+	Using             string  `ddl:"parameter,single_quotes,no_equals" sql:"USING"`
+	Label             *string `ddl:"parameter,single_quotes" sql:"Label"`
+}
+
+type DropVersion struct {
+	VersionIdentifier string `ddl:"keyword,no_quotes"`
+}
+
+type AddPatchForVersion struct {
+	VersionIdentifier *string `ddl:"keyword,no_quotes"`
+	Using             string  `ddl:"parameter,single_quotes,no_equals" sql:"USING"`
+	Label             *string `ddl:"parameter,single_quotes" sql:"Label"`
 }
 
 // DropApplicationPackageOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-application-package.

@@ -85,8 +85,23 @@ func (s *AlterApplicationPackageRequest) WithSetReleaseDirective(SetReleaseDirec
 	return s
 }
 
-func (s *AlterApplicationPackageRequest) WithUnsetReleaseDirective(UnsetReleaseDirective *string) *AlterApplicationPackageRequest {
+func (s *AlterApplicationPackageRequest) WithUnsetReleaseDirective(UnsetReleaseDirective *UnsetReleaseDirectiveRequest) *AlterApplicationPackageRequest {
 	s.UnsetReleaseDirective = UnsetReleaseDirective
+	return s
+}
+
+func (s *AlterApplicationPackageRequest) WithAddVersion(AddVersion *AddVersionRequest) *AlterApplicationPackageRequest {
+	s.AddVersion = AddVersion
+	return s
+}
+
+func (s *AlterApplicationPackageRequest) WithDropVersion(DropVersion *DropVersionRequest) *AlterApplicationPackageRequest {
+	s.DropVersion = DropVersion
+	return s
+}
+
+func (s *AlterApplicationPackageRequest) WithAddPatchForVersion(AddPatchForVersion *AddPatchForVersionRequest) *AlterApplicationPackageRequest {
+	s.AddPatchForVersion = AddPatchForVersion
 	return s
 }
 
@@ -192,6 +207,55 @@ func NewSetReleaseDirectiveRequest(
 	s.Version = Version
 	s.Patch = Patch
 	return &s
+}
+
+func NewUnsetReleaseDirectiveRequest(
+	ReleaseDirective string,
+) *UnsetReleaseDirectiveRequest {
+	s := UnsetReleaseDirectiveRequest{}
+	s.ReleaseDirective = ReleaseDirective
+	return &s
+}
+
+func NewAddVersionRequest(
+	Using string,
+) *AddVersionRequest {
+	s := AddVersionRequest{}
+	s.Using = Using
+	return &s
+}
+
+func (s *AddVersionRequest) WithVersionIdentifier(VersionIdentifier *string) *AddVersionRequest {
+	s.VersionIdentifier = VersionIdentifier
+	return s
+}
+
+func (s *AddVersionRequest) WithLabel(Label *string) *AddVersionRequest {
+	s.Label = Label
+	return s
+}
+
+func NewDropVersionRequest(
+	VersionIdentifier string,
+) *DropVersionRequest {
+	s := DropVersionRequest{}
+	s.VersionIdentifier = VersionIdentifier
+	return &s
+}
+
+func NewAddPatchForVersionRequest(
+	VersionIdentifier *string,
+	Using string,
+) *AddPatchForVersionRequest {
+	s := AddPatchForVersionRequest{}
+	s.VersionIdentifier = VersionIdentifier
+	s.Using = Using
+	return &s
+}
+
+func (s *AddPatchForVersionRequest) WithLabel(Label *string) *AddPatchForVersionRequest {
+	s.Label = Label
+	return s
 }
 
 func NewDropApplicationPackageRequest(

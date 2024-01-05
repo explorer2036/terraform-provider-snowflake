@@ -28,7 +28,10 @@ type AlterApplicationPackageRequest struct {
 	ModifyReleaseDirective     *ModifyReleaseDirectiveRequest
 	SetDefaultReleaseDirective *SetDefaultReleaseDirectiveRequest
 	SetReleaseDirective        *SetReleaseDirectiveRequest
-	UnsetReleaseDirective      *string
+	UnsetReleaseDirective      *UnsetReleaseDirectiveRequest
+	AddVersion                 *AddVersionRequest
+	DropVersion                *DropVersionRequest
+	AddPatchForVersion         *AddPatchForVersionRequest
 	SetTags                    []TagAssociation
 	UnsetTags                  []ObjectIdentifier
 }
@@ -65,6 +68,26 @@ type SetReleaseDirectiveRequest struct {
 	Accounts         []string // required
 	Version          string   // required
 	Patch            int      // required
+}
+
+type UnsetReleaseDirectiveRequest struct {
+	ReleaseDirective string // required
+}
+
+type AddVersionRequest struct {
+	VersionIdentifier *string
+	Using             string // required
+	Label             *string
+}
+
+type DropVersionRequest struct {
+	VersionIdentifier string // required
+}
+
+type AddPatchForVersionRequest struct {
+	VersionIdentifier *string // required
+	Using             string  // required
+	Label             *string
 }
 
 type DropApplicationPackageRequest struct {

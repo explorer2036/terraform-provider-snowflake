@@ -37,7 +37,7 @@ func TestApplicationPackages_Create(t *testing.T) {
 				Value: "v1",
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, "CREATE APPLICATION PACKAGE IF NOT EXISTS %s DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 1 DEFAULT_DDL_COLLATION = 'en_US' COMMENT = 'comment' TAG (%s = 'v1') DISTRIBUTION = INTERNAL", id.FullyQualifiedName(), t1.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, "CREATE APPLICATION PACKAGE IF NOT EXISTS %s DATA_RETENTION_TIME_IN_DAYS = 1 MAX_DATA_EXTENSION_TIME_IN_DAYS = 1 DEFAULT_DDL_COLLATION = 'en_US' COMMENT = 'comment' DISTRIBUTION = INTERNAL TAG (%s = 'v1')", id.FullyQualifiedName(), t1.FullyQualifiedName())
 	})
 }
 
@@ -60,6 +60,23 @@ func TestApplicationPackages_Alter(t *testing.T) {
 		opts := defaultOpts()
 		opts.name = NewAccountObjectIdentifier("")
 		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+		opts := defaultOpts()
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationPackageOptions", "Set", "Unset", "ModifyReleaseDirective", "SetDefaultReleaseDirective", "SetReleaseDirective", "UnsetReleaseDirective", "AddVersion", "DropVersion", "AddPatchForVersion", "SetTags", "UnsetTags"))
+	})
+
+	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.SetDefaultReleaseDirective = &SetDefaultReleaseDirective{
+			Version: "v1",
+			Patch:   1,
+		}
+		opts.UnsetReleaseDirective = &UnsetReleaseDirective{
+			ReleaseDirective: "DEFAULT",
+		}
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationPackageOptions", "Set", "Unset", "ModifyReleaseDirective", "SetDefaultReleaseDirective", "SetReleaseDirective", "UnsetReleaseDirective", "AddVersion", "DropVersion", "AddPatchForVersion", "SetTags", "UnsetTags"))
 	})
 
 	t.Run("alter: set options", func(t *testing.T) {
@@ -139,10 +156,50 @@ func TestApplicationPackages_Alter(t *testing.T) {
 		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION PACKAGE IF EXISTS %s SET RELEASE DIRECTIVE DEFAULT ACCOUNTS = (org1.acc1, org2.acc2) VERSION = V1 PATCH = 1`, id.FullyQualifiedName())
 	})
 
+	t.Run("alter: set release directive with no accounts", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.SetReleaseDirective = &SetReleaseDirective{
+			ReleaseDirective: "DEFAULT",
+			Version:          "V1",
+			Patch:            1,
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION PACKAGE IF EXISTS %s SET RELEASE DIRECTIVE DEFAULT ACCOUNTS = () VERSION = V1 PATCH = 1`, id.FullyQualifiedName())
+	})
+
 	t.Run("alter: unset release directive", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.UnsetReleaseDirective = String("DEFAULT")
+		opts.UnsetReleaseDirective = &UnsetReleaseDirective{
+			ReleaseDirective: "DEFAULT",
+		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION PACKAGE IF EXISTS %s UNSET RELEASE DIRECTIVE DEFAULT`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: add version", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.AddVersion = &AddVersion{
+			VersionIdentifier: String("v1_1"),
+			Using:             "@hello_snowflake_code.core.hello_snowflake_stage",
+			Label:             String("test"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION PACKAGE IF EXISTS %s ADD VERSION v1_1 USING '@hello_snowflake_code.core.hello_snowflake_stage' Label = 'test'`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: drop version", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.DropVersion = &DropVersion{
+			VersionIdentifier: "v1_1",
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION PACKAGE IF EXISTS %s DROP VERSION v1_1`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: add patch for version", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.AddPatchForVersion = &AddPatchForVersion{
+			VersionIdentifier: String("v1_1"),
+			Using:             "@hello_snowflake_code.core.hello_snowflake_stage",
+			Label:             String("test"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION PACKAGE IF EXISTS %s ADD PATCH FOR VERSION v1_1 USING '@hello_snowflake_code.core.hello_snowflake_stage' Label = 'test'`, id.FullyQualifiedName())
 	})
 }
 
