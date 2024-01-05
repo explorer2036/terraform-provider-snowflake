@@ -151,6 +151,22 @@ func (r *ShowApplicationPackageRequest) toOpts() *ShowApplicationPackageOptions 
 }
 
 func (r applicationPackageRow) convert() *ApplicationPackage {
-	// TODO: Mapping
-	return &ApplicationPackage{}
+	e := &ApplicationPackage{
+		CreatedOn:     r.CreatedOn,
+		Name:          r.Name,
+		IsDefault:     r.IsDefault == "Y",
+		IsCurrent:     r.IsCurrent == "Y",
+		Distribution:  r.Distribution,
+		Owner:         r.Owner,
+		Comment:       r.Comment,
+		RetentionTime: r.RetentionTime,
+		Options:       r.Options,
+	}
+	if r.DroppedOn.Valid {
+		e.DroppedOn = r.DroppedOn.String
+	}
+	if r.ApplicationClass.Valid {
+		e.ApplicationClass = r.ApplicationClass.String
+	}
+	return e
 }
