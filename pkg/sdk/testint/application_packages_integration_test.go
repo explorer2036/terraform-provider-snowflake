@@ -10,6 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+/*
+todo: add tests for:
+  - Modifies the properties of an existing application package: https://docs.snowflake.com/en/sql-reference/sql/alter-application-package-release-directive
+  - Modifies the versioning of an existing application package: https://docs.snowflake.com/en/sql-reference/sql/alter-application-package-version
+*/
+
 func TestInt_ApplicationPackages(t *testing.T) {
 	client := testClient(t)
 	ctx := testContext(t)
