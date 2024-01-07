@@ -21,19 +21,23 @@ type CreateApplicationPackageRequest struct {
 }
 
 type AlterApplicationPackageRequest struct {
-	IfExists                   *bool
-	name                       AccountObjectIdentifier // required
-	Set                        *ApplicationPackageSetRequest
-	Unset                      *ApplicationPackageUnsetRequest
-	ModifyReleaseDirective     *ModifyReleaseDirectiveRequest
-	SetDefaultReleaseDirective *SetDefaultReleaseDirectiveRequest
-	SetReleaseDirective        *SetReleaseDirectiveRequest
-	UnsetReleaseDirective      *UnsetReleaseDirectiveRequest
-	AddVersion                 *AddVersionRequest
-	DropVersion                *DropVersionRequest
-	AddPatchForVersion         *AddPatchForVersionRequest
-	SetTags                    []TagAssociation
-	UnsetTags                  []ObjectIdentifier
+	IfExists                        *bool
+	name                            AccountObjectIdentifier // required
+	Set                             *ApplicationPackageSetRequest
+	UnsetDataRetentionTimeInDays    *bool
+	UnsetMaxDataExtensionTimeInDays *bool
+	UnsetDefaultDdlCollation        *bool
+	UnsetComment                    *bool
+	UnsetDistribution               *bool
+	ModifyReleaseDirective          *ModifyReleaseDirectiveRequest
+	SetDefaultReleaseDirective      *SetDefaultReleaseDirectiveRequest
+	SetReleaseDirective             *SetReleaseDirectiveRequest
+	UnsetReleaseDirective           *UnsetReleaseDirectiveRequest
+	AddVersion                      *AddVersionRequest
+	DropVersion                     *DropVersionRequest
+	AddPatchForVersion              *AddPatchForVersionRequest
+	SetTags                         []TagAssociation
+	UnsetTags                       []ObjectIdentifier
 }
 
 type ApplicationPackageSetRequest struct {
@@ -42,14 +46,6 @@ type ApplicationPackageSetRequest struct {
 	DefaultDdlCollation        *string
 	Comment                    *string
 	Distribution               *Distribution
-}
-
-type ApplicationPackageUnsetRequest struct {
-	DataRetentionTimeInDays    *bool
-	MaxDataExtensionTimeInDays *bool
-	DefaultDdlCollation        *bool
-	Comment                    *bool
-	Distribution               *bool
 }
 
 type ModifyReleaseDirectiveRequest struct {
