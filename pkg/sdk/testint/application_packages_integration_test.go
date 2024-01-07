@@ -15,8 +15,7 @@ import (
 
 /*
 todo: add tests for:
-  - Modifies the properties of an existing application package: https://docs.snowflake.com/en/sql-reference/sql/alter-application-package-release-directive
-  - Modifies the versioning of an existing application package: https://docs.snowflake.com/en/sql-reference/sql/alter-application-package-version
+  - Creates a custom release directive for the specified accounts : https://docs.snowflake.com/en/sql-reference/sql/alter-application-package-release-directive
 */
 
 func TestInt_ApplicationPackages(t *testing.T) {
@@ -176,7 +175,12 @@ type StagedFile struct {
 	Size int    `json:"size"`
 }
 
-func TestInt_ApplicationPackagesModifyVersion(t *testing.T) {
+type ApplicationPackageVersion struct {
+	Version string `json:"version"`
+	Patch   int    `json:"patch"`
+}
+
+func TestInt_ApplicationPackagesVersionAndReleaseDirective(t *testing.T) {
 	client := testClient(t)
 	ctx := context.Background()
 
@@ -245,6 +249,15 @@ func TestInt_ApplicationPackagesModifyVersion(t *testing.T) {
 		})
 	}
 
+	showApplicationPackageVersion := func(t *testing.T, name string) []ApplicationPackageVersion {
+		t.Helper()
+
+		var versions []ApplicationPackageVersion
+		err := client.QueryForTests(ctx, &versions, fmt.Sprintf(`SHOW VERSIONS IN APPLICATION PACKAGE "%s"`, name))
+		require.NoError(t, err)
+		return versions
+	}
+
 	t.Run("alter application package: add, patch and drop version", func(t *testing.T) {
 		e := createApplicationPackageHandle(t)
 		s := createStageHandle(t)
@@ -259,17 +272,54 @@ func TestInt_ApplicationPackagesModifyVersion(t *testing.T) {
 		r1 := sdk.NewAlterApplicationPackageRequest(id).WithAddVersion(vr)
 		err := client.ApplicationPackages.Alter(ctx, r1)
 		require.NoError(t, err)
+		versions := showApplicationPackageVersion(t, e.Name)
+		require.Equal(t, 1, len(versions))
+		require.Equal(t, version, versions[0].Version)
+		require.Equal(t, 0, versions[0].Patch)
 
-		// ALTER APPLICATION PACKAGE "hello_snowflake_package" ADD PATCH FOR VERSION V001 USING '@"terraform_test_database"."terraform_test_schema"."dev_stage"';
 		// add patch for application package version
 		pr := sdk.NewAddPatchForVersionRequest(&version, using).WithLabel(sdk.String("patch version V001"))
 		r2 := sdk.NewAlterApplicationPackageRequest(id).WithAddPatchForVersion(pr)
 		err = client.ApplicationPackages.Alter(ctx, r2)
 		require.NoError(t, err)
+		versions = showApplicationPackageVersion(t, e.Name)
+		require.Equal(t, 2, len(versions))
+		require.Equal(t, version, versions[0].Version)
+		require.Equal(t, 0, versions[0].Patch)
+		require.Equal(t, version, versions[1].Version)
+		require.Equal(t, 1, versions[1].Patch)
 
 		// drop version from application package
 		r3 := sdk.NewAlterApplicationPackageRequest(id).WithDropVersion(sdk.NewDropVersionRequest(version))
 		err = client.ApplicationPackages.Alter(ctx, r3)
+		require.NoError(t, err)
+		versions = showApplicationPackageVersion(t, e.Name)
+		require.Equal(t, 0, len(versions))
+	})
+
+	t.Run("alter application package: set default release directive", func(t *testing.T) {
+		e := createApplicationPackageHandle(t)
+		s := createStageHandle(t)
+		uploadFileForStageHandle(t, s.ID(), "manifest.yml")
+		uploadFileForStageHandle(t, s.ID(), "setup.sql")
+
+		version := "V001"
+		using := "@" + s.ID().FullyQualifiedName()
+		// add version to application package
+		id := sdk.NewAccountObjectIdentifier(e.Name)
+		vr := sdk.NewAddVersionRequest(using).WithVersionIdentifier(&version).WithLabel(sdk.String("add version V001"))
+		r1 := sdk.NewAlterApplicationPackageRequest(id).WithAddVersion(vr)
+		err := client.ApplicationPackages.Alter(ctx, r1)
+		require.NoError(t, err)
+		versions := showApplicationPackageVersion(t, e.Name)
+		require.Equal(t, 1, len(versions))
+		require.Equal(t, version, versions[0].Version)
+		require.Equal(t, 0, versions[0].Patch)
+
+		// set default release directive
+		rr := sdk.NewSetDefaultReleaseDirectiveRequest(version, 0)
+		r2 := sdk.NewAlterApplicationPackageRequest(id).WithSetDefaultReleaseDirective(rr)
+		err = client.ApplicationPackages.Alter(ctx, r2)
 		require.NoError(t, err)
 	})
 }
