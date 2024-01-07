@@ -1,7 +1,10 @@
 package testint
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
@@ -34,7 +37,7 @@ func TestInt_ApplicationPackages(t *testing.T) {
 		}
 	}
 
-	createApplicationPackageHandle := func(t *testing.T, client *sdk.Client) *sdk.ApplicationPackage {
+	createApplicationPackageHandle := func(t *testing.T) *sdk.ApplicationPackage {
 		t.Helper()
 
 		id := sdk.NewAccountObjectIdentifier(random.StringN(4))
@@ -97,7 +100,7 @@ func TestInt_ApplicationPackages(t *testing.T) {
 	})
 
 	t.Run("alter application package: set", func(t *testing.T) {
-		e := createApplicationPackageHandle(t, client)
+		e := createApplicationPackageHandle(t)
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
 		distribution := sdk.DistributionPointer(sdk.DistributionExternal)
@@ -118,7 +121,7 @@ func TestInt_ApplicationPackages(t *testing.T) {
 	})
 
 	t.Run("alter application package: unset", func(t *testing.T) {
-		e := createApplicationPackageHandle(t, client)
+		e := createApplicationPackageHandle(t)
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
 		// unset comment
@@ -137,9 +140,9 @@ func TestInt_ApplicationPackages(t *testing.T) {
 	})
 
 	t.Run("alter application package: set and unset tags", func(t *testing.T) {
-		f := createApplicationPackageHandle(t, client)
+		e := createApplicationPackageHandle(t)
+		id := sdk.NewAccountObjectIdentifier(e.Name)
 
-		id := sdk.NewAccountObjectIdentifier(f.Name)
 		setTags := []sdk.TagAssociation{
 			{
 				Name:  tagTest.ID(),
@@ -159,12 +162,114 @@ func TestInt_ApplicationPackages(t *testing.T) {
 	})
 
 	t.Run("show application package for SQL: with like", func(t *testing.T) {
-		p := createApplicationPackageHandle(t, client)
+		e := createApplicationPackageHandle(t)
 
-		packages, err := client.ApplicationPackages.Show(ctx, sdk.NewShowApplicationPackageRequest().WithLike(&sdk.Like{Pattern: &p.Name}))
+		packages, err := client.ApplicationPackages.Show(ctx, sdk.NewShowApplicationPackageRequest().WithLike(&sdk.Like{Pattern: &e.Name}))
+		require.NoError(t, err)
+		require.Equal(t, 1, len(packages))
+		require.Equal(t, *e, packages[0])
+	})
+}
+
+type StagedFile struct {
+	Name string `json:"name"`
+	Size int    `json:"size"`
+}
+
+func TestInt_ApplicationPackagesModifyVersion(t *testing.T) {
+	client := testClient(t)
+	ctx := context.Background()
+
+	databaseTest, schemaTest := testDb(t), testSchema(t)
+
+	cleanupApplicationPackageHandle := func(id sdk.AccountObjectIdentifier) func() {
+		return func() {
+			err := client.ApplicationPackages.Drop(ctx, sdk.NewDropApplicationPackageRequest(id))
+			if errors.Is(err, sdk.ErrObjectNotExistOrAuthorized) {
+				return
+			}
+			require.NoError(t, err)
+		}
+	}
+
+	createApplicationPackageHandle := func(t *testing.T) *sdk.ApplicationPackage {
+		t.Helper()
+
+		id := sdk.NewAccountObjectIdentifier("snowflake_package_test")
+		request := sdk.NewCreateApplicationPackageRequest(id).WithDistribution(sdk.DistributionPointer(sdk.DistributionInternal))
+		err := client.ApplicationPackages.Create(ctx, request)
+		require.NoError(t, err)
+		t.Cleanup(cleanupApplicationPackageHandle(id))
+
+		// grant role "ACCOUNTADMIN" on application package
+		_, err = client.ExecForTests(ctx, fmt.Sprintf(`GRANT MANAGE VERSIONS ON APPLICATION PACKAGE "%s" TO ROLE ACCOUNTADMIN;`, id.Name()))
 		require.NoError(t, err)
 
-		require.Equal(t, 1, len(packages))
-		require.Equal(t, *p, packages[0])
+		e, err := client.ApplicationPackages.ShowByID(ctx, id)
+		require.NoError(t, err)
+		return e
+	}
+
+	createStageHandle := func(t *testing.T) *sdk.Stage {
+		t.Helper()
+
+		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, "stage_test")
+		co := sdk.NewStageCopyOptionsRequest().WithOnError(sdk.NewStageCopyOnErrorOptionsRequest().WithSkipFile())
+		cr := sdk.NewCreateInternalStageRequest(id).WithCopyOptions(co)
+		err := client.Stages.CreateInternal(ctx, cr)
+		require.NoError(t, err)
+		t.Cleanup(func() {
+			err = client.Stages.Drop(ctx, sdk.NewDropStageRequest(id))
+			require.NoError(t, err)
+		})
+
+		e, err := client.Stages.ShowByID(ctx, id)
+		require.NoError(t, err)
+		return e
+	}
+
+	uploadFileForStageHandle := func(t *testing.T, id sdk.SchemaObjectIdentifier, name string) {
+		t.Helper()
+
+		tempFile := fmt.Sprintf("/tmp/%s", name)
+		f, err := os.Create(tempFile)
+		require.NoError(t, err)
+		f.Close()
+		defer os.Remove(name)
+
+		_, err = client.ExecForTests(ctx, fmt.Sprintf(`PUT file://%s @%s AUTO_COMPRESS = FALSE OVERWRITE = TRUE`, tempFile, id.FullyQualifiedName()))
+		require.NoError(t, err)
+		t.Cleanup(func() {
+			_, err = client.ExecForTests(ctx, fmt.Sprintf(`REMOVE @%s/%s`, id.FullyQualifiedName(), name))
+			require.NoError(t, err)
+		})
+	}
+
+	t.Run("alter application package: add, patch and drop version", func(t *testing.T) {
+		e := createApplicationPackageHandle(t)
+		s := createStageHandle(t)
+		uploadFileForStageHandle(t, s.ID(), "manifest.yml")
+		uploadFileForStageHandle(t, s.ID(), "setup.sql")
+
+		version := "V001"
+		using := "@" + s.ID().FullyQualifiedName()
+		// add version to application package
+		id := sdk.NewAccountObjectIdentifier(e.Name)
+		vr := sdk.NewAddVersionRequest(using).WithVersionIdentifier(&version).WithLabel(sdk.String("add version V001"))
+		r1 := sdk.NewAlterApplicationPackageRequest(id).WithAddVersion(vr)
+		err := client.ApplicationPackages.Alter(ctx, r1)
+		require.NoError(t, err)
+
+		// ALTER APPLICATION PACKAGE "hello_snowflake_package" ADD PATCH FOR VERSION V001 USING '@"terraform_test_database"."terraform_test_schema"."dev_stage"';
+		// add patch for application package version
+		pr := sdk.NewAddPatchForVersionRequest(&version, using).WithLabel(sdk.String("patch version V001"))
+		r2 := sdk.NewAlterApplicationPackageRequest(id).WithAddPatchForVersion(pr)
+		err = client.ApplicationPackages.Alter(ctx, r2)
+		require.NoError(t, err)
+
+		// drop version from application package
+		r3 := sdk.NewAlterApplicationPackageRequest(id).WithDropVersion(sdk.NewDropVersionRequest(version))
+		err = client.ApplicationPackages.Alter(ctx, r3)
+		require.NoError(t, err)
 	})
 }
