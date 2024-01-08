@@ -14,8 +14,8 @@ func NewCreateApplicationRequest(
 	return &s
 }
 
-func (s *CreateApplicationRequest) WithApplicationVersion(ApplicationVersion *ApplicationVersionRequest) *CreateApplicationRequest {
-	s.ApplicationVersion = ApplicationVersion
+func (s *CreateApplicationRequest) WithVersion(Version *ApplicationVersionRequest) *CreateApplicationRequest {
+	s.Version = Version
 	return s
 }
 
@@ -34,13 +34,12 @@ func (s *CreateApplicationRequest) WithTag(Tag []TagAssociation) *CreateApplicat
 	return s
 }
 
-func NewApplicationVersionRequest() *ApplicationVersionRequest {
-	return &ApplicationVersionRequest{}
-}
-
-func (s *ApplicationVersionRequest) WithVersionDirectory(VersionDirectory *string) *ApplicationVersionRequest {
+func NewApplicationVersionRequest(
+	VersionDirectory *string,
+) *ApplicationVersionRequest {
+	s := ApplicationVersionRequest{}
 	s.VersionDirectory = VersionDirectory
-	return s
+	return &s
 }
 
 func (s *ApplicationVersionRequest) WithVersionAndPatch(VersionAndPatch *VersionAndPatchRequest) *ApplicationVersionRequest {
@@ -50,10 +49,55 @@ func (s *ApplicationVersionRequest) WithVersionAndPatch(VersionAndPatch *Version
 
 func NewVersionAndPatchRequest(
 	Version string,
-	Patch int,
+	Patch *int,
 ) *VersionAndPatchRequest {
 	s := VersionAndPatchRequest{}
 	s.Version = Version
 	s.Patch = Patch
+	return &s
+}
+
+func NewDropApplicationRequest(
+	name AccountObjectIdentifier,
+) *DropApplicationRequest {
+	s := DropApplicationRequest{}
+	s.name = name
+	return &s
+}
+
+func (s *DropApplicationRequest) WithIfExists(IfExists *bool) *DropApplicationRequest {
+	s.IfExists = IfExists
+	return s
+}
+
+func (s *DropApplicationRequest) WithCascade(Cascade *bool) *DropApplicationRequest {
+	s.Cascade = Cascade
+	return s
+}
+
+func NewShowApplicationRequest() *ShowApplicationRequest {
+	return &ShowApplicationRequest{}
+}
+
+func (s *ShowApplicationRequest) WithLike(Like *Like) *ShowApplicationRequest {
+	s.Like = Like
+	return s
+}
+
+func (s *ShowApplicationRequest) WithStartsWith(StartsWith *string) *ShowApplicationRequest {
+	s.StartsWith = StartsWith
+	return s
+}
+
+func (s *ShowApplicationRequest) WithLimit(Limit *LimitFrom) *ShowApplicationRequest {
+	s.Limit = Limit
+	return s
+}
+
+func NewDescribeApplicationRequest(
+	name AccountObjectIdentifier,
+) *DescribeApplicationRequest {
+	s := DescribeApplicationRequest{}
+	s.name = name
 	return &s
 }

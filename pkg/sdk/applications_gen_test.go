@@ -1,13 +1,19 @@
 package sdk
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
+)
 
 func TestApplications_Create(t *testing.T) {
 	id := RandomAccountObjectIdentifier()
+	pid := RandomAccountObjectIdentifier()
 
 	defaultOpts := func() *CreateApplicationOptions {
 		return &CreateApplicationOptions{
-			name: id,
+			name:        id,
+			PackageName: pid,
 		}
 	}
 
@@ -24,18 +30,58 @@ func TestApplications_Create(t *testing.T) {
 
 	t.Run("validation: exactly one field should be present", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.ApplicationVersion = &ApplicationVersion{
+		opts.Version = &ApplicationVersion{
 			VersionAndPatch: &VersionAndPatch{
 				Version: "1.0",
-				Patch:   1,
+				Patch:   Int(1),
 			},
 			VersionDirectory: String("@test"),
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("CreateApplicationOptions.ApplicationVersion", "VersionDirectory", "VersionAndPatch"))
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("CreateApplicationOptions.Version", "VersionDirectory", "VersionAndPatch"))
 	})
 
-	// t.Run("all options", func(t *testing.T) {
-	// 	opts := defaultOpts()
-	// 	assertOptsValidAndSQLEquals(t, opts, "TODO: fill me")
-	// })
+	t.Run("all options", func(t *testing.T) {
+		tid := NewSchemaObjectIdentifier(random.StringN(4), random.StringN(4), random.StringN(4))
+
+		opts := defaultOpts()
+		opts.Comment = String("test")
+		opts.Tag = []TagAssociation{
+			{
+				Name:  tid,
+				Value: "v1",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `CREATE APPLICATION %s FROM APPLICATION PACKAGE %s COMMENT = 'test' TAG (%s = 'v1')`, id.FullyQualifiedName(), pid.FullyQualifiedName(), tid.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.Comment = String("test")
+		opts.Version = &ApplicationVersion{
+			VersionDirectory: String("@test"),
+		}
+		opts.DebugMode = Bool(true)
+		opts.Tag = []TagAssociation{
+			{
+				Name:  tid,
+				Value: "v1",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `CREATE APPLICATION %s FROM APPLICATION PACKAGE %s USING '@test' DEBUG_MODE = true COMMENT = 'test' TAG (%s = 'v1')`, id.FullyQualifiedName(), pid.FullyQualifiedName(), tid.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.Comment = String("test")
+		opts.Version = &ApplicationVersion{
+			VersionAndPatch: &VersionAndPatch{
+				Version: "V001",
+				Patch:   Int(1),
+			},
+		}
+		opts.DebugMode = Bool(true)
+		opts.Tag = []TagAssociation{
+			{
+				Name:  tid,
+				Value: "v1",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `CREATE APPLICATION %s FROM APPLICATION PACKAGE %s USING VERSION V001 PATCH 1 DEBUG_MODE = true COMMENT = 'test' TAG (%s = 'v1')`, id.FullyQualifiedName(), pid.FullyQualifiedName(), tid.FullyQualifiedName())
+	})
 }
