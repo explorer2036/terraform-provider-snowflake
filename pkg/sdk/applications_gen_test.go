@@ -86,6 +86,42 @@ func TestApplications_Create(t *testing.T) {
 	})
 }
 
+func TestApplications_Alter(t *testing.T) {
+	id := RandomAccountObjectIdentifier()
+
+	defaultOpts := func() *AlterApplicationOptions {
+		return &AlterApplicationOptions{
+			IfExists: Bool(true),
+			name:     id,
+		}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *AlterApplicationOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewAccountObjectIdentifier("")
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+		opts := defaultOpts()
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationOptions", "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
+	})
+
+	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Upgrade = Bool(true)
+		opts.Unset = &ApplicationUnset{
+			Comment: Bool(true),
+		}
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationOptions", "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
+	})
+}
+
 func TestApplications_Drop(t *testing.T) {
 	id := RandomAccountObjectIdentifier()
 
