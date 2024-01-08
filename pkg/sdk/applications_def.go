@@ -13,6 +13,16 @@ var applicationVersion = g.NewQueryStruct("ApplicationVersion").
 	OptionalQueryStructField("VersionAndPatch", versionAndPatch, g.KeywordOptions().NoQuotes()).
 	WithValidation(g.ExactlyOneValueSet, "VersionDirectory", "VersionAndPatch")
 
+var applicationSet = g.NewQueryStruct("ApplicationSet").
+	OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
+	OptionalBooleanAssignment("SHARE_EVENTS_WITH_PROVIDER", g.ParameterOptions()).
+	OptionalBooleanAssignment("DEBUG_MODE", g.ParameterOptions())
+
+var applicationUnset = g.NewQueryStruct("ApplicationUnset").
+	OptionalSQL("COMMENT").
+	OptionalSQL("SHARE_EVENTS_WITH_PROVIDER").
+	OptionalSQL("DEBUG_MODE")
+
 var ApplicationsDef = g.NewInterface(
 	"Applications",
 	"Application",
@@ -44,6 +54,33 @@ var ApplicationsDef = g.NewInterface(
 		Name().
 		OptionalSQL("CASCADE").
 		WithValidation(g.ValidIdentifier, "name"),
+).AlterOperation(
+	"https://docs.snowflake.com/en/sql-reference/sql/alter-application",
+	g.NewQueryStruct("AlterApplication").
+		Alter().
+		IfExists().
+		Name().
+		OptionalQueryStructField(
+			"Set",
+			applicationSet,
+			g.KeywordOptions().SQL("SET"),
+		).
+		OptionalQueryStructField(
+			"Unset",
+			applicationUnset,
+			g.KeywordOptions().SQL("UNSET"),
+		).
+		OptionalSQL("UPGRADE").
+		OptionalQueryStructField(
+			"UpgradeVersion",
+			applicationVersion,
+			g.KeywordOptions().SQL("UPGRADE USING"),
+		).
+		PredefinedQueryStructField("UnsetReferences", "[]string", g.KeywordOptions().SingleQuotes()).
+		OptionalSetTags().
+		OptionalUnsetTags().
+		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ExactlyOneValueSet, "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"),
 ).ShowOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/show-applications",
 	g.DbStruct("applicationRow").

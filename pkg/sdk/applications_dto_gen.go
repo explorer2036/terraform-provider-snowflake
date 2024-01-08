@@ -5,6 +5,7 @@ package sdk
 var (
 	_ optionsProvider[CreateApplicationOptions]   = new(CreateApplicationRequest)
 	_ optionsProvider[DropApplicationOptions]     = new(DropApplicationRequest)
+	_ optionsProvider[AlterApplicationOptions]    = new(AlterApplicationRequest)
 	_ optionsProvider[ShowApplicationOptions]     = new(ShowApplicationRequest)
 	_ optionsProvider[DescribeApplicationOptions] = new(DescribeApplicationRequest)
 )
@@ -32,6 +33,30 @@ type DropApplicationRequest struct {
 	IfExists *bool
 	name     AccountObjectIdentifier // required
 	Cascade  *bool
+}
+
+type AlterApplicationRequest struct {
+	IfExists        *bool
+	name            AccountObjectIdentifier // required
+	Set             *ApplicationSetRequest
+	Unset           *ApplicationUnsetRequest
+	Upgrade         *bool
+	UpgradeVersion  *ApplicationVersionRequest
+	UnsetReferences []string
+	SetTags         []TagAssociation
+	UnsetTags       []ObjectIdentifier
+}
+
+type ApplicationSetRequest struct {
+	Comment                 *string
+	ShareEventsWithProvider *bool
+	DebugMode               *bool
+}
+
+type ApplicationUnsetRequest struct {
+	Comment                 *bool
+	ShareEventsWithProvider *bool
+	DebugMode               *bool
 }
 
 type ShowApplicationRequest struct {

@@ -3,6 +3,7 @@ package sdk
 var (
 	_ validatable = new(CreateApplicationOptions)
 	_ validatable = new(DropApplicationOptions)
+	_ validatable = new(AlterApplicationOptions)
 	_ validatable = new(ShowApplicationOptions)
 	_ validatable = new(DescribeApplicationOptions)
 )
@@ -33,6 +34,25 @@ func (opts *DropApplicationOptions) validate() error {
 	var errs []error
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	return JoinErrors(errs...)
+}
+
+func (opts *AlterApplicationOptions) validate() error {
+	if opts == nil {
+		return ErrNilOptions
+	}
+	var errs []error
+	if !ValidObjectIdentifier(opts.name) {
+		errs = append(errs, ErrInvalidObjectIdentifier)
+	}
+	if !exactlyOneValueSet(opts.Set, opts.Unset, opts.Upgrade, opts.UpgradeVersion, opts.UnsetReferences, opts.SetTags, opts.UnsetTags) {
+		errs = append(errs, errExactlyOneOf("AlterApplicationOptions", "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
+	}
+	if valueSet(opts.UpgradeVersion) {
+		if !exactlyOneValueSet(opts.UpgradeVersion.VersionDirectory, opts.UpgradeVersion.VersionAndPatch) {
+			errs = append(errs, errExactlyOneOf("AlterApplicationOptions.UpgradeVersion", "VersionDirectory", "VersionAndPatch"))
+		}
 	}
 	return JoinErrors(errs...)
 }

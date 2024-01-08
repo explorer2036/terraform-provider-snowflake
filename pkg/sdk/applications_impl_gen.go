@@ -22,6 +22,11 @@ func (v *applications) Drop(ctx context.Context, request *DropApplicationRequest
 	return validateAndExec(v.client, ctx, opts)
 }
 
+func (v *applications) Alter(ctx context.Context, request *AlterApplicationRequest) error {
+	opts := request.toOpts()
+	return validateAndExec(v.client, ctx, opts)
+}
+
 func (v *applications) Show(ctx context.Context, request *ShowApplicationRequest) ([]Application, error) {
 	opts := request.toOpts()
 	dbRows, err := validateAndQuery[applicationRow](v.client, ctx, opts)
@@ -80,6 +85,45 @@ func (r *DropApplicationRequest) toOpts() *DropApplicationOptions {
 		IfExists: r.IfExists,
 		name:     r.name,
 		Cascade:  r.Cascade,
+	}
+	return opts
+}
+
+func (r *AlterApplicationRequest) toOpts() *AlterApplicationOptions {
+	opts := &AlterApplicationOptions{
+		IfExists: r.IfExists,
+		name:     r.name,
+
+		Upgrade: r.Upgrade,
+
+		UnsetReferences: r.UnsetReferences,
+		SetTags:         r.SetTags,
+		UnsetTags:       r.UnsetTags,
+	}
+	if r.Set != nil {
+		opts.Set = &ApplicationSet{
+			Comment:                 r.Set.Comment,
+			ShareEventsWithProvider: r.Set.ShareEventsWithProvider,
+			DebugMode:               r.Set.DebugMode,
+		}
+	}
+	if r.Unset != nil {
+		opts.Unset = &ApplicationUnset{
+			Comment:                 r.Unset.Comment,
+			ShareEventsWithProvider: r.Unset.ShareEventsWithProvider,
+			DebugMode:               r.Unset.DebugMode,
+		}
+	}
+	if r.UpgradeVersion != nil {
+		opts.UpgradeVersion = &ApplicationVersion{
+			VersionDirectory: r.UpgradeVersion.VersionDirectory,
+		}
+		if r.UpgradeVersion.VersionAndPatch != nil {
+			opts.UpgradeVersion.VersionAndPatch = &VersionAndPatch{
+				Version: r.UpgradeVersion.VersionAndPatch.Version,
+				Patch:   r.UpgradeVersion.VersionAndPatch.Patch,
+			}
+		}
 	}
 	return opts
 }

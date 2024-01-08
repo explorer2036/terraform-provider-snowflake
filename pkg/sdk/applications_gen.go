@@ -5,6 +5,7 @@ import "context"
 type Applications interface {
 	Create(ctx context.Context, request *CreateApplicationRequest) error
 	Drop(ctx context.Context, request *DropApplicationRequest) error
+	Alter(ctx context.Context, request *AlterApplicationRequest) error
 	Show(ctx context.Context, request *ShowApplicationRequest) ([]Application, error)
 	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*Application, error)
 	Describe(ctx context.Context, id AccountObjectIdentifier) ([]ApplicationDetail, error)
@@ -40,6 +41,32 @@ type DropApplicationOptions struct {
 	IfExists    *bool                   `ddl:"keyword" sql:"IF EXISTS"`
 	name        AccountObjectIdentifier `ddl:"identifier"`
 	Cascade     *bool                   `ddl:"keyword" sql:"CASCADE"`
+}
+
+// AlterApplicationOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-application.
+type AlterApplicationOptions struct {
+	alter           bool                    `ddl:"static" sql:"ALTER"`
+	IfExists        *bool                   `ddl:"keyword" sql:"IF EXISTS"`
+	name            AccountObjectIdentifier `ddl:"identifier"`
+	Set             *ApplicationSet         `ddl:"keyword" sql:"SET"`
+	Unset           *ApplicationUnset       `ddl:"keyword" sql:"UNSET"`
+	Upgrade         *bool                   `ddl:"keyword" sql:"UPGRADE"`
+	UpgradeVersion  *ApplicationVersion     `ddl:"keyword" sql:"UPGRADE USING"`
+	UnsetReferences []string                `ddl:"keyword,single_quotes"`
+	SetTags         []TagAssociation        `ddl:"keyword" sql:"SET TAG"`
+	UnsetTags       []ObjectIdentifier      `ddl:"keyword" sql:"UNSET TAG"`
+}
+
+type ApplicationSet struct {
+	Comment                 *string `ddl:"parameter,single_quotes" sql:"COMMENT"`
+	ShareEventsWithProvider *bool   `ddl:"parameter" sql:"SHARE_EVENTS_WITH_PROVIDER"`
+	DebugMode               *bool   `ddl:"parameter" sql:"DEBUG_MODE"`
+}
+
+type ApplicationUnset struct {
+	Comment                 *bool `ddl:"keyword" sql:"COMMENT"`
+	ShareEventsWithProvider *bool `ddl:"keyword" sql:"SHARE_EVENTS_WITH_PROVIDER"`
+	DebugMode               *bool `ddl:"keyword" sql:"DEBUG_MODE"`
 }
 
 // ShowApplicationOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-applications.
