@@ -5,7 +5,7 @@ import "context"
 type Applications interface {
 	Create(ctx context.Context, request *CreateApplicationRequest) error
 	Drop(ctx context.Context, request *DropApplicationRequest) error
-	Show(ctx context.Context, request *ShowApplicationRequest) ([]ApplicationPackage, error)
+	Show(ctx context.Context, request *ShowApplicationRequest) ([]Application, error)
 	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*Application, error)
 	Describe(ctx context.Context, id AccountObjectIdentifier) ([]ApplicationDetail, error)
 }
@@ -51,7 +51,7 @@ type ShowApplicationOptions struct {
 	Limit        *LimitFrom `ddl:"keyword" sql:"LIMIT"`
 }
 
-type applicationPackageRow struct {
+type applicationRow struct {
 	CreatedOn     string `db:"created_on"`
 	Name          string `db:"name"`
 	IsDefault     string `db:"is_default"`
@@ -67,7 +67,7 @@ type applicationPackageRow struct {
 	RetentionTime int    `db:"retention_time"`
 }
 
-type ApplicationPackage struct {
+type Application struct {
 	CreatedOn     string
 	Name          string
 	IsDefault     bool

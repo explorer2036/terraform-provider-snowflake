@@ -46,7 +46,7 @@ var ApplicationsDef = g.NewInterface(
 		WithValidation(g.ValidIdentifier, "name"),
 ).ShowOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/show-applications",
-	g.DbStruct("applicationPackageRow").
+	g.DbStruct("applicationRow").
 		Field("created_on", "string").
 		Field("name", "string").
 		Field("is_default", "string").
@@ -60,7 +60,7 @@ var ApplicationsDef = g.NewInterface(
 		Field("patch", "int").
 		Field("options", "string").
 		Field("retention_time", "int"),
-	g.PlainStruct("ApplicationPackage").
+	g.PlainStruct("Application").
 		Field("CreatedOn", "string").
 		Field("Name", "string").
 		Field("IsDefault", "bool").

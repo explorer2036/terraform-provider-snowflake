@@ -85,3 +85,85 @@ func TestApplications_Create(t *testing.T) {
 		assertOptsValidAndSQLEquals(t, opts, `CREATE APPLICATION %s FROM APPLICATION PACKAGE %s USING VERSION V001 PATCH 1 DEBUG_MODE = true COMMENT = 'test' TAG (%s = 'v1')`, id.FullyQualifiedName(), pid.FullyQualifiedName(), tid.FullyQualifiedName())
 	})
 }
+
+func TestApplications_Drop(t *testing.T) {
+	id := RandomAccountObjectIdentifier()
+
+	defaultOpts := func() *DropApplicationOptions {
+		return &DropApplicationOptions{
+			name: id,
+		}
+	}
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *DropApplicationOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewAccountObjectIdentifier("")
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.IfExists = Bool(true)
+		opts.Cascade = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `DROP APPLICATION IF EXISTS %s CASCADE`, id.FullyQualifiedName())
+	})
+}
+
+func TestApplications_Describe(t *testing.T) {
+	id := RandomAccountObjectIdentifier()
+
+	defaultOpts := func() *DescribeApplicationOptions {
+		return &DescribeApplicationOptions{
+			name: id,
+		}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		opts := (*DescribeApplicationOptions)(nil)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewAccountObjectIdentifier("")
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		assertOptsValidAndSQLEquals(t, opts, `DESCRIBE APPLICATION %s`, id.FullyQualifiedName())
+	})
+}
+
+func TestApplications_Show(t *testing.T) {
+	defaultOpts := func() *ShowApplicationOptions {
+		return &ShowApplicationOptions{}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *ShowApplicationOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("basic", func(t *testing.T) {
+		opts := defaultOpts()
+		assertOptsValidAndSQLEquals(t, opts, `SHOW APPLICATIONS`)
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Like = &Like{
+			Pattern: String("pattern"),
+		}
+		opts.StartsWith = String("A")
+		opts.Limit = &LimitFrom{
+			Rows: Int(1),
+			From: String("B"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `SHOW APPLICATIONS LIKE 'pattern' STARTS WITH 'A' LIMIT 1 FROM 'B'`)
+	})
+}

@@ -22,19 +22,19 @@ func (v *applications) Drop(ctx context.Context, request *DropApplicationRequest
 	return validateAndExec(v.client, ctx, opts)
 }
 
-func (v *applications) Show(ctx context.Context, request *ShowApplicationRequest) ([]ApplicationPackage, error) {
+func (v *applications) Show(ctx context.Context, request *ShowApplicationRequest) ([]Application, error) {
 	opts := request.toOpts()
-	dbRows, err := validateAndQuery[applicationPackageRow](v.client, ctx, opts)
+	dbRows, err := validateAndQuery[applicationRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err
 	}
-	resultList := convertRows[applicationPackageRow, ApplicationPackage](dbRows)
+	resultList := convertRows[applicationRow, Application](dbRows)
 	return resultList, nil
 }
 
 func (v *applications) ShowByID(ctx context.Context, id AccountObjectIdentifier) (*Application, error) {
-	// TODO: adjust request if e.g. LIKE is supported for the resource
-	applications, err := v.Show(ctx, NewShowApplicationRequest())
+	request := NewShowApplicationRequest().WithLike(&Like{String(id.Name())})
+	applications, err := v.Show(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -93,9 +93,22 @@ func (r *ShowApplicationRequest) toOpts() *ShowApplicationOptions {
 	return opts
 }
 
-func (r applicationPackageRow) convert() *ApplicationPackage {
-	// TODO: Mapping
-	return &ApplicationPackage{}
+func (r applicationRow) convert() *Application {
+	return &Application{
+		CreatedOn:     r.CreatedOn,
+		Name:          r.Name,
+		IsDefault:     r.IsDefault == "Y",
+		IsCurrent:     r.IsCurrent == "Y",
+		SourceType:    r.SourceType,
+		Source:        r.Source,
+		Owner:         r.Owner,
+		Comment:       r.Comment,
+		Version:       r.Version,
+		Label:         r.Label,
+		Patch:         r.Patch,
+		Options:       r.Options,
+		RetentionTime: r.RetentionTime,
+	}
 }
 
 func (r *DescribeApplicationRequest) toOpts() *DescribeApplicationOptions {
@@ -106,6 +119,8 @@ func (r *DescribeApplicationRequest) toOpts() *DescribeApplicationOptions {
 }
 
 func (r applicationDetailRow) convert() *ApplicationDetail {
-	// TODO: Mapping
-	return &ApplicationDetail{}
+	return &ApplicationDetail{
+		Property: r.Property,
+		Value:    r.Value,
+	}
 }
