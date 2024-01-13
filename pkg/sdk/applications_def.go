@@ -9,7 +9,7 @@ var versionAndPatch = g.NewQueryStruct("VersionAndPatch").
 	OptionalNumberAssignment("PATCH", g.ParameterOptions().NoEquals().Required())
 
 var applicationVersion = g.NewQueryStruct("ApplicationVersion").
-	OptionalText("VersionDirectory", g.KeywordOptions().SingleQuotes().Required()).
+	OptionalText("VersionDirectory", g.KeywordOptions().SingleQuotes()).
 	OptionalQueryStructField("VersionAndPatch", versionAndPatch, g.KeywordOptions().NoQuotes()).
 	WithValidation(g.ExactlyOneValueSet, "VersionDirectory", "VersionAndPatch")
 

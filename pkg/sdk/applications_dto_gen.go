@@ -20,7 +20,7 @@ type CreateApplicationRequest struct {
 }
 
 type ApplicationVersionRequest struct {
-	VersionDirectory *string // required
+	VersionDirectory *string
 	VersionAndPatch  *VersionAndPatchRequest
 }
 

@@ -34,12 +34,13 @@ func (s *CreateApplicationRequest) WithTag(Tag []TagAssociation) *CreateApplicat
 	return s
 }
 
-func NewApplicationVersionRequest(
-	VersionDirectory *string,
-) *ApplicationVersionRequest {
-	s := ApplicationVersionRequest{}
+func NewApplicationVersionRequest() *ApplicationVersionRequest {
+	return &ApplicationVersionRequest{}
+}
+
+func (s *ApplicationVersionRequest) WithVersionDirectory(VersionDirectory *string) *ApplicationVersionRequest {
 	s.VersionDirectory = VersionDirectory
-	return &s
+	return s
 }
 
 func (s *ApplicationVersionRequest) WithVersionAndPatch(VersionAndPatch *VersionAndPatchRequest) *ApplicationVersionRequest {
