@@ -46,13 +46,14 @@ type DropApplicationOptions struct {
 // AlterApplicationOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-application.
 type AlterApplicationOptions struct {
 	alter           bool                    `ddl:"static" sql:"ALTER"`
+	application     bool                    `ddl:"static" sql:"APPLICATION"`
 	IfExists        *bool                   `ddl:"keyword" sql:"IF EXISTS"`
 	name            AccountObjectIdentifier `ddl:"identifier"`
 	Set             *ApplicationSet         `ddl:"keyword" sql:"SET"`
 	Unset           *ApplicationUnset       `ddl:"keyword" sql:"UNSET"`
 	Upgrade         *bool                   `ddl:"keyword" sql:"UPGRADE"`
 	UpgradeVersion  *ApplicationVersion     `ddl:"keyword" sql:"UPGRADE USING"`
-	UnsetReferences []string                `ddl:"keyword,single_quotes"`
+	UnsetReferences []ApplicationReference  `ddl:"parameter,parentheses,no_equals" sql:"UNSET REFERENCES"`
 	SetTags         []TagAssociation        `ddl:"keyword" sql:"SET TAG"`
 	UnsetTags       []ObjectIdentifier      `ddl:"keyword" sql:"UNSET TAG"`
 }
@@ -67,6 +68,10 @@ type ApplicationUnset struct {
 	Comment                 *bool `ddl:"keyword" sql:"COMMENT"`
 	ShareEventsWithProvider *bool `ddl:"keyword" sql:"SHARE_EVENTS_WITH_PROVIDER"`
 	DebugMode               *bool `ddl:"keyword" sql:"DEBUG_MODE"`
+}
+
+type ApplicationReference struct {
+	Reference string `ddl:"keyword,single_quotes"`
 }
 
 // ShowApplicationOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-applications.

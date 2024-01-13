@@ -23,6 +23,8 @@ var applicationUnset = g.NewQueryStruct("ApplicationUnset").
 	OptionalSQL("SHARE_EVENTS_WITH_PROVIDER").
 	OptionalSQL("DEBUG_MODE")
 
+var applicationReferences = g.NewQueryStruct("ApplicationReference").Text("Reference", g.KeywordOptions().SingleQuotes())
+
 var ApplicationsDef = g.NewInterface(
 	"Applications",
 	"Application",
@@ -58,6 +60,7 @@ var ApplicationsDef = g.NewInterface(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-application",
 	g.NewQueryStruct("AlterApplication").
 		Alter().
+		SQL("APPLICATION").
 		IfExists().
 		Name().
 		OptionalQueryStructField(
@@ -76,7 +79,11 @@ var ApplicationsDef = g.NewInterface(
 			applicationVersion,
 			g.KeywordOptions().SQL("UPGRADE USING"),
 		).
-		PredefinedQueryStructField("UnsetReferences", "[]string", g.KeywordOptions().SingleQuotes()).
+		ListQueryStructField(
+			"UnsetReferences",
+			applicationReferences,
+			g.ParameterOptions().Parentheses().NoEquals().SQL("UNSET REFERENCES"),
+		).
 		OptionalSetTags().
 		OptionalUnsetTags().
 		WithValidation(g.ValidIdentifier, "name").

@@ -96,9 +96,8 @@ func (r *AlterApplicationRequest) toOpts() *AlterApplicationOptions {
 
 		Upgrade: r.Upgrade,
 
-		UnsetReferences: r.UnsetReferences,
-		SetTags:         r.SetTags,
-		UnsetTags:       r.UnsetTags,
+		SetTags:   r.SetTags,
+		UnsetTags: r.UnsetTags,
 	}
 	if r.Set != nil {
 		opts.Set = &ApplicationSet{
@@ -124,6 +123,15 @@ func (r *AlterApplicationRequest) toOpts() *AlterApplicationOptions {
 				Patch:   r.UpgradeVersion.VersionAndPatch.Patch,
 			}
 		}
+	}
+	if r.UnsetReferences != nil {
+		s := make([]ApplicationReference, len(r.UnsetReferences))
+		for i, v := range r.UnsetReferences {
+			s[i] = ApplicationReference{
+				Reference: v.Reference,
+			}
+		}
+		opts.UnsetReferences = s
 	}
 	return opts
 }

@@ -108,7 +108,7 @@ func (s *AlterApplicationRequest) WithUpgradeVersion(UpgradeVersion *Application
 	return s
 }
 
-func (s *AlterApplicationRequest) WithUnsetReferences(UnsetReferences []string) *AlterApplicationRequest {
+func (s *AlterApplicationRequest) WithUnsetReferences(UnsetReferences []ApplicationReferenceRequest) *AlterApplicationRequest {
 	s.UnsetReferences = UnsetReferences
 	return s
 }
@@ -158,6 +158,15 @@ func (s *ApplicationUnsetRequest) WithShareEventsWithProvider(ShareEventsWithPro
 
 func (s *ApplicationUnsetRequest) WithDebugMode(DebugMode *bool) *ApplicationUnsetRequest {
 	s.DebugMode = DebugMode
+	return s
+}
+
+func NewApplicationReferenceRequest() *ApplicationReferenceRequest {
+	return &ApplicationReferenceRequest{}
+}
+
+func (s *ApplicationReferenceRequest) WithReference(Reference string) *ApplicationReferenceRequest {
+	s.Reference = Reference
 	return s
 }
 

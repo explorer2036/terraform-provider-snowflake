@@ -91,8 +91,7 @@ func TestApplications_Alter(t *testing.T) {
 
 	defaultOpts := func() *AlterApplicationOptions {
 		return &AlterApplicationOptions{
-			IfExists: Bool(true),
-			name:     id,
+			name: id,
 		}
 	}
 
@@ -119,6 +118,84 @@ func TestApplications_Alter(t *testing.T) {
 			Comment: Bool(true),
 		}
 		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationOptions", "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
+	})
+
+	t.Run("alter: set options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.IfExists = Bool(true)
+		opts.Set = &ApplicationSet{
+			ShareEventsWithProvider: Bool(true),
+			DebugMode:               Bool(true),
+			Comment:                 String("test"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION IF EXISTS %s SET COMMENT = 'test' SHARE_EVENTS_WITH_PROVIDER = true DEBUG_MODE = true`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: unset options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.IfExists = Bool(true)
+		opts.Unset = &ApplicationUnset{
+			Comment:                 Bool(true),
+			ShareEventsWithProvider: Bool(true),
+			DebugMode:               Bool(true),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION IF EXISTS %s UNSET COMMENT SHARE_EVENTS_WITH_PROVIDER DEBUG_MODE`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: set tags", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.SetTags = []TagAssociation{
+			{
+				Name:  NewAccountObjectIdentifier("tag1"),
+				Value: "value1",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s SET TAG "tag1" = 'value1'`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: unset tags", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.UnsetTags = []ObjectIdentifier{
+			NewAccountObjectIdentifier("tag1"),
+			NewAccountObjectIdentifier("tag2"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s UNSET TAG "tag1", "tag2"`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: upgrade", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Upgrade = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s UPGRADE`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: upgrade version", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.UpgradeVersion = &ApplicationVersion{
+			VersionDirectory: String("@test"),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s UPGRADE USING '@test'`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.UpgradeVersion = &ApplicationVersion{
+			VersionAndPatch: &VersionAndPatch{
+				Version: "V001",
+				Patch:   Int(1),
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s UPGRADE USING VERSION V001 PATCH 1`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: unset references", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.UnsetReferences = []ApplicationReference{
+			{
+				Reference: "ref1",
+			},
+			{
+				Reference: "ref2",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s UNSET REFERENCES ('ref1', 'ref2')`, id.FullyQualifiedName())
 	})
 }
 
