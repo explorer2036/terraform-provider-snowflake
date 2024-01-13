@@ -13,6 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+/*
+ * todo: add integration test for `ALTER APPLICATION <name> UPGRADE`
+ */
+
 func TestInt_Applications(t *testing.T) {
 	client := testClient(t)
 	ctx := testContext(t)
@@ -70,21 +74,29 @@ func TestInt_Applications(t *testing.T) {
 		return stage
 	}
 
-	createApplicationHandle := func(t *testing.T, applicationPackageName, version string, patch int, debug bool) *sdk.Application {
+	createApplicationHandle := func(t *testing.T, applicationPackageName, version string, patch int, versionDirectory bool, debug bool, addPatch bool) (*sdk.Stage, *sdk.Application) {
 		t.Helper()
 
-		createApplicationPackageHandle(t, applicationPackageName, version, patch, false)
+		stage := createApplicationPackageHandle(t, applicationPackageName, version, patch, false)
 
 		id := sdk.NewAccountObjectIdentifier(random.StringN(4))
 		vr := sdk.NewApplicationVersionRequest().WithVersionAndPatch(sdk.NewVersionAndPatchRequest(version, &patch))
+		if versionDirectory {
+			vr = sdk.NewApplicationVersionRequest().WithVersionDirectory(sdk.String("@" + stage.ID().FullyQualifiedName()))
+		}
 		request := sdk.NewCreateApplicationRequest(id, sdk.NewAccountObjectIdentifier(applicationPackageName)).WithVersion(vr).WithDebugMode(&debug)
 		err := client.Applications.Create(ctx, request)
 		require.NoError(t, err)
 		t.Cleanup(cleanupApplicationHandle(id))
 
-		e, err := client.Applications.ShowByID(ctx, id)
+		if addPatch {
+			_, err := client.ExecForTests(ctx, fmt.Sprintf(`ALTER APPLICATION PACKAGE "%s" ADD PATCH FOR VERSION %s USING '@%s'`, applicationPackageName, version, stage.ID().FullyQualifiedName()))
+			require.NoError(t, err)
+		}
+
+		application, err := client.Applications.ShowByID(ctx, id)
 		require.NoError(t, err)
-		return e
+		return stage, application
 	}
 
 	assertApplication := func(t *testing.T, id sdk.AccountObjectIdentifier, applicationPackageName, version string, patch int) {
@@ -199,7 +211,7 @@ func TestInt_Applications(t *testing.T) {
 
 	t.Run("show application: with like", func(t *testing.T) {
 		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
-		e := createApplicationHandle(t, applicationPackageName, version, patch, true)
+		_, e := createApplicationHandle(t, applicationPackageName, version, patch, false, true, false)
 		packages, err := client.Applications.Show(ctx, sdk.NewShowApplicationRequest().WithLike(&sdk.Like{Pattern: &e.Name}))
 		require.NoError(t, err)
 		require.Equal(t, 1, len(packages))
@@ -208,7 +220,7 @@ func TestInt_Applications(t *testing.T) {
 
 	t.Run("alter application: set", func(t *testing.T) {
 		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
-		e := createApplicationHandle(t, applicationPackageName, version, patch, false)
+		_, e := createApplicationHandle(t, applicationPackageName, version, patch, false, true, false)
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
 		comment, mode := random.StringN(4), true
@@ -234,7 +246,7 @@ func TestInt_Applications(t *testing.T) {
 
 	t.Run("alter application: unset", func(t *testing.T) {
 		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
-		e := createApplicationHandle(t, applicationPackageName, version, patch, true)
+		_, e := createApplicationHandle(t, applicationPackageName, version, patch, false, true, false)
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
 		// unset coment
@@ -258,7 +270,7 @@ func TestInt_Applications(t *testing.T) {
 
 	t.Run("alter application: set and unset tags", func(t *testing.T) {
 		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
-		e := createApplicationHandle(t, applicationPackageName, version, patch, true)
+		_, e := createApplicationHandle(t, applicationPackageName, version, patch, false, true, false)
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
 		setTags := []sdk.TagAssociation{
@@ -279,9 +291,42 @@ func TestInt_Applications(t *testing.T) {
 		assertApplication(t, id, applicationPackageName, version, patch)
 	})
 
+	t.Run("alter application: upgrade with version and patch", func(t *testing.T) {
+		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+		_, e := createApplicationHandle(t, applicationPackageName, version, patch, false, true, true)
+		id := sdk.NewAccountObjectIdentifier(e.Name)
+
+		vr := sdk.NewVersionAndPatchRequest(version, sdk.Int(patch+1))
+		av := sdk.NewApplicationVersionRequest().WithVersionAndPatch(vr)
+		err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUpgradeVersion(av))
+		require.NoError(t, err)
+		assertApplication(t, id, applicationPackageName, version, patch+1)
+	})
+
+	t.Run("alter application: upgrade with version directory", func(t *testing.T) {
+		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+		s, e := createApplicationHandle(t, applicationPackageName, version, patch, true, true, false)
+		id := sdk.NewAccountObjectIdentifier(e.Name)
+
+		av := sdk.NewApplicationVersionRequest().WithVersionDirectory(sdk.String("@" + s.ID().FullyQualifiedName()))
+		err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUpgradeVersion(av))
+		require.NoError(t, err)
+		assertApplication(t, id, applicationPackageName, "UNVERSIONED", patch+1)
+	})
+
+	t.Run("alter application: unset references", func(t *testing.T) {
+		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+		_, e := createApplicationHandle(t, applicationPackageName, version, patch, false, true, false)
+		id := sdk.NewAccountObjectIdentifier(e.Name)
+
+		err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUnsetReferences(sdk.NewApplicationReferencesRequest()))
+		require.NoError(t, err)
+		assertApplication(t, id, applicationPackageName, version, patch)
+	})
+
 	t.Run("describe application", func(t *testing.T) {
 		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
-		e := createApplicationHandle(t, applicationPackageName, version, patch, true)
+		_, e := createApplicationHandle(t, applicationPackageName, version, patch, false, true, false)
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
 		details, err := client.Applications.Describe(ctx, id)

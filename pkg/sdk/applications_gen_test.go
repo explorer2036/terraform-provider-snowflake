@@ -191,12 +191,18 @@ func TestApplications_Alter(t *testing.T) {
 
 	t.Run("alter: unset references", func(t *testing.T) {
 		opts := defaultOpts()
-		opts.UnsetReferences = []ApplicationReference{
-			{
-				Reference: "ref1",
-			},
-			{
-				Reference: "ref2",
+		opts.UnsetReferences = &ApplicationReferences{}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s UNSET REFERENCES`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.UnsetReferences = &ApplicationReferences{
+			References: []ApplicationReference{
+				{
+					Reference: "ref1",
+				},
+				{
+					Reference: "ref2",
+				},
 			},
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION %s UNSET REFERENCES ('ref1', 'ref2')`, id.FullyQualifiedName())

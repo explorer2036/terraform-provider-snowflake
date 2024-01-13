@@ -44,7 +44,7 @@ type AlterApplicationRequest struct {
 	UnsetDebugMode               *bool
 	Upgrade                      *bool
 	UpgradeVersion               *ApplicationVersionRequest
-	UnsetReferences              []ApplicationReferenceRequest
+	UnsetReferences              *ApplicationReferencesRequest
 	SetTags                      []TagAssociation
 	UnsetTags                    []ObjectIdentifier
 }
@@ -53,6 +53,10 @@ type ApplicationSetRequest struct {
 	Comment                 *string
 	ShareEventsWithProvider *bool
 	DebugMode               *bool
+}
+
+type ApplicationReferencesRequest struct {
+	References []ApplicationReferenceRequest
 }
 
 type ApplicationReferenceRequest struct {

@@ -22,7 +22,11 @@ var applicationSet = g.NewQueryStruct("ApplicationSet").
 	OptionalBooleanAssignment("SHARE_EVENTS_WITH_PROVIDER", g.ParameterOptions()).
 	OptionalBooleanAssignment("DEBUG_MODE", g.ParameterOptions())
 
-var applicationReferences = g.NewQueryStruct("ApplicationReference").Text("Reference", g.KeywordOptions().SingleQuotes())
+var applicationReferences = g.NewQueryStruct("ApplicationReferences").ListQueryStructField(
+	"References",
+	g.NewQueryStruct("ApplicationReference").Text("Reference", g.KeywordOptions().SingleQuotes()),
+	g.ParameterOptions().Parentheses().NoEquals(),
+)
 
 var ApplicationsDef = g.NewInterface(
 	"Applications",
@@ -76,10 +80,10 @@ var ApplicationsDef = g.NewInterface(
 			applicationVersion,
 			g.KeywordOptions().SQL("UPGRADE USING"),
 		).
-		ListQueryStructField(
+		OptionalQueryStructField(
 			"UnsetReferences",
 			applicationReferences,
-			g.ParameterOptions().Parentheses().NoEquals().SQL("UNSET REFERENCES"),
+			g.KeywordOptions().SQL("UNSET REFERENCES"),
 		).
 		OptionalSetTags().
 		OptionalUnsetTags().
