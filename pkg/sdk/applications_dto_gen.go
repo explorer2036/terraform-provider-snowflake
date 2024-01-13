@@ -36,25 +36,21 @@ type DropApplicationRequest struct {
 }
 
 type AlterApplicationRequest struct {
-	IfExists        *bool
-	name            AccountObjectIdentifier // required
-	Set             *ApplicationSetRequest
-	Unset           *ApplicationUnsetRequest
-	Upgrade         *bool
-	UpgradeVersion  *ApplicationVersionRequest
-	UnsetReferences []ApplicationReferenceRequest
-	SetTags         []TagAssociation
-	UnsetTags       []ObjectIdentifier
+	IfExists                     *bool
+	name                         AccountObjectIdentifier // required
+	Set                          *ApplicationSetRequest
+	UnsetComment                 *bool
+	UnsetShareEventsWithProvider *bool
+	UnsetDebugMode               *bool
+	Upgrade                      *bool
+	UpgradeVersion               *ApplicationVersionRequest
+	UnsetReferences              []ApplicationReferenceRequest
+	SetTags                      []TagAssociation
+	UnsetTags                    []ObjectIdentifier
 }
 
 type ApplicationSetRequest struct {
 	Comment                 *string
-	ShareEventsWithProvider *bool
-	DebugMode               *bool
-}
-
-type ApplicationUnsetRequest struct {
-	Comment                 *bool
 	ShareEventsWithProvider *bool
 	DebugMode               *bool
 }

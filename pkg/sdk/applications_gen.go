@@ -48,29 +48,25 @@ type DropApplicationOptions struct {
 
 // AlterApplicationOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-application.
 type AlterApplicationOptions struct {
-	alter           bool                    `ddl:"static" sql:"ALTER"`
-	application     bool                    `ddl:"static" sql:"APPLICATION"`
-	IfExists        *bool                   `ddl:"keyword" sql:"IF EXISTS"`
-	name            AccountObjectIdentifier `ddl:"identifier"`
-	Set             *ApplicationSet         `ddl:"keyword" sql:"SET"`
-	Unset           *ApplicationUnset       `ddl:"keyword" sql:"UNSET"`
-	Upgrade         *bool                   `ddl:"keyword" sql:"UPGRADE"`
-	UpgradeVersion  *ApplicationVersion     `ddl:"keyword" sql:"UPGRADE USING"`
-	UnsetReferences []ApplicationReference  `ddl:"parameter,parentheses,no_equals" sql:"UNSET REFERENCES"`
-	SetTags         []TagAssociation        `ddl:"keyword" sql:"SET TAG"`
-	UnsetTags       []ObjectIdentifier      `ddl:"keyword" sql:"UNSET TAG"`
+	alter                        bool                    `ddl:"static" sql:"ALTER"`
+	application                  bool                    `ddl:"static" sql:"APPLICATION"`
+	IfExists                     *bool                   `ddl:"keyword" sql:"IF EXISTS"`
+	name                         AccountObjectIdentifier `ddl:"identifier"`
+	Set                          *ApplicationSet         `ddl:"keyword" sql:"SET"`
+	UnsetComment                 *bool                   `ddl:"keyword" sql:"UNSET COMMENT"`
+	UnsetShareEventsWithProvider *bool                   `ddl:"keyword" sql:"UNSET SHARE_EVENTS_WITH_PROVIDER"`
+	UnsetDebugMode               *bool                   `ddl:"keyword" sql:"UNSET DEBUG_MODE"`
+	Upgrade                      *bool                   `ddl:"keyword" sql:"UPGRADE"`
+	UpgradeVersion               *ApplicationVersion     `ddl:"keyword" sql:"UPGRADE USING"`
+	UnsetReferences              []ApplicationReference  `ddl:"parameter,parentheses,no_equals" sql:"UNSET REFERENCES"`
+	SetTags                      []TagAssociation        `ddl:"keyword" sql:"SET TAG"`
+	UnsetTags                    []ObjectIdentifier      `ddl:"keyword" sql:"UNSET TAG"`
 }
 
 type ApplicationSet struct {
 	Comment                 *string `ddl:"parameter,single_quotes" sql:"COMMENT"`
 	ShareEventsWithProvider *bool   `ddl:"parameter" sql:"SHARE_EVENTS_WITH_PROVIDER"`
 	DebugMode               *bool   `ddl:"parameter" sql:"DEBUG_MODE"`
-}
-
-type ApplicationUnset struct {
-	Comment                 *bool `ddl:"keyword" sql:"COMMENT"`
-	ShareEventsWithProvider *bool `ddl:"keyword" sql:"SHARE_EVENTS_WITH_PROVIDER"`
-	DebugMode               *bool `ddl:"keyword" sql:"DEBUG_MODE"`
 }
 
 type ApplicationReference struct {

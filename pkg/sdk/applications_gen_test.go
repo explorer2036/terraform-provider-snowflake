@@ -108,16 +108,14 @@ func TestApplications_Alter(t *testing.T) {
 
 	t.Run("validation: exactly one field should be present", func(t *testing.T) {
 		opts := defaultOpts()
-		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationOptions", "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationOptions", "Set", "UnsetComment", "UnsetShareEventsWithProvider", "UnsetDebugMode", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
 	})
 
 	t.Run("validation: exactly one field should be present", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Upgrade = Bool(true)
-		opts.Unset = &ApplicationUnset{
-			Comment: Bool(true),
-		}
-		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationOptions", "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
+		opts.UnsetComment = Bool(true)
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterApplicationOptions", "Set", "UnsetComment", "UnsetShareEventsWithProvider", "UnsetDebugMode", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"))
 	})
 
 	t.Run("alter: set options", func(t *testing.T) {
@@ -134,12 +132,18 @@ func TestApplications_Alter(t *testing.T) {
 	t.Run("alter: unset options", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.IfExists = Bool(true)
-		opts.Unset = &ApplicationUnset{
-			Comment:                 Bool(true),
-			ShareEventsWithProvider: Bool(true),
-			DebugMode:               Bool(true),
-		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION IF EXISTS %s UNSET COMMENT SHARE_EVENTS_WITH_PROVIDER DEBUG_MODE`, id.FullyQualifiedName())
+		opts.UnsetComment = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION IF EXISTS %s UNSET COMMENT`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.IfExists = Bool(true)
+		opts.UnsetShareEventsWithProvider = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION IF EXISTS %s UNSET SHARE_EVENTS_WITH_PROVIDER`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.IfExists = Bool(true)
+		opts.UnsetDebugMode = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `ALTER APPLICATION IF EXISTS %s UNSET DEBUG_MODE`, id.FullyQualifiedName())
 	})
 
 	t.Run("alter: set tags", func(t *testing.T) {

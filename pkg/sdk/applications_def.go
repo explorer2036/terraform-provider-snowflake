@@ -22,11 +22,6 @@ var applicationSet = g.NewQueryStruct("ApplicationSet").
 	OptionalBooleanAssignment("SHARE_EVENTS_WITH_PROVIDER", g.ParameterOptions()).
 	OptionalBooleanAssignment("DEBUG_MODE", g.ParameterOptions())
 
-var applicationUnset = g.NewQueryStruct("ApplicationUnset").
-	OptionalSQL("COMMENT").
-	OptionalSQL("SHARE_EVENTS_WITH_PROVIDER").
-	OptionalSQL("DEBUG_MODE")
-
 var applicationReferences = g.NewQueryStruct("ApplicationReference").Text("Reference", g.KeywordOptions().SingleQuotes())
 
 var ApplicationsDef = g.NewInterface(
@@ -72,11 +67,9 @@ var ApplicationsDef = g.NewInterface(
 			applicationSet,
 			g.KeywordOptions().SQL("SET"),
 		).
-		OptionalQueryStructField(
-			"Unset",
-			applicationUnset,
-			g.KeywordOptions().SQL("UNSET"),
-		).
+		OptionalSQL("UNSET COMMENT").
+		OptionalSQL("UNSET SHARE_EVENTS_WITH_PROVIDER").
+		OptionalSQL("UNSET DEBUG_MODE").
 		OptionalSQL("UPGRADE").
 		OptionalQueryStructField(
 			"UpgradeVersion",
@@ -91,7 +84,7 @@ var ApplicationsDef = g.NewInterface(
 		OptionalSetTags().
 		OptionalUnsetTags().
 		WithValidation(g.ValidIdentifier, "name").
-		WithValidation(g.ExactlyOneValueSet, "Set", "Unset", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"),
+		WithValidation(g.ExactlyOneValueSet, "Set", "UnsetComment", "UnsetShareEventsWithProvider", "UnsetDebugMode", "Upgrade", "UpgradeVersion", "UnsetReferences", "SetTags", "UnsetTags"),
 ).ShowOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/show-applications",
 	g.DbStruct("applicationRow").

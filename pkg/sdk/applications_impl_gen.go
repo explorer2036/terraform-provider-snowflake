@@ -94,7 +94,10 @@ func (r *AlterApplicationRequest) toOpts() *AlterApplicationOptions {
 		IfExists: r.IfExists,
 		name:     r.name,
 
-		Upgrade: r.Upgrade,
+		UnsetComment:                 r.UnsetComment,
+		UnsetShareEventsWithProvider: r.UnsetShareEventsWithProvider,
+		UnsetDebugMode:               r.UnsetDebugMode,
+		Upgrade:                      r.Upgrade,
 
 		SetTags:   r.SetTags,
 		UnsetTags: r.UnsetTags,
@@ -104,13 +107,6 @@ func (r *AlterApplicationRequest) toOpts() *AlterApplicationOptions {
 			Comment:                 r.Set.Comment,
 			ShareEventsWithProvider: r.Set.ShareEventsWithProvider,
 			DebugMode:               r.Set.DebugMode,
-		}
-	}
-	if r.Unset != nil {
-		opts.Unset = &ApplicationUnset{
-			Comment:                 r.Unset.Comment,
-			ShareEventsWithProvider: r.Unset.ShareEventsWithProvider,
-			DebugMode:               r.Unset.DebugMode,
 		}
 	}
 	if r.UpgradeVersion != nil {
