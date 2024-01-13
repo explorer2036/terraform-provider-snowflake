@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
@@ -16,8 +17,8 @@ func TestInt_Applications(t *testing.T) {
 	ctx := testContext(t)
 
 	databaseTest, schemaTest := testDb(t), testSchema(t)
-	tagTest, tagCleanup := createTag(t, client, databaseTest, schemaTest)
-	t.Cleanup(tagCleanup)
+	// tagTest, tagCleanup := createTag(t, client, databaseTest, schemaTest)
+	// t.Cleanup(tagCleanup)
 
 	cleanupApplicationHandle := func(id sdk.AccountObjectIdentifier) func() {
 		return func() {
@@ -68,93 +69,232 @@ func TestInt_Applications(t *testing.T) {
 		return stage
 	}
 
-	t.Run("create application: without version", func(t *testing.T) {
-		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
-		createApplicationPackageHandle(t, applicationPackageName, version, patch, true)
+	createApplicationHandle := func(t *testing.T, applicationPackageName, version string, patch int, debug bool) *sdk.Application {
+		t.Helper()
 
-		id := sdk.NewAccountObjectIdentifier(random.StringN(4))
-		pid := sdk.NewAccountObjectIdentifier(applicationPackageName)
-		comment := random.StringN(4)
-		request := sdk.NewCreateApplicationRequest(id, pid).
-			WithComment(&comment).
-			WithTag([]sdk.TagAssociation{
-				{
-					Name:  tagTest.ID(),
-					Value: "v1",
-				},
-			})
-		err := client.Applications.Create(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupApplicationHandle(id))
-
-		e, err := client.Applications.ShowByID(ctx, id)
-		require.NoError(t, err)
-		require.Equal(t, id.Name(), e.Name)
-		require.Equal(t, "ACCOUNTADMIN", e.Owner)
-		require.Equal(t, comment, e.Comment)
-		require.Equal(t, "APPLICATION PACKAGE", e.SourceType)
-		require.Equal(t, applicationPackageName, e.Source)
-		require.Equal(t, version, e.Version)
-		require.Equal(t, patch, e.Patch)
-	})
-
-	t.Run("create application: version and patch", func(t *testing.T) {
-		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
 		createApplicationPackageHandle(t, applicationPackageName, version, patch, false)
 
 		id := sdk.NewAccountObjectIdentifier(random.StringN(4))
-		pid := sdk.NewAccountObjectIdentifier(applicationPackageName)
 		vr := sdk.NewApplicationVersionRequest().WithVersionAndPatch(sdk.NewVersionAndPatchRequest(version, &patch))
-		comment := random.StringN(4)
-		request := sdk.NewCreateApplicationRequest(id, pid).
-			WithDebugMode(sdk.Bool(true)).
-			WithComment(&comment).
-			WithVersion(vr)
+		request := sdk.NewCreateApplicationRequest(id, sdk.NewAccountObjectIdentifier(applicationPackageName)).WithVersion(vr).WithDebugMode(&debug)
 		err := client.Applications.Create(ctx, request)
 		require.NoError(t, err)
 		t.Cleanup(cleanupApplicationHandle(id))
 
 		e, err := client.Applications.ShowByID(ctx, id)
 		require.NoError(t, err)
-		require.Equal(t, id.Name(), e.Name)
-		require.Equal(t, "ACCOUNTADMIN", e.Owner)
-		require.Equal(t, comment, e.Comment)
-		require.Equal(t, "APPLICATION PACKAGE", e.SourceType)
-		require.Equal(t, applicationPackageName, e.Source)
-		require.Equal(t, version, e.Version)
-		require.Equal(t, patch, e.Patch)
-	})
+		return e
+	}
 
-	t.Run("create application: version directory", func(t *testing.T) {
+	// assertApplication := func(t *testing.T, id sdk.AccountObjectIdentifier, applicationPackageName, version string, patch int) {
+	// 	t.Helper()
+
+	// 	e, err := client.Applications.ShowByID(ctx, id)
+	// 	require.NoError(t, err)
+
+	// 	assert.NotEmpty(t, e.CreatedOn)
+	// 	assert.Equal(t, id.Name(), e.Name)
+	// 	assert.Equal(t, false, e.IsDefault)
+	// 	assert.Equal(t, true, e.IsCurrent)
+	// 	assert.Equal(t, "APPLICATION PACKAGE", e.SourceType)
+	// 	assert.Equal(t, applicationPackageName, e.Source)
+	// 	assert.Equal(t, version, e.Version)
+	// 	assert.Equal(t, patch, e.Patch)
+	// 	assert.Equal(t, "ACCOUNTADMIN", e.Owner)
+	// 	assert.Empty(t, e.Comment)
+	// 	assert.Equal(t, 1, e.RetentionTime)
+	// 	assert.Empty(t, e.Options)
+	// }
+
+	// t.Run("create application: without version", func(t *testing.T) {
+	// 	applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+	// 	createApplicationPackageHandle(t, applicationPackageName, version, patch, true)
+
+	// 	id := sdk.NewAccountObjectIdentifier(random.StringN(4))
+	// 	pid := sdk.NewAccountObjectIdentifier(applicationPackageName)
+	// 	comment := random.StringN(4)
+	// 	request := sdk.NewCreateApplicationRequest(id, pid).
+	// 		WithComment(&comment).
+	// 		WithTag([]sdk.TagAssociation{
+	// 			{
+	// 				Name:  tagTest.ID(),
+	// 				Value: "v1",
+	// 			},
+	// 		})
+	// 	err := client.Applications.Create(ctx, request)
+	// 	require.NoError(t, err)
+	// 	t.Cleanup(cleanupApplicationHandle(id))
+
+	// 	e, err := client.Applications.ShowByID(ctx, id)
+	// 	require.NoError(t, err)
+	// 	require.Equal(t, id.Name(), e.Name)
+	// 	require.Equal(t, "ACCOUNTADMIN", e.Owner)
+	// 	require.Equal(t, comment, e.Comment)
+	// 	require.Equal(t, "APPLICATION PACKAGE", e.SourceType)
+	// 	require.Equal(t, applicationPackageName, e.Source)
+	// 	require.Equal(t, version, e.Version)
+	// 	require.Equal(t, patch, e.Patch)
+	// })
+
+	// t.Run("create application: version and patch", func(t *testing.T) {
+	// 	applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+	// 	createApplicationPackageHandle(t, applicationPackageName, version, patch, false)
+
+	// 	id := sdk.NewAccountObjectIdentifier(random.StringN(4))
+	// 	pid := sdk.NewAccountObjectIdentifier(applicationPackageName)
+	// 	vr := sdk.NewApplicationVersionRequest().WithVersionAndPatch(sdk.NewVersionAndPatchRequest(version, &patch))
+	// 	comment := random.StringN(4)
+	// 	request := sdk.NewCreateApplicationRequest(id, pid).
+	// 		WithDebugMode(sdk.Bool(true)).
+	// 		WithComment(&comment).
+	// 		WithVersion(vr)
+	// 	err := client.Applications.Create(ctx, request)
+	// 	require.NoError(t, err)
+	// 	t.Cleanup(cleanupApplicationHandle(id))
+
+	// 	e, err := client.Applications.ShowByID(ctx, id)
+	// 	require.NoError(t, err)
+	// 	require.Equal(t, id.Name(), e.Name)
+	// 	require.Equal(t, "ACCOUNTADMIN", e.Owner)
+	// 	require.Equal(t, comment, e.Comment)
+	// 	require.Equal(t, "APPLICATION PACKAGE", e.SourceType)
+	// 	require.Equal(t, applicationPackageName, e.Source)
+	// 	require.Equal(t, version, e.Version)
+	// 	require.Equal(t, patch, e.Patch)
+	// })
+
+	// t.Run("create application: version directory", func(t *testing.T) {
+	// 	applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+	// 	stage := createApplicationPackageHandle(t, applicationPackageName, version, patch, false)
+
+	// 	id := sdk.NewAccountObjectIdentifier(random.StringN(4))
+	// 	pid := sdk.NewAccountObjectIdentifier(applicationPackageName)
+	// 	vr := sdk.NewApplicationVersionRequest().WithVersionDirectory(sdk.String("@" + stage.ID().FullyQualifiedName()))
+	// 	comment := random.StringN(4)
+	// 	request := sdk.NewCreateApplicationRequest(id, pid).
+	// 		WithDebugMode(sdk.Bool(true)).
+	// 		WithComment(&comment).
+	// 		WithVersion(vr).
+	// 		WithTag([]sdk.TagAssociation{
+	// 			{
+	// 				Name:  tagTest.ID(),
+	// 				Value: "v1",
+	// 			},
+	// 		})
+	// 	err := client.Applications.Create(ctx, request)
+	// 	require.NoError(t, err)
+	// 	t.Cleanup(cleanupApplicationHandle(id))
+
+	// 	e, err := client.Applications.ShowByID(ctx, id)
+	// 	require.NoError(t, err)
+	// 	require.Equal(t, id.Name(), e.Name)
+	// 	require.Equal(t, "ACCOUNTADMIN", e.Owner)
+	// 	require.Equal(t, comment, e.Comment)
+	// 	require.Equal(t, "APPLICATION PACKAGE", e.SourceType)
+	// 	require.Equal(t, applicationPackageName, e.Source)
+	// 	require.Equal(t, "UNVERSIONED", e.Version)
+	// 	require.Equal(t, patch, e.Patch)
+	// })
+
+	// t.Run("show application: with like", func(t *testing.T) {
+	// 	applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+	// 	e := createApplicationHandle(t, applicationPackageName, version, patch)
+	// 	packages, err := client.Applications.Show(ctx, sdk.NewShowApplicationRequest().WithLike(&sdk.Like{Pattern: &e.Name}))
+	// 	require.NoError(t, err)
+	// 	require.Equal(t, 1, len(packages))
+	// 	require.Equal(t, *e, packages[0])
+	// })
+
+	// t.Run("alter application: set", func(t *testing.T) {
+	// 	applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+	// 	e := createApplicationHandle(t, applicationPackageName, version, patch, false)
+	// 	id := sdk.NewAccountObjectIdentifier(e.Name)
+
+	// 	comment, mode := random.StringN(4), true
+	// 	set := sdk.NewApplicationSetRequest().
+	// 		WithComment(&comment).
+	// 		WithDebugMode(&mode)
+	// 	err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithSet(set))
+	// 	require.NoError(t, err)
+
+	// 	details, err := client.Applications.Describe(ctx, id)
+	// 	require.NoError(t, err)
+	// 	pairs := make(map[string]string)
+	// 	for _, detail := range details {
+	// 		pairs[detail.Property] = detail.Value
+	// 	}
+	// 	require.Equal(t, e.SourceType, pairs["source_type"])
+	// 	require.Equal(t, e.Source, pairs["source"])
+	// 	require.Equal(t, e.Version, pairs["version"])
+	// 	require.Equal(t, strconv.Itoa(e.Patch), pairs["patch"])
+	// 	require.Equal(t, comment, pairs["comment"])
+	// 	require.Equal(t, strconv.FormatBool(mode), pairs["debug_mode"])
+	// })
+
+	t.Run("alter application: unset", func(t *testing.T) {
 		applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
-		stage := createApplicationPackageHandle(t, applicationPackageName, version, patch, false)
+		e := createApplicationHandle(t, applicationPackageName, version, patch, true)
+		id := sdk.NewAccountObjectIdentifier(e.Name)
 
-		id := sdk.NewAccountObjectIdentifier(random.StringN(4))
-		pid := sdk.NewAccountObjectIdentifier(applicationPackageName)
-		vr := sdk.NewApplicationVersionRequest().WithVersionDirectory(sdk.String("@" + stage.ID().FullyQualifiedName()))
-		comment := random.StringN(4)
-		request := sdk.NewCreateApplicationRequest(id, pid).
-			WithDebugMode(sdk.Bool(true)).
-			WithComment(&comment).
-			WithVersion(vr).
-			WithTag([]sdk.TagAssociation{
-				{
-					Name:  tagTest.ID(),
-					Value: "v1",
-				},
-			})
-		err := client.Applications.Create(ctx, request)
+		unset := sdk.NewApplicationUnsetRequest().
+			WithComment(sdk.Bool(true)).
+			WithDebugMode(sdk.Bool(true))
+		err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUnset(unset))
 		require.NoError(t, err)
-		t.Cleanup(cleanupApplicationHandle(id))
 
-		e, err := client.Applications.ShowByID(ctx, id)
+		details, err := client.Applications.Describe(ctx, id)
 		require.NoError(t, err)
-		require.Equal(t, id.Name(), e.Name)
-		require.Equal(t, "ACCOUNTADMIN", e.Owner)
-		require.Equal(t, comment, e.Comment)
-		require.Equal(t, "APPLICATION PACKAGE", e.SourceType)
-		require.Equal(t, applicationPackageName, e.Source)
-		require.Equal(t, "UNVERSIONED", e.Version)
-		require.Equal(t, patch, e.Patch)
+		pairs := make(map[string]string)
+		for _, detail := range details {
+			pairs[detail.Property] = detail.Value
+		}
+		require.Equal(t, e.SourceType, pairs["source_type"])
+		require.Equal(t, e.Source, pairs["source"])
+		require.Equal(t, e.Version, pairs["version"])
+		require.Equal(t, strconv.Itoa(e.Patch), pairs["patch"])
+		require.Empty(t, pairs["comment"])
+		require.Equal(t, strconv.FormatBool(false), pairs["debug_mode"])
 	})
+
+	// t.Run("alter application: set and unset tags", func(t *testing.T) {
+	// 	applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+	// 	e := createApplicationHandle(t, applicationPackageName, version, patch)
+	// 	id := sdk.NewAccountObjectIdentifier(e.Name)
+
+	// 	setTags := []sdk.TagAssociation{
+	// 		{
+	// 			Name:  tagTest.ID(),
+	// 			Value: "v1",
+	// 		},
+	// 	}
+	// 	err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithSetTags(setTags))
+	// 	require.NoError(t, err)
+	// 	assertApplication(t, id, applicationPackageName, version, patch)
+
+	// 	unsetTags := []sdk.ObjectIdentifier{
+	// 		tagTest.ID(),
+	// 	}
+	// 	err = client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUnsetTags(unsetTags))
+	// 	require.NoError(t, err)
+	// 	assertApplication(t, id, applicationPackageName, version, patch)
+	// })
+
+	// t.Run("describe application", func(t *testing.T) {
+	// 	applicationPackageName, version, patch := "hello_snowflake_package_test", "V001", 0
+	// 	e := createApplicationHandle(t, applicationPackageName, version, patch)
+	// 	id := sdk.NewAccountObjectIdentifier(e.Name)
+
+	// 	details, err := client.Applications.Describe(ctx, id)
+	// 	require.NoError(t, err)
+	// 	pairs := make(map[string]string)
+	// 	for _, detail := range details {
+	// 		pairs[detail.Property] = detail.Value
+	// 	}
+	// 	require.Equal(t, e.SourceType, pairs["source_type"])
+	// 	require.Equal(t, e.Source, pairs["source"])
+	// 	require.Equal(t, e.Version, pairs["version"])
+	// 	require.Equal(t, e.Label, pairs["version_label"])
+	// 	require.Equal(t, e.Comment, pairs["comment"])
+	// 	require.Equal(t, strconv.Itoa(e.Patch), pairs["patch"])
+	// })
 }

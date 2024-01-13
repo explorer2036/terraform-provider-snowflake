@@ -4,6 +4,10 @@ import g "github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/poc/gen
 
 //go:generate go run ./poc/main.go
 
+/*
+ * 	todo: add definition for `CREATE APPLICATION <name> FROM LISTING <listing_name> [ COMMENT = '<string_literal>' ] [ WITH TAG ( <tag_name> = '<tag_value>' [ , ... ] ) ]`
+ */
+
 var versionAndPatch = g.NewQueryStruct("VersionAndPatch").
 	TextAssignment("VERSION", g.ParameterOptions().NoEquals().NoQuotes().Required()).
 	OptionalNumberAssignment("PATCH", g.ParameterOptions().NoEquals().Required())
@@ -129,7 +133,7 @@ var ApplicationsDef = g.NewInterface(
 	"https://docs.snowflake.com/en/sql-reference/sql/desc-application",
 	g.DbStruct("applicationDetailRow").
 		Field("property", "string").
-		Field("value", "string"),
+		Field("value", "sql.NullString"),
 	g.PlainStruct("ApplicationDetail").
 		Field("Property", "string").
 		Field("Value", "string"),

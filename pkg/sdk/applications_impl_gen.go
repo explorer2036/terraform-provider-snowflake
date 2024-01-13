@@ -171,8 +171,11 @@ func (r *DescribeApplicationRequest) toOpts() *DescribeApplicationOptions {
 }
 
 func (r applicationDetailRow) convert() *ApplicationDetail {
-	return &ApplicationDetail{
+	e := &ApplicationDetail{
 		Property: r.Property,
-		Value:    r.Value,
 	}
+	if r.Value.Valid {
+		e.Value = r.Value.String
+	}
+	return e
 }

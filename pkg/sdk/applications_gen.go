@@ -1,6 +1,9 @@
 package sdk
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 type Applications interface {
 	Create(ctx context.Context, request *CreateApplicationRequest) error
@@ -123,8 +126,8 @@ type DescribeApplicationOptions struct {
 }
 
 type applicationDetailRow struct {
-	Property string `db:"property"`
-	Value    string `db:"value"`
+	Property string         `db:"property"`
+	Value    sql.NullString `db:"value"`
 }
 
 type ApplicationDetail struct {
