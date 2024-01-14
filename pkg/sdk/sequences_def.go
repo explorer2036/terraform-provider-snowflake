@@ -4,6 +4,10 @@ import g "github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/poc/gen
 
 //go:generate go run ./poc/main.go
 
+var sequenceSet = g.NewQueryStruct("SequenceSet").
+	PredefinedQueryStructField("ValuesBehavior", "*ValuesBehavior", g.KeywordOptions()).
+	OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes())
+
 var SequencesDef = g.NewInterface(
 	"Sequences",
 	"Sequence",
@@ -23,6 +27,24 @@ var SequencesDef = g.NewInterface(
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
 		WithValidation(g.ValidIdentifier, "name").
 		WithValidation(g.ConflictingFields, "OrReplace", "IfNotExists"),
+).AlterOperation(
+	"https://docs.snowflake.com/en/sql-reference/sql/alter-sequence",
+	g.NewQueryStruct("AlterSequence").
+		Alter().
+		SQL("SEQUENCE").
+		IfExists().
+		Name().
+		Identifier("RenameTo", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RENAME TO")).
+		OptionalNumberAssignment("SET INCREMENT", g.ParameterOptions().NoQuotes()).
+		OptionalQueryStructField(
+			"Set",
+			sequenceSet,
+			g.KeywordOptions().SQL("SET"),
+		).
+		OptionalSQL("UNSET COMMENT").
+		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ValidIdentifierIfSet, "RenameTo").
+		WithValidation(g.ExactlyOneValueSet, "RenameTo", "SetIncrement", "Set", "UnsetComment"),
 ).ShowOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/show-sequences",
 	g.DbStruct("sequenceRow").

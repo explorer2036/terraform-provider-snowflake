@@ -47,6 +47,53 @@ func (s *CreateSequenceRequest) WithComment(Comment *string) *CreateSequenceRequ
 	return s
 }
 
+func NewAlterSequenceRequest(
+	name SchemaObjectIdentifier,
+) *AlterSequenceRequest {
+	s := AlterSequenceRequest{}
+	s.name = name
+	return &s
+}
+
+func (s *AlterSequenceRequest) WithIfExists(IfExists *bool) *AlterSequenceRequest {
+	s.IfExists = IfExists
+	return s
+}
+
+func (s *AlterSequenceRequest) WithRenameTo(RenameTo *SchemaObjectIdentifier) *AlterSequenceRequest {
+	s.RenameTo = RenameTo
+	return s
+}
+
+func (s *AlterSequenceRequest) WithSetIncrement(SetIncrement *int) *AlterSequenceRequest {
+	s.SetIncrement = SetIncrement
+	return s
+}
+
+func (s *AlterSequenceRequest) WithSet(Set *SequenceSetRequest) *AlterSequenceRequest {
+	s.Set = Set
+	return s
+}
+
+func (s *AlterSequenceRequest) WithUnsetComment(UnsetComment *bool) *AlterSequenceRequest {
+	s.UnsetComment = UnsetComment
+	return s
+}
+
+func NewSequenceSetRequest() *SequenceSetRequest {
+	return &SequenceSetRequest{}
+}
+
+func (s *SequenceSetRequest) WithValuesBehavior(ValuesBehavior *ValuesBehavior) *SequenceSetRequest {
+	s.ValuesBehavior = ValuesBehavior
+	return s
+}
+
+func (s *SequenceSetRequest) WithComment(Comment *string) *SequenceSetRequest {
+	s.Comment = Comment
+	return s
+}
+
 func NewShowSequenceRequest() *ShowSequenceRequest {
 	return &ShowSequenceRequest{}
 }

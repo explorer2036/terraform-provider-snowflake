@@ -17,6 +17,11 @@ func (v *sequences) Create(ctx context.Context, request *CreateSequenceRequest) 
 	return validateAndExec(v.client, ctx, opts)
 }
 
+func (v *sequences) Alter(ctx context.Context, request *AlterSequenceRequest) error {
+	opts := request.toOpts()
+	return validateAndExec(v.client, ctx, opts)
+}
+
 func (v *sequences) Show(ctx context.Context, request *ShowSequenceRequest) ([]Sequence, error) {
 	opts := request.toOpts()
 	dbRows, err := validateAndQuery[sequenceRow](v.client, ctx, opts)
@@ -62,6 +67,24 @@ func (r *CreateSequenceRequest) toOpts() *CreateSequenceOptions {
 		Increment:      r.Increment,
 		ValuesBehavior: r.ValuesBehavior,
 		Comment:        r.Comment,
+	}
+	return opts
+}
+
+func (r *AlterSequenceRequest) toOpts() *AlterSequenceOptions {
+	opts := &AlterSequenceOptions{
+		IfExists:     r.IfExists,
+		name:         r.name,
+		RenameTo:     r.RenameTo,
+		SetIncrement: r.SetIncrement,
+
+		UnsetComment: r.UnsetComment,
+	}
+	if r.Set != nil {
+		opts.Set = &SequenceSet{
+			ValuesBehavior: r.Set.ValuesBehavior,
+			Comment:        r.Set.Comment,
+		}
 	}
 	return opts
 }

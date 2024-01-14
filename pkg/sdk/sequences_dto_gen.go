@@ -4,6 +4,7 @@ package sdk
 
 var (
 	_ optionsProvider[CreateSequenceOptions]   = new(CreateSequenceRequest)
+	_ optionsProvider[AlterSequenceOptions]    = new(AlterSequenceRequest)
 	_ optionsProvider[ShowSequenceOptions]     = new(ShowSequenceRequest)
 	_ optionsProvider[DescribeSequenceOptions] = new(DescribeSequenceRequest)
 	_ optionsProvider[DropSequenceOptions]     = new(DropSequenceRequest)
@@ -16,6 +17,20 @@ type CreateSequenceRequest struct {
 	With           *bool
 	Start          *int
 	Increment      *int
+	ValuesBehavior *ValuesBehavior
+	Comment        *string
+}
+
+type AlterSequenceRequest struct {
+	IfExists     *bool
+	name         SchemaObjectIdentifier // required
+	RenameTo     *SchemaObjectIdentifier
+	SetIncrement *int
+	Set          *SequenceSetRequest
+	UnsetComment *bool
+}
+
+type SequenceSetRequest struct {
 	ValuesBehavior *ValuesBehavior
 	Comment        *string
 }

@@ -4,6 +4,7 @@ import "context"
 
 type Sequences interface {
 	Create(ctx context.Context, request *CreateSequenceRequest) error
+	Alter(ctx context.Context, request *AlterSequenceRequest) error
 	Show(ctx context.Context, request *ShowSequenceRequest) ([]Sequence, error)
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Sequence, error)
 	Describe(ctx context.Context, id SchemaObjectIdentifier) ([]SequenceDetail, error)
@@ -22,6 +23,23 @@ type CreateSequenceOptions struct {
 	Increment      *int                   `ddl:"parameter,no_quotes" sql:"INCREMENT"`
 	ValuesBehavior *ValuesBehavior        `ddl:"keyword"`
 	Comment        *string                `ddl:"parameter,single_quotes" sql:"COMMENT"`
+}
+
+// AlterSequenceOptions is based on https://docs.snowflake.com/en/sql-reference/sql/alter-sequence.
+type AlterSequenceOptions struct {
+	alter        bool                    `ddl:"static" sql:"ALTER"`
+	sequence     bool                    `ddl:"static" sql:"SEQUENCE"`
+	IfExists     *bool                   `ddl:"keyword" sql:"IF EXISTS"`
+	name         SchemaObjectIdentifier  `ddl:"identifier"`
+	RenameTo     *SchemaObjectIdentifier `ddl:"identifier" sql:"RENAME TO"`
+	SetIncrement *int                    `ddl:"parameter,no_quotes" sql:"SET INCREMENT"`
+	Set          *SequenceSet            `ddl:"keyword" sql:"SET"`
+	UnsetComment *bool                   `ddl:"keyword" sql:"UNSET COMMENT"`
+}
+
+type SequenceSet struct {
+	ValuesBehavior *ValuesBehavior `ddl:"keyword"`
+	Comment        *string         `ddl:"parameter,single_quotes" sql:"COMMENT"`
 }
 
 // ShowSequenceOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-sequences.
