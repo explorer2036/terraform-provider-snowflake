@@ -41,15 +41,15 @@ func (v *sequences) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*S
 	return collections.FindOne(sequences, func(r Sequence) bool { return r.Name == id.Name() })
 }
 
-func (v *sequences) Describe(ctx context.Context, id SchemaObjectIdentifier) ([]SequenceDetail, error) {
+func (v *sequences) Describe(ctx context.Context, id SchemaObjectIdentifier) (*SequenceDetail, error) {
 	opts := &DescribeSequenceOptions{
 		name: id,
 	}
-	rows, err := validateAndQuery[sequenceDetailRow](v.client, ctx, opts)
+	result, err := validateAndQueryOne[sequenceDetailRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err
 	}
-	return convertRows[sequenceDetailRow, SequenceDetail](rows), nil
+	return result.convert(), nil
 }
 
 func (v *sequences) Drop(ctx context.Context, request *DropSequenceRequest) error {
