@@ -198,3 +198,28 @@ type Secret struct {
 	VariableName string `ddl:"keyword,single_quotes"`
 	Name         string `ddl:"parameter,no_quotes"`
 }
+
+type NetworkIdentifierType string
+
+func NetworkIdentifierTypePointer(v NetworkIdentifierType) *NetworkIdentifierType {
+	return &v
+}
+
+const (
+	NetworkIdentifierTypeIpv4        NetworkIdentifierType = "IPV4"
+	NetworkIdentifierTypeAwsVpcEid   NetworkIdentifierType = "AWSVPCEID"
+	NetworkIdentifierTypeAzureLinkId NetworkIdentifierType = "AZURELINKID"
+	NetworkIdentifierTypeHostPort    NetworkIdentifierType = "HOST_PORT"
+)
+
+type NetworkRuleMode string
+
+func NetworkRuleModePointer(v NetworkRuleMode) *NetworkRuleMode {
+	return &v
+}
+
+const (
+	NetworkRuleModeIngress       NetworkRuleMode = "INGRESS"
+	NetworkRuleModeInternalStage NetworkRuleMode = "INTERNAL_STAGE"
+	NetworkRuleModeEgress        NetworkRuleMode = "EGRESS"
+)
