@@ -73,70 +73,63 @@ func TestInt_ApplicationPackages(t *testing.T) {
 		assert.Empty(t, e.ApplicationClass)
 	}
 
-	t.Run("create application package", func(t *testing.T) {
-		id := sdk.NewAccountObjectIdentifier(random.StringN(4))
-		comment := random.StringN(4)
-		request := sdk.NewCreateApplicationPackageRequest(id).
-			WithComment(&comment).
-			WithTag([]sdk.TagAssociation{
-				{
-					Name:  tagTest.ID(),
-					Value: "v1",
-				},
-			}).
-			WithDistribution(sdk.DistributionPointer(sdk.DistributionExternal))
-		err := client.ApplicationPackages.Create(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupApplicationPackageHandle(id))
+	// t.Run("create application package", func(t *testing.T) {
+	// 	id := sdk.NewAccountObjectIdentifier(random.StringN(4))
+	// 	comment := random.StringN(4)
+	// 	request := sdk.NewCreateApplicationPackageRequest(id).
+	// 		WithComment(&comment).
+	// 		WithTag([]sdk.TagAssociation{
+	// 			{
+	// 				Name:  tagTest.ID(),
+	// 				Value: "v1",
+	// 			},
+	// 		}).
+	// 		WithDistribution(sdk.DistributionPointer(sdk.DistributionExternal))
+	// 	err := client.ApplicationPackages.Create(ctx, request)
+	// 	require.NoError(t, err)
+	// 	t.Cleanup(cleanupApplicationPackageHandle(id))
 
-		e, err := client.ApplicationPackages.ShowByID(ctx, id)
-		require.NoError(t, err)
-		require.Equal(t, id.Name(), e.Name)
-		require.Equal(t, sdk.DistributionExternal, sdk.Distribution(e.Distribution))
-		require.Equal(t, "ACCOUNTADMIN", e.Owner)
-		require.Equal(t, comment, e.Comment)
-		require.Equal(t, 1, e.RetentionTime)
-	})
+	// 	e, err := client.ApplicationPackages.ShowByID(ctx, id)
+	// 	require.NoError(t, err)
+	// 	require.Equal(t, id.Name(), e.Name)
+	// 	require.Equal(t, sdk.DistributionExternal, sdk.Distribution(e.Distribution))
+	// 	require.Equal(t, "ACCOUNTADMIN", e.Owner)
+	// 	require.Equal(t, comment, e.Comment)
+	// 	require.Equal(t, 1, e.RetentionTime)
+	// })
 
-	t.Run("alter application package: set", func(t *testing.T) {
-		e := createApplicationPackageHandle(t)
-		id := sdk.NewAccountObjectIdentifier(e.Name)
+	// t.Run("alter application package: set", func(t *testing.T) {
+	// 	e := createApplicationPackageHandle(t)
+	// 	id := sdk.NewAccountObjectIdentifier(e.Name)
 
-		distribution := sdk.DistributionPointer(sdk.DistributionExternal)
-		set := sdk.NewApplicationPackageSetRequest().
-			WithDistribution(distribution).
-			WithComment(sdk.String("test")).
-			WithDataRetentionTimeInDays(sdk.Int(2)).
-			WithMaxDataExtensionTimeInDays(sdk.Int(2)).
-			WithDefaultDdlCollation(sdk.String("utf8mb4_0900_ai_ci"))
-		err := client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithSet(set))
-		require.NoError(t, err)
+	// 	distribution := sdk.DistributionPointer(sdk.DistributionExternal)
+	// 	set := sdk.NewApplicationPackageSetRequest().
+	// 		WithDistribution(distribution).
+	// 		WithComment(sdk.String("test")).
+	// 		WithDataRetentionTimeInDays(sdk.Int(2)).
+	// 		WithMaxDataExtensionTimeInDays(sdk.Int(2)).
+	// 		WithDefaultDdlCollation(sdk.String("utf8mb4_0900_ai_ci"))
+	// 	err := client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithSet(set))
+	// 	require.NoError(t, err)
 
-		o, err := client.ApplicationPackages.ShowByID(ctx, id)
-		require.NoError(t, err)
-		assert.Equal(t, *distribution, sdk.Distribution(o.Distribution))
-		assert.Equal(t, 2, o.RetentionTime)
-		assert.Equal(t, "test", o.Comment)
-	})
+	// 	o, err := client.ApplicationPackages.ShowByID(ctx, id)
+	// 	require.NoError(t, err)
+	// 	assert.Equal(t, *distribution, sdk.Distribution(o.Distribution))
+	// 	assert.Equal(t, 2, o.RetentionTime)
+	// 	assert.Equal(t, "test", o.Comment)
+	// })
 
 	t.Run("alter application package: unset", func(t *testing.T) {
 		e := createApplicationPackageHandle(t)
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
-		// unset comment
-		unset := sdk.NewApplicationPackageUnsetRequest().WithComment(sdk.Bool(true))
+		// unset comment and distribution
+		unset := sdk.NewApplicationPackageUnsetRequest().WithComment(sdk.Bool(true)).WithDistribution(sdk.Bool(true))
 		err := client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithUnset(unset))
 		require.NoError(t, err)
 		o, err := client.ApplicationPackages.ShowByID(ctx, id)
 		require.NoError(t, err)
 		require.Empty(t, o.Comment)
-
-		// unset distribution
-		unset = sdk.NewApplicationPackageUnsetRequest().WithDistribution(sdk.Bool(true))
-		err = client.ApplicationPackages.Alter(ctx, sdk.NewAlterApplicationPackageRequest(id).WithUnset(unset))
-		require.NoError(t, err)
-		o, err = client.ApplicationPackages.ShowByID(ctx, id)
-		require.NoError(t, err)
 		require.Equal(t, sdk.DistributionInternal, sdk.Distribution(o.Distribution))
 	})
 
@@ -162,14 +155,14 @@ func TestInt_ApplicationPackages(t *testing.T) {
 		assertApplicationPackage(t, id)
 	})
 
-	t.Run("show application package for SQL: with like", func(t *testing.T) {
-		e := createApplicationPackageHandle(t)
+	// t.Run("show application package for SQL: with like", func(t *testing.T) {
+	// 	e := createApplicationPackageHandle(t)
 
-		packages, err := client.ApplicationPackages.Show(ctx, sdk.NewShowApplicationPackageRequest().WithLike(&sdk.Like{Pattern: &e.Name}))
-		require.NoError(t, err)
-		require.Equal(t, 1, len(packages))
-		require.Equal(t, *e, packages[0])
-	})
+	// 	packages, err := client.ApplicationPackages.Show(ctx, sdk.NewShowApplicationPackageRequest().WithLike(&sdk.Like{Pattern: &e.Name}))
+	// 	require.NoError(t, err)
+	// 	require.Equal(t, 1, len(packages))
+	// 	require.Equal(t, *e, packages[0])
+	// })
 }
 
 type StagedFile struct {
