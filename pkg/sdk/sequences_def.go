@@ -20,7 +20,6 @@ var SequencesDef = g.NewInterface(
 		SQL("SEQUENCE").
 		IfNotExists().
 		Name().
-		OptionalSQL("WITH").
 		OptionalNumberAssignment("START", g.ParameterOptions().NoQuotes()).
 		OptionalNumberAssignment("INCREMENT", g.ParameterOptions().NoQuotes()).
 		PredefinedQueryStructField("ValuesBehavior", "*ValuesBehavior", g.KeywordOptions()).
