@@ -250,14 +250,16 @@ func TestInt_Applications(t *testing.T) {
 		id := sdk.NewAccountObjectIdentifier(e.Name)
 
 		// unset coment
-		err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUnsetComment(sdk.Bool(true)))
+		unset := sdk.NewApplicationUnsetRequest().WithComment(sdk.Bool(true))
+		err := client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUnset(unset))
 		require.NoError(t, err)
 		o, err := client.Applications.ShowByID(ctx, id)
 		require.NoError(t, err)
 		require.Empty(t, o.Comment)
 
 		// unset debug mode
-		err = client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUnsetDebugMode(sdk.Bool(true)))
+		unset = sdk.NewApplicationUnsetRequest().WithDebugMode(sdk.Bool(true))
+		err = client.Applications.Alter(ctx, sdk.NewAlterApplicationRequest(id).WithUnset(unset))
 		require.NoError(t, err)
 		details, err := client.Applications.Describe(ctx, id)
 		require.NoError(t, err)
