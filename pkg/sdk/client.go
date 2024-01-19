@@ -60,18 +60,18 @@ type Client struct {
 	ResourceMonitors ResourceMonitors
 	Roles            Roles
 	Schemas          Schemas
-	// Sequences        Sequences
-	SessionPolicies SessionPolicies
-	Sessions        Sessions
-	Shares          Shares
-	Stages          Stages
-	Streams         Streams
-	Tables          Tables
-	Tags            Tags
-	Tasks           Tasks
-	Users           Users
-	Views           Views
-	Warehouses      Warehouses
+	Sequences        Sequences
+	SessionPolicies  SessionPolicies
+	Sessions         Sessions
+	Shares           Shares
+	Stages           Stages
+	Streams          Streams
+	Tables           Tables
+	Tags             Tags
+	Tasks            Tasks
+	Users            Users
+	Views            Views
+	Warehouses       Warehouses
 }
 
 func (c *Client) GetAccountLocator() string {
@@ -203,7 +203,7 @@ func (c *Client) initialize() {
 	c.ResourceMonitors = &resourceMonitors{client: c}
 	c.Roles = &roles{client: c}
 	c.Schemas = &schemas{client: c}
-	// c.Sequences = &sequences{client: c}
+	c.Sequences = &sequences{client: c}
 	c.SessionPolicies = &sessionPolicies{client: c}
 	c.Sessions = &sessions{client: c}
 	c.Shares = &shares{client: c}
