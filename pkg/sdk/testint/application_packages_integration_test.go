@@ -162,7 +162,7 @@ func TestInt_ApplicationPackages(t *testing.T) {
 		assertApplicationPackage(t, id)
 	})
 
-	t.Run("show application package for SQL: with like", func(t *testing.T) {
+	t.Run("show application package: with like", func(t *testing.T) {
 		e := createApplicationPackageHandle(t)
 
 		packages, err := client.ApplicationPackages.Show(ctx, sdk.NewShowApplicationPackageRequest().WithLike(&sdk.Like{Pattern: &e.Name}))

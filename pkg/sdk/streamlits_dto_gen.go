@@ -3,8 +3,11 @@ package sdk
 //go:generate go run ./dto-builder-generator/main.go
 
 var (
-	_ optionsProvider[CreateStreamlitOptions] = new(CreateStreamlitRequest)
-	_ optionsProvider[AlterStreamlitOptions]  = new(AlterStreamlitRequest)
+	_ optionsProvider[CreateStreamlitOptions]   = new(CreateStreamlitRequest)
+	_ optionsProvider[AlterStreamlitOptions]    = new(AlterStreamlitRequest)
+	_ optionsProvider[DropStreamlitOptions]     = new(DropStreamlitRequest)
+	_ optionsProvider[ShowStreamlitOptions]     = new(ShowStreamlitRequest)
+	_ optionsProvider[DescribeStreamlitOptions] = new(DescribeStreamlitRequest)
 )
 
 type CreateStreamlitRequest struct {
@@ -20,13 +23,29 @@ type CreateStreamlitRequest struct {
 type AlterStreamlitRequest struct {
 	IfExists *bool
 	name     SchemaObjectIdentifier // required
-	Set      *StreamlitsSetRequest
+	Set      *StreamlitSetRequest
 	RenameTo *SchemaObjectIdentifier
 }
 
-type StreamlitsSetRequest struct {
+type StreamlitSetRequest struct {
 	RootLocation *string // required
-	Warehouse    *AccountObjectIdentifier
 	MainFile     *string // required
+	Warehouse    *AccountObjectIdentifier
 	Comment      *string
+}
+
+type DropStreamlitRequest struct {
+	IfExists *bool
+	name     SchemaObjectIdentifier // required
+}
+
+type ShowStreamlitRequest struct {
+	Terse *bool
+	Like  *Like
+	In    *In
+	Limit *LimitFrom
+}
+
+type DescribeStreamlitRequest struct {
+	name SchemaObjectIdentifier // required
 }

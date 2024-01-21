@@ -49,7 +49,7 @@ func (s *AlterStreamlitRequest) WithIfExists(IfExists *bool) *AlterStreamlitRequ
 	return s
 }
 
-func (s *AlterStreamlitRequest) WithSet(Set *StreamlitsSetRequest) *AlterStreamlitRequest {
+func (s *AlterStreamlitRequest) WithSet(Set *StreamlitSetRequest) *AlterStreamlitRequest {
 	s.Set = Set
 	return s
 }
@@ -59,22 +59,67 @@ func (s *AlterStreamlitRequest) WithRenameTo(RenameTo *SchemaObjectIdentifier) *
 	return s
 }
 
-func NewStreamlitsSetRequest(
+func NewStreamlitSetRequest(
 	RootLocation *string,
 	MainFile *string,
-) *StreamlitsSetRequest {
-	s := StreamlitsSetRequest{}
+) *StreamlitSetRequest {
+	s := StreamlitSetRequest{}
 	s.RootLocation = RootLocation
 	s.MainFile = MainFile
 	return &s
 }
 
-func (s *StreamlitsSetRequest) WithWarehouse(Warehouse *AccountObjectIdentifier) *StreamlitsSetRequest {
+func (s *StreamlitSetRequest) WithWarehouse(Warehouse *AccountObjectIdentifier) *StreamlitSetRequest {
 	s.Warehouse = Warehouse
 	return s
 }
 
-func (s *StreamlitsSetRequest) WithComment(Comment *string) *StreamlitsSetRequest {
+func (s *StreamlitSetRequest) WithComment(Comment *string) *StreamlitSetRequest {
 	s.Comment = Comment
 	return s
+}
+
+func NewDropStreamlitRequest(
+	name SchemaObjectIdentifier,
+) *DropStreamlitRequest {
+	s := DropStreamlitRequest{}
+	s.name = name
+	return &s
+}
+
+func (s *DropStreamlitRequest) WithIfExists(IfExists *bool) *DropStreamlitRequest {
+	s.IfExists = IfExists
+	return s
+}
+
+func NewShowStreamlitRequest() *ShowStreamlitRequest {
+	return &ShowStreamlitRequest{}
+}
+
+func (s *ShowStreamlitRequest) WithTerse(Terse *bool) *ShowStreamlitRequest {
+	s.Terse = Terse
+	return s
+}
+
+func (s *ShowStreamlitRequest) WithLike(Like *Like) *ShowStreamlitRequest {
+	s.Like = Like
+	return s
+}
+
+func (s *ShowStreamlitRequest) WithIn(In *In) *ShowStreamlitRequest {
+	s.In = In
+	return s
+}
+
+func (s *ShowStreamlitRequest) WithLimit(Limit *LimitFrom) *ShowStreamlitRequest {
+	s.Limit = Limit
+	return s
+}
+
+func NewDescribeStreamlitRequest(
+	name SchemaObjectIdentifier,
+) *DescribeStreamlitRequest {
+	s := DescribeStreamlitRequest{}
+	s.name = name
+	return &s
 }
