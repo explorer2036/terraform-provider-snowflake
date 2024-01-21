@@ -11,7 +11,7 @@ type Streamlits interface {
 	Drop(ctx context.Context, request *DropStreamlitRequest) error
 	Show(ctx context.Context, request *ShowStreamlitRequest) ([]Streamlit, error)
 	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*Streamlit, error)
-	Describe(ctx context.Context, id SchemaObjectIdentifier) (*StreamlitDetails, error)
+	Describe(ctx context.Context, id SchemaObjectIdentifier) (*StreamlitDetail, error)
 }
 
 // CreateStreamlitOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-streamlit.
@@ -95,7 +95,7 @@ type DescribeStreamlitOptions struct {
 	name      SchemaObjectIdentifier `ddl:"identifier"`
 }
 
-type streamlitsDetailsRow struct {
+type streamlitsDetailRow struct {
 	Name           string         `db:"name"`
 	Title          sql.NullString `db:"title"`
 	RootLocation   string         `db:"root_location"`
@@ -104,7 +104,7 @@ type streamlitsDetailsRow struct {
 	UrlId          string         `db:"url_id"`
 }
 
-type StreamlitDetails struct {
+type StreamlitDetail struct {
 	Name           string
 	Title          string
 	RootLocation   string

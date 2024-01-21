@@ -85,14 +85,14 @@ var StreamlitsDef = g.NewInterface(
 ).ShowByIdOperation().DescribeOperation(
 	g.DescriptionMappingKindSingleValue,
 	"https://docs.snowflake.com/en/sql-reference/sql/desc-streamlit",
-	g.DbStruct("streamlitsDetailsRow").
+	g.DbStruct("streamlitsDetailRow").
 		Field("name", "string").
 		Field("title", "sql.NullString").
 		Field("root_location", "string").
 		Field("main_file", "string").
 		Field("query_warehouse", "sql.NullString").
 		Field("url_id", "string"),
-	g.PlainStruct("StreamlitDetails").
+	g.PlainStruct("StreamlitDetail").
 		Field("Name", "string").
 		Field("Title", "string").
 		Field("RootLocation", "string").

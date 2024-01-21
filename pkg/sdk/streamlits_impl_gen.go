@@ -46,11 +46,11 @@ func (v *streamlits) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*
 	return collections.FindOne(streamlits, func(r Streamlit) bool { return r.Name == id.Name() })
 }
 
-func (v *streamlits) Describe(ctx context.Context, id SchemaObjectIdentifier) (*StreamlitDetails, error) {
+func (v *streamlits) Describe(ctx context.Context, id SchemaObjectIdentifier) (*StreamlitDetail, error) {
 	opts := &DescribeStreamlitOptions{
 		name: id,
 	}
-	result, err := validateAndQueryOne[streamlitsDetailsRow](v.client, ctx, opts)
+	result, err := validateAndQueryOne[streamlitsDetailRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -135,8 +135,8 @@ func (r *DescribeStreamlitRequest) toOpts() *DescribeStreamlitOptions {
 	return opts
 }
 
-func (r streamlitsDetailsRow) convert() *StreamlitDetails {
-	e := &StreamlitDetails{
+func (r streamlitsDetailRow) convert() *StreamlitDetail {
+	e := &StreamlitDetail{
 		Name:         r.Name,
 		RootLocation: r.RootLocation,
 		MainFile:     r.MainFile,
