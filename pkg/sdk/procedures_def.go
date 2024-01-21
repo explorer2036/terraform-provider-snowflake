@@ -378,8 +378,9 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
 		WithValidation(g.ValidateValueSet, "RuntimeVersion").
+		WithValidation(g.ValidateValueSet, "Packages").
 		WithValidation(g.ValidateValueSet, "Handler").
-		WithValidation(g.ValidIdentifier, "ProcedureName").
+		WithValidation(g.ValidIdentifierIfSet, "ProcedureName").
 		WithValidation(g.ValidIdentifier, "Name"),
 ).CustomOperation(
 	"CreateAndCallForScala",
@@ -423,8 +424,9 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
 		WithValidation(g.ValidateValueSet, "RuntimeVersion").
+		WithValidation(g.ValidateValueSet, "Packages").
 		WithValidation(g.ValidateValueSet, "Handler").
-		WithValidation(g.ValidIdentifier, "ProcedureName").
+		WithValidation(g.ValidIdentifierIfSet, "ProcedureName").
 		WithValidation(g.ValidIdentifier, "Name"),
 ).CustomOperation(
 	"CreateAndCallForJavaScript",
@@ -453,7 +455,8 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
 		WithValidation(g.ValidateValueSet, "ProcedureDefinition").
-		WithValidation(g.ValidIdentifier, "ProcedureName").
+		WithValidation(g.ValidateValueSet, "ResultDataType").
+		WithValidation(g.ValidIdentifierIfSet, "ProcedureName").
 		WithValidation(g.ValidIdentifier, "Name"),
 ).CustomOperation(
 	"CreateAndCallForPython",
@@ -496,9 +499,11 @@ var ProceduresDef = g.NewInterface(
 		Identifier("ProcedureName", g.KindOfT[AccountObjectIdentifier](), g.IdentifierOptions().Required()).
 		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
+		WithValidation(g.ValidateValueSet, "ProcedureDefinition").
 		WithValidation(g.ValidateValueSet, "RuntimeVersion").
+		WithValidation(g.ValidateValueSet, "Packages").
 		WithValidation(g.ValidateValueSet, "Handler").
-		WithValidation(g.ValidIdentifier, "ProcedureName").
+		WithValidation(g.ValidIdentifierIfSet, "ProcedureName").
 		WithValidation(g.ValidIdentifier, "Name"),
 ).CustomOperation(
 	"CreateAndCallForSQL",
@@ -530,6 +535,6 @@ var ProceduresDef = g.NewInterface(
 		PredefinedQueryStructField("CallArguments", "[]string", g.KeywordOptions().MustParentheses()).
 		PredefinedQueryStructField("ScriptingVariable", "*string", g.ParameterOptions().NoEquals().NoQuotes().SQL("INTO")).
 		WithValidation(g.ValidateValueSet, "ProcedureDefinition").
-		WithValidation(g.ValidIdentifier, "ProcedureName").
+		WithValidation(g.ValidIdentifierIfSet, "ProcedureName").
 		WithValidation(g.ValidIdentifier, "Name"),
 )
