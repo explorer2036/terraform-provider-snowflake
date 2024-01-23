@@ -33,41 +33,55 @@ func (r *CreateReplicationGroupRequest) toOpts() *CreateReplicationGroupOptions 
 		Users:             r.ObjectTypes.Users,
 		Warehouses:        r.ObjectTypes.Warehouses,
 	}
-	if r.Databases != nil {
-		s := make([]ReplicationGroupDatabase, len(r.Databases))
-		for i, v := range r.Databases {
+	if r.AllowedDatabases != nil {
+		s := make([]ReplicationGroupDatabase, len(r.AllowedDatabases))
+		for i, v := range r.AllowedDatabases {
 			s[i] = ReplicationGroupDatabase{
 				Database: v.Database,
 			}
 		}
-		opts.Databases = s
+		opts.AllowedDatabases = s
 	}
-	if r.Shares != nil {
-		s := make([]ReplicationGroupShare, len(r.Shares))
-		for i, v := range r.Shares {
+	if r.AllowedShares != nil {
+		s := make([]ReplicationGroupShare, len(r.AllowedShares))
+		for i, v := range r.AllowedShares {
 			s[i] = ReplicationGroupShare{
 				Share: v.Share,
 			}
 		}
-		opts.Shares = s
+		opts.AllowedShares = s
 	}
-	if r.IntegrationTypes != nil {
-		s := make([]ReplicationGroupIntegrationType, len(r.IntegrationTypes))
-		for i, v := range r.IntegrationTypes {
+	if r.AllowedIntegrationTypes != nil {
+		s := make([]ReplicationGroupIntegrationType, len(r.AllowedIntegrationTypes))
+		for i, v := range r.AllowedIntegrationTypes {
 			s[i] = ReplicationGroupIntegrationType{
 				IntegrationType: v.IntegrationType,
 			}
 		}
-		opts.IntegrationTypes = s
+		opts.AllowedIntegrationTypes = s
 	}
-	if r.Accounts != nil {
-		s := make([]ReplicationGroupAccount, len(r.Accounts))
-		for i, v := range r.Accounts {
+	if r.AllowedAccounts != nil {
+		s := make([]ReplicationGroupAccount, len(r.AllowedAccounts))
+		for i, v := range r.AllowedAccounts {
 			s[i] = ReplicationGroupAccount{
 				Account: v.Account,
 			}
 		}
-		opts.Accounts = s
+		opts.AllowedAccounts = s
+	}
+	if r.ReplicationSchedule != nil {
+		opts.ReplicationSchedule = &ReplicationGroupSchedule{}
+		if r.ReplicationSchedule.IntervalMinutes != nil {
+			opts.ReplicationSchedule.IntervalMinutes = &ScheduleIntervalMinutes{
+				Minutes: r.ReplicationSchedule.IntervalMinutes.Minutes,
+			}
+		}
+		if r.ReplicationSchedule.CronExpression != nil {
+			opts.ReplicationSchedule.CronExpression = &ScheduleCronExpression{
+				Expression: r.ReplicationSchedule.CronExpression.Expression,
+				TimeZone:   r.ReplicationSchedule.CronExpression.TimeZone,
+			}
+		}
 	}
 	return opts
 }

@@ -34,7 +34,7 @@ func TestReplicationGroups_Create(t *testing.T) {
 			Databases: Bool(true),
 			Shares:    Bool(true),
 		}
-		opts.Databases = []ReplicationGroupDatabase{
+		opts.AllowedDatabases = []ReplicationGroupDatabase{
 			{
 				Database: "db1",
 			},
@@ -42,7 +42,7 @@ func TestReplicationGroups_Create(t *testing.T) {
 				Database: "db2",
 			},
 		}
-		opts.Shares = []ReplicationGroupShare{
+		opts.AllowedShares = []ReplicationGroupShare{
 			{
 				Share: "share1",
 			},
@@ -50,7 +50,7 @@ func TestReplicationGroups_Create(t *testing.T) {
 				Share: "share2",
 			},
 		}
-		opts.Accounts = []ReplicationGroupAccount{
+		opts.AllowedAccounts = []ReplicationGroupAccount{
 			{
 				Account: "org.acct1",
 			},
@@ -58,6 +58,13 @@ func TestReplicationGroups_Create(t *testing.T) {
 				Account: "org.acct2",
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `CREATE REPLICATION GROUP IF NOT EXISTS %s OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = db1, db2 ALLOWED_SHARES = share1, share2 ALLOWED_ACCOUNTS = org.acct1, org.acct2`, id.FullyQualifiedName())
+		opts.IgnoreEditionCheck = Bool(true)
+		opts.ReplicationSchedule = &ReplicationGroupSchedule{
+			CronExpression: &ScheduleCronExpression{
+				Expression: "0 0 10-20 * TUE,THU",
+				TimeZone:   "UTC",
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `CREATE REPLICATION GROUP IF NOT EXISTS %s OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = db1, db2 ALLOWED_SHARES = share1, share2 ALLOWED_ACCOUNTS = org.acct1, org.acct2 IGNORE EDITION CHECK REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC'`, id.FullyQualifiedName())
 	})
 }

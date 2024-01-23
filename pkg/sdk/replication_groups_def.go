@@ -16,6 +16,23 @@ var replicationGroupObjectTypes = g.NewQueryStruct("ReplicationGroupObjectTypes"
 	OptionalSQL("WAREHOUSES").
 	WithValidation(g.AtLeastOneValueSet, "AccountParameters", "Databases", "Integrations", "NetworkPolicies", "ResourceMonitors", "Roles", "Shares", "Users", "Warehouses")
 
+// [ REPLICATION_SCHEDULE = '{ <num> MINUTE | USING CRON <expr> <time_zone> }' ]
+var replicationGroupSchedule = g.NewQueryStruct("ReplicationGroupSchedule").
+	OptionalQueryStructField("IntervalMinutes",
+		g.NewQueryStruct("ScheduleIntervalMinutes").
+			Number("Minutes", g.KeywordOptions().Required()).
+			SQL("MINUTES"),
+		g.KeywordOptions(),
+	).
+	OptionalQueryStructField("CronExpression",
+		g.NewQueryStruct("ScheduleCronExpression").
+			SQL("USING CRON").
+			Text("Expression", g.KeywordOptions().Required()).
+			Text("TimeZone", g.KeywordOptions().Required()),
+		g.KeywordOptions(),
+	).
+	WithValidation(g.ExactlyOneValueSet, "IntervalMinutes", "CronExpression")
+
 var (
 	replicationGroupDatabase        = g.NewQueryStruct("ReplicationGroupDatabase").Text("Database", g.KeywordOptions())
 	replicationGroupShare           = g.NewQueryStruct("ReplicationGroupShare").Text("Share", g.KeywordOptions())
@@ -40,25 +57,32 @@ var ReplicationGroupsDef = g.NewInterface(
 			g.ListOptions().NoParentheses().SQL("OBJECT_TYPES ="),
 		).
 		ListQueryStructField(
-			"Databases",
+			"AllowedDatabases",
 			replicationGroupDatabase,
 			g.ParameterOptions().NoParentheses().SQL("ALLOWED_DATABASES"),
 		).
 		ListQueryStructField(
-			"Shares",
+			"AllowedShares",
 			replicationGroupShare,
 			g.ParameterOptions().NoParentheses().SQL("ALLOWED_SHARES"),
 		).
 		ListQueryStructField(
-			"IntegrationTypes",
+			"AllowedIntegrationTypes",
 			replicationGroupIntegrationType,
 			g.ParameterOptions().NoParentheses().SQL("ALLOWED_INTEGRATION_TYPES"),
 		).
 		ListQueryStructField(
-			"Accounts",
+			"AllowedAccounts",
 			replicationGroupAccount,
 			g.ParameterOptions().NoParentheses().SQL("ALLOWED_ACCOUNTS"),
 		).
 		OptionalSQL("IGNORE EDITION CHECK").
-		WithValidation(g.ValidIdentifier, "name"),
+		OptionalQueryStructField(
+			"ReplicationSchedule",
+			replicationGroupSchedule,
+			g.ParameterOptions().SingleQuotes().SQL("REPLICATION_SCHEDULE"),
+		).
+		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ValidateValueSet, "ObjectTypes").
+		WithValidation(g.ValidateValueSet, "AllowedAccounts"),
 )

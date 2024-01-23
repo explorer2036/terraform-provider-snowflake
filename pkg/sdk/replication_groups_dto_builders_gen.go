@@ -22,28 +22,33 @@ func (s *CreateReplicationGroupRequest) WithObjectTypes(ObjectTypes ReplicationG
 	return s
 }
 
-func (s *CreateReplicationGroupRequest) WithDatabases(Databases []ReplicationGroupDatabaseRequest) *CreateReplicationGroupRequest {
-	s.Databases = Databases
+func (s *CreateReplicationGroupRequest) WithAllowedDatabases(AllowedDatabases []ReplicationGroupDatabaseRequest) *CreateReplicationGroupRequest {
+	s.AllowedDatabases = AllowedDatabases
 	return s
 }
 
-func (s *CreateReplicationGroupRequest) WithShares(Shares []ReplicationGroupShareRequest) *CreateReplicationGroupRequest {
-	s.Shares = Shares
+func (s *CreateReplicationGroupRequest) WithAllowedShares(AllowedShares []ReplicationGroupShareRequest) *CreateReplicationGroupRequest {
+	s.AllowedShares = AllowedShares
 	return s
 }
 
-func (s *CreateReplicationGroupRequest) WithIntegrationTypes(IntegrationTypes []ReplicationGroupIntegrationTypeRequest) *CreateReplicationGroupRequest {
-	s.IntegrationTypes = IntegrationTypes
+func (s *CreateReplicationGroupRequest) WithAllowedIntegrationTypes(AllowedIntegrationTypes []ReplicationGroupIntegrationTypeRequest) *CreateReplicationGroupRequest {
+	s.AllowedIntegrationTypes = AllowedIntegrationTypes
 	return s
 }
 
-func (s *CreateReplicationGroupRequest) WithAccounts(Accounts []ReplicationGroupAccountRequest) *CreateReplicationGroupRequest {
-	s.Accounts = Accounts
+func (s *CreateReplicationGroupRequest) WithAllowedAccounts(AllowedAccounts []ReplicationGroupAccountRequest) *CreateReplicationGroupRequest {
+	s.AllowedAccounts = AllowedAccounts
 	return s
 }
 
 func (s *CreateReplicationGroupRequest) WithIgnoreEditionCheck(IgnoreEditionCheck *bool) *CreateReplicationGroupRequest {
 	s.IgnoreEditionCheck = IgnoreEditionCheck
+	return s
+}
+
+func (s *CreateReplicationGroupRequest) WithReplicationSchedule(ReplicationSchedule *ReplicationGroupScheduleRequest) *CreateReplicationGroupRequest {
+	s.ReplicationSchedule = ReplicationSchedule
 	return s
 }
 
@@ -130,4 +135,36 @@ func NewReplicationGroupAccountRequest() *ReplicationGroupAccountRequest {
 func (s *ReplicationGroupAccountRequest) WithAccount(Account string) *ReplicationGroupAccountRequest {
 	s.Account = Account
 	return s
+}
+
+func NewReplicationGroupScheduleRequest() *ReplicationGroupScheduleRequest {
+	return &ReplicationGroupScheduleRequest{}
+}
+
+func (s *ReplicationGroupScheduleRequest) WithIntervalMinutes(IntervalMinutes *ScheduleIntervalMinutesRequest) *ReplicationGroupScheduleRequest {
+	s.IntervalMinutes = IntervalMinutes
+	return s
+}
+
+func (s *ReplicationGroupScheduleRequest) WithCronExpression(CronExpression *ScheduleCronExpressionRequest) *ReplicationGroupScheduleRequest {
+	s.CronExpression = CronExpression
+	return s
+}
+
+func NewScheduleIntervalMinutesRequest(
+	Minutes int,
+) *ScheduleIntervalMinutesRequest {
+	s := ScheduleIntervalMinutesRequest{}
+	s.Minutes = Minutes
+	return &s
+}
+
+func NewScheduleCronExpressionRequest(
+	Expression string,
+	TimeZone string,
+) *ScheduleCronExpressionRequest {
+	s := ScheduleCronExpressionRequest{}
+	s.Expression = Expression
+	s.TimeZone = TimeZone
+	return &s
 }
