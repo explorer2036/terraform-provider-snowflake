@@ -26,7 +26,7 @@ var (
 
 type FailoverGroups interface {
 	Create(ctx context.Context, id AccountObjectIdentifier, objectTypes []PluralObjectType, allowedAccounts []AccountIdentifier, opts *CreateFailoverGroupOptions) error
-	CreateSecondaryReplicationGroup(ctx context.Context, id AccountObjectIdentifier, primaryFailoverGroupID ExternalObjectIdentifier, opts *CreateSecondaryReplicationGroupOptions) error
+	CreateSecondaryFailoverGroup(ctx context.Context, id AccountObjectIdentifier, primaryFailoverGroupID ExternalObjectIdentifier, opts *CreateSecondaryFailoverGroupOptions) error
 	AlterSource(ctx context.Context, id AccountObjectIdentifier, opts *AlterSourceFailoverGroupOptions) error
 	AlterTarget(ctx context.Context, id AccountObjectIdentifier, opts *AlterTargetFailoverGroupOptions) error
 	Drop(ctx context.Context, id AccountObjectIdentifier, opts *DropFailoverGroupOptions) error
@@ -94,8 +94,8 @@ func (v *failoverGroups) Create(ctx context.Context, id AccountObjectIdentifier,
 	return err
 }
 
-// CreateSecondaryReplicationGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-failover-group.
-type CreateSecondaryReplicationGroupOptions struct {
+// CreateSecondaryFailoverGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-failover-group.
+type CreateSecondaryFailoverGroupOptions struct {
 	create               bool                     `ddl:"static" sql:"CREATE"`
 	failoverGroup        bool                     `ddl:"static" sql:"FAILOVER GROUP"`
 	IfNotExists          *bool                    `ddl:"keyword" sql:"IF NOT EXISTS"`
@@ -103,7 +103,7 @@ type CreateSecondaryReplicationGroupOptions struct {
 	primaryFailoverGroup ExternalObjectIdentifier `ddl:"identifier" sql:"AS REPLICA OF"`
 }
 
-func (opts *CreateSecondaryReplicationGroupOptions) validate() error {
+func (opts *CreateSecondaryFailoverGroupOptions) validate() error {
 	if opts == nil {
 		return errors.Join(ErrNilOptions)
 	}
@@ -112,14 +112,14 @@ func (opts *CreateSecondaryReplicationGroupOptions) validate() error {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
 	if !ValidObjectIdentifier(opts.primaryFailoverGroup) {
-		errs = append(errs, errInvalidIdentifier("CreateSecondaryReplicationGroupOptions", "primaryFailoverGroup"))
+		errs = append(errs, errInvalidIdentifier("CreateSecondaryFailoverGroupOptions", "primaryFailoverGroup"))
 	}
 	return errors.Join(errs...)
 }
 
-func (v *failoverGroups) CreateSecondaryReplicationGroup(ctx context.Context, id AccountObjectIdentifier, primaryFailoverGroupID ExternalObjectIdentifier, opts *CreateSecondaryReplicationGroupOptions) error {
+func (v *failoverGroups) CreateSecondaryFailoverGroup(ctx context.Context, id AccountObjectIdentifier, primaryFailoverGroupID ExternalObjectIdentifier, opts *CreateSecondaryFailoverGroupOptions) error {
 	if opts == nil {
-		opts = &CreateSecondaryReplicationGroupOptions{}
+		opts = &CreateSecondaryFailoverGroupOptions{}
 	}
 	opts.name = id
 	opts.primaryFailoverGroup = primaryFailoverGroupID

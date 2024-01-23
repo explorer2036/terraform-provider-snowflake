@@ -144,7 +144,7 @@ func TestInt_CreateSecondaryReplicationGroup(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 	// create a replica of failover group in target account
-	err = secondaryClient.FailoverGroups.CreateSecondaryReplicationGroup(ctx, failoverGroup.ID(), failoverGroup.ExternalID(), &sdk.CreateSecondaryReplicationGroupOptions{
+	err = secondaryClient.FailoverGroups.CreateSecondaryFailoverGroup(ctx, failoverGroup.ID(), failoverGroup.ExternalID(), &sdk.CreateSecondaryFailoverGroupOptions{
 		IfNotExists: sdk.Bool(true),
 	})
 	require.NoError(t, err)
@@ -578,7 +578,7 @@ func TestInt_FailoverGroupsAlterTarget(t *testing.T) {
 	time.Sleep(1 * time.Second)
 
 	// create a replica of failover group in target account
-	err = secondaryClient.FailoverGroups.CreateSecondaryReplicationGroup(ctx, failoverGroup.ID(), failoverGroup.ExternalID(), &sdk.CreateSecondaryReplicationGroupOptions{
+	err = secondaryClient.FailoverGroups.CreateSecondaryFailoverGroup(ctx, failoverGroup.ID(), failoverGroup.ExternalID(), &sdk.CreateSecondaryFailoverGroupOptions{
 		IfNotExists: sdk.Bool(true),
 	})
 	require.NoError(t, err)

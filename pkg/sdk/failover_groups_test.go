@@ -43,8 +43,8 @@ func TestFailoverGroupsCreate(t *testing.T) {
 	})
 }
 
-func TestCreateSecondaryReplicationGroup(t *testing.T) {
-	opts := &CreateSecondaryReplicationGroupOptions{
+func TestCreateSecondaryFailoverGroup(t *testing.T) {
+	opts := &CreateSecondaryFailoverGroupOptions{
 		IfNotExists:          Bool(true),
 		name:                 NewAccountObjectIdentifier("fg1"),
 		primaryFailoverGroup: NewExternalObjectIdentifierFromFullyQualifiedName("myorg.myaccount.fg1"),
