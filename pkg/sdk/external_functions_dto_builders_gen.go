@@ -114,3 +114,120 @@ func (s *ExternalFunctionContextHeaderRequest) WithContextFunction(ContextFuncti
 	s.ContextFunction = ContextFunction
 	return s
 }
+
+func NewAlterExternalFunctionRequest(
+	name SchemaObjectIdentifier,
+	ArgumentDataTypes []DataType,
+) *AlterExternalFunctionRequest {
+	s := AlterExternalFunctionRequest{}
+	s.name = name
+	s.ArgumentDataTypes = ArgumentDataTypes
+	return &s
+}
+
+func (s *AlterExternalFunctionRequest) WithIfExists(IfExists *bool) *AlterExternalFunctionRequest {
+	s.IfExists = IfExists
+	return s
+}
+
+func (s *AlterExternalFunctionRequest) WithSet(Set *ExternalFunctionSetRequest) *AlterExternalFunctionRequest {
+	s.Set = Set
+	return s
+}
+
+func (s *AlterExternalFunctionRequest) WithUnset(Unset *ExternalFunctionUnsetRequest) *AlterExternalFunctionRequest {
+	s.Unset = Unset
+	return s
+}
+
+func NewExternalFunctionSetRequest() *ExternalFunctionSetRequest {
+	return &ExternalFunctionSetRequest{}
+}
+
+func (s *ExternalFunctionSetRequest) WithApiIntegration(ApiIntegration *AccountObjectIdentifier) *ExternalFunctionSetRequest {
+	s.ApiIntegration = ApiIntegration
+	return s
+}
+
+func (s *ExternalFunctionSetRequest) WithHeaders(Headers []ExternalFunctionHeaderRequest) *ExternalFunctionSetRequest {
+	s.Headers = Headers
+	return s
+}
+
+func (s *ExternalFunctionSetRequest) WithContextHeaders(ContextHeaders []ExternalFunctionContextHeaderRequest) *ExternalFunctionSetRequest {
+	s.ContextHeaders = ContextHeaders
+	return s
+}
+
+func (s *ExternalFunctionSetRequest) WithMaxBatchRows(MaxBatchRows *int) *ExternalFunctionSetRequest {
+	s.MaxBatchRows = MaxBatchRows
+	return s
+}
+
+func (s *ExternalFunctionSetRequest) WithCompression(Compression *string) *ExternalFunctionSetRequest {
+	s.Compression = Compression
+	return s
+}
+
+func (s *ExternalFunctionSetRequest) WithRequestTranslator(RequestTranslator *SchemaObjectIdentifier) *ExternalFunctionSetRequest {
+	s.RequestTranslator = RequestTranslator
+	return s
+}
+
+func (s *ExternalFunctionSetRequest) WithResponseTranslator(ResponseTranslator *SchemaObjectIdentifier) *ExternalFunctionSetRequest {
+	s.ResponseTranslator = ResponseTranslator
+	return s
+}
+
+func NewExternalFunctionUnsetRequest() *ExternalFunctionUnsetRequest {
+	return &ExternalFunctionUnsetRequest{}
+}
+
+func (s *ExternalFunctionUnsetRequest) WithComment(Comment *bool) *ExternalFunctionUnsetRequest {
+	s.Comment = Comment
+	return s
+}
+
+func (s *ExternalFunctionUnsetRequest) WithHeaders(Headers *bool) *ExternalFunctionUnsetRequest {
+	s.Headers = Headers
+	return s
+}
+
+func (s *ExternalFunctionUnsetRequest) WithContextHeaders(ContextHeaders *bool) *ExternalFunctionUnsetRequest {
+	s.ContextHeaders = ContextHeaders
+	return s
+}
+
+func (s *ExternalFunctionUnsetRequest) WithMaxBatchRows(MaxBatchRows *bool) *ExternalFunctionUnsetRequest {
+	s.MaxBatchRows = MaxBatchRows
+	return s
+}
+
+func (s *ExternalFunctionUnsetRequest) WithCompression(Compression *bool) *ExternalFunctionUnsetRequest {
+	s.Compression = Compression
+	return s
+}
+
+func (s *ExternalFunctionUnsetRequest) WithSecure(Secure *bool) *ExternalFunctionUnsetRequest {
+	s.Secure = Secure
+	return s
+}
+
+func (s *ExternalFunctionUnsetRequest) WithRequestTranslator(RequestTranslator *bool) *ExternalFunctionUnsetRequest {
+	s.RequestTranslator = RequestTranslator
+	return s
+}
+
+func (s *ExternalFunctionUnsetRequest) WithResponseTranslator(ResponseTranslator *bool) *ExternalFunctionUnsetRequest {
+	s.ResponseTranslator = ResponseTranslator
+	return s
+}
+
+func NewShowExternalFunctionRequest() *ShowExternalFunctionRequest {
+	return &ShowExternalFunctionRequest{}
+}
+
+func (s *ShowExternalFunctionRequest) WithLike(Like *Like) *ShowExternalFunctionRequest {
+	s.Like = Like
+	return s
+}

@@ -4,6 +4,8 @@ package sdk
 
 var (
 	_ optionsProvider[CreateExternalFunctionOptions] = new(CreateExternalFunctionRequest)
+	_ optionsProvider[AlterExternalFunctionOptions]  = new(AlterExternalFunctionRequest)
+	_ optionsProvider[ShowExternalFunctionOptions]   = new(ShowExternalFunctionRequest)
 )
 
 type CreateExternalFunctionRequest struct {
@@ -38,4 +40,37 @@ type ExternalFunctionHeaderRequest struct {
 
 type ExternalFunctionContextHeaderRequest struct {
 	ContextFunction string
+}
+
+type AlterExternalFunctionRequest struct {
+	IfExists          *bool
+	name              SchemaObjectIdentifier // required
+	ArgumentDataTypes []DataType             // required
+	Set               *ExternalFunctionSetRequest
+	Unset             *ExternalFunctionUnsetRequest
+}
+
+type ExternalFunctionSetRequest struct {
+	ApiIntegration     *AccountObjectIdentifier
+	Headers            []ExternalFunctionHeaderRequest
+	ContextHeaders     []ExternalFunctionContextHeaderRequest
+	MaxBatchRows       *int
+	Compression        *string
+	RequestTranslator  *SchemaObjectIdentifier
+	ResponseTranslator *SchemaObjectIdentifier
+}
+
+type ExternalFunctionUnsetRequest struct {
+	Comment            *bool
+	Headers            *bool
+	ContextHeaders     *bool
+	MaxBatchRows       *bool
+	Compression        *bool
+	Secure             *bool
+	RequestTranslator  *bool
+	ResponseTranslator *bool
+}
+
+type ShowExternalFunctionRequest struct {
+	Like *Like
 }
