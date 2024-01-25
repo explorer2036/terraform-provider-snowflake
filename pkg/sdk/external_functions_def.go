@@ -83,6 +83,7 @@ var ExternalFunctionsDef = g.NewInterface(
 		WithValidation(g.ValidateValueSet, "ApiIntegration").
 		WithValidation(g.ValidIdentifierIfSet, "ApiIntegration").
 		WithValidation(g.ValidIdentifierIfSet, "RequestTranslator").
+		WithValidation(g.ValidateValueSet, "As").
 		WithValidation(g.ValidIdentifierIfSet, "ResponseTranslator"),
 ).AlterOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-function",

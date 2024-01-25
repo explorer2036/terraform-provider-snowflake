@@ -14,11 +14,17 @@ func (opts *CreateExternalFunctionOptions) validate() error {
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
+	if !valueSet(opts.ApiIntegration) {
+		errs = append(errs, errNotSet("CreateExternalFunctionOptions", "ApiIntegration"))
+	}
 	if opts.ApiIntegration != nil && !ValidObjectIdentifier(opts.ApiIntegration) {
 		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "ApiIntegration"))
 	}
 	if opts.RequestTranslator != nil && !ValidObjectIdentifier(opts.RequestTranslator) {
-		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "ResponseTranslator"))
+		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "RequestTranslator"))
+	}
+	if !valueSet(opts.As) {
+		errs = append(errs, errNotSet("CreateExternalFunctionOptions", "As"))
 	}
 	if opts.ResponseTranslator != nil && !ValidObjectIdentifier(opts.ResponseTranslator) {
 		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "ResponseTranslator"))
