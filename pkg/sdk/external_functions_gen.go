@@ -105,6 +105,7 @@ type externalFunctionRow struct {
 	IsExternalFunction string         `db:"is_external_function"`
 	Language           string         `db:"language"`
 	IsMemoizable       sql.NullString `db:"is_memoizable"`
+	IsDataMetric       sql.NullString `db:"is_data_metric"`
 }
 
 type ExternalFunction struct {
@@ -125,4 +126,5 @@ type ExternalFunction struct {
 	IsExternalFunction bool
 	Language           string
 	IsMemoizable       bool
+	IsDataMetric       bool
 }

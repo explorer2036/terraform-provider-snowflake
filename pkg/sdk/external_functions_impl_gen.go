@@ -149,5 +149,8 @@ func (r externalFunctionRow) convert() *ExternalFunction {
 	if r.IsMemoizable.Valid {
 		e.IsMemoizable = r.IsMemoizable.String == "Y"
 	}
+	if r.IsDataMetric.Valid {
+		e.IsDataMetric = r.IsDataMetric.String == "Y"
+	}
 	return e
 }

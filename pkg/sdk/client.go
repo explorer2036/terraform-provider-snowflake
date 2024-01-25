@@ -52,6 +52,7 @@ type Client struct {
 	FailoverGroups      FailoverGroups
 	FileFormats         FileFormats
 	Functions           Functions
+	ExternalFunctions   ExternalFunctions
 	Grants              Grants
 	ManagedAccounts     ManagedAccounts
 	MaskingPolicies     MaskingPolicies
@@ -199,6 +200,7 @@ func (c *Client) initialize() {
 	c.FailoverGroups = &failoverGroups{client: c}
 	c.FileFormats = &fileFormats{client: c}
 	c.Functions = &functions{client: c}
+	c.ExternalFunctions = &externalFunctions{client: c}
 	c.Grants = &grants{client: c}
 	c.ManagedAccounts = &managedAccounts{client: c}
 	c.MaskingPolicies = &maskingPolicies{client: c}
