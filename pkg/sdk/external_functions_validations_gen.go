@@ -11,6 +11,15 @@ func (opts *CreateExternalFunctionOptions) validate() error {
 		return ErrNilOptions
 	}
 	var errs []error
+	if !ValidObjectIdentifier(opts.ApiIntegration) {
+		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "ApiIntegration"))
+	}
+	if opts.RequestTranslator != nil && !ValidObjectIdentifier(opts.RequestTranslator) {
+		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "ResponseTranslator"))
+	}
+	if opts.ResponseTranslator != nil && !ValidObjectIdentifier(opts.ResponseTranslator) {
+		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "ResponseTranslator"))
+	}
 	if !ValidObjectIdentifier(opts.name) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}

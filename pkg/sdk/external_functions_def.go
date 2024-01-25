@@ -63,7 +63,7 @@ var ExternalFunctionsDef = g.NewInterface(
 		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
 		PredefinedQueryStructField("ReturnResultsBehavior", "*ReturnResultsBehavior", g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-		Identifier("ApiIntegration", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("API_INTEGRATION =")).
+		Identifier("ApiIntegration", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("API_INTEGRATION =").Required()).
 		ListQueryStructField(
 			"Headers",
 			externalFunctionHeader,
@@ -79,6 +79,9 @@ var ExternalFunctionsDef = g.NewInterface(
 		OptionalIdentifier("RequestTranslator", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("REQUEST_TRANSLATOR =")).
 		OptionalIdentifier("ResponseTranslator", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RESPONSE_TRANSLATOR =")).
 		TextAssignment("AS", g.ParameterOptions().SingleQuotes().Required()).
+		WithValidation(g.ValidIdentifier, "ApiIntegration").
+		WithValidation(g.ValidIdentifierIfSet, "RequestTranslator").
+		WithValidation(g.ValidIdentifierIfSet, "ResponseTranslator").
 		WithValidation(g.ValidIdentifier, "name"),
 ).AlterOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-function",

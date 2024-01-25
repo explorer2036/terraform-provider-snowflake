@@ -7,11 +7,13 @@ import ()
 func NewCreateExternalFunctionRequest(
 	name SchemaObjectIdentifier,
 	ResultDataType DataType,
+	ApiIntegration *AccountObjectIdentifier,
 	As string,
 ) *CreateExternalFunctionRequest {
 	s := CreateExternalFunctionRequest{}
 	s.name = name
 	s.ResultDataType = ResultDataType
+	s.ApiIntegration = ApiIntegration
 	s.As = As
 	return &s
 }
@@ -48,11 +50,6 @@ func (s *CreateExternalFunctionRequest) WithReturnResultsBehavior(ReturnResultsB
 
 func (s *CreateExternalFunctionRequest) WithComment(Comment *string) *CreateExternalFunctionRequest {
 	s.Comment = Comment
-	return s
-}
-
-func (s *CreateExternalFunctionRequest) WithApiIntegration(ApiIntegration *AccountObjectIdentifier) *CreateExternalFunctionRequest {
-	s.ApiIntegration = ApiIntegration
 	return s
 }
 

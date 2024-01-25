@@ -18,7 +18,7 @@ type CreateExternalFunctionRequest struct {
 	NullInputBehavior     *NullInputBehavior
 	ReturnResultsBehavior *ReturnResultsBehavior
 	Comment               *string
-	ApiIntegration        *AccountObjectIdentifier
+	ApiIntegration        *AccountObjectIdentifier // required
 	Headers               []ExternalFunctionHeaderRequest
 	ContextHeaders        []ExternalFunctionContextHeaderRequest
 	MaxBatchRows          *int
