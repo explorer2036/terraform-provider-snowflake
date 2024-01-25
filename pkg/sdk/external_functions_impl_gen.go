@@ -52,21 +52,29 @@ func (r *CreateExternalFunctionRequest) toOpts() *CreateExternalFunctionOptions 
 	if r.Arguments != nil {
 		s := make([]ExternalFunctionArgument, len(r.Arguments))
 		for i, v := range r.Arguments {
-			s[i] = ExternalFunctionArgument(v)
+			s[i] = ExternalFunctionArgument{
+				ArgName:     v.ArgName,
+				ArgDataType: v.ArgDataType,
+			}
 		}
 		opts.Arguments = s
 	}
 	if r.Headers != nil {
 		s := make([]ExternalFunctionHeader, len(r.Headers))
 		for i, v := range r.Headers {
-			s[i] = ExternalFunctionHeader(v)
+			s[i] = ExternalFunctionHeader{
+				Name:  v.Name,
+				Value: v.Value,
+			}
 		}
 		opts.Headers = s
 	}
 	if r.ContextHeaders != nil {
 		s := make([]ExternalFunctionContextHeader, len(r.ContextHeaders))
 		for i, v := range r.ContextHeaders {
-			s[i] = ExternalFunctionContextHeader(v)
+			s[i] = ExternalFunctionContextHeader{
+				ContextFunction: v.ContextFunction,
+			}
 		}
 		opts.ContextHeaders = s
 	}
@@ -91,14 +99,19 @@ func (r *AlterExternalFunctionRequest) toOpts() *AlterExternalFunctionOptions {
 		if r.Set.Headers != nil {
 			s := make([]ExternalFunctionHeader, len(r.Set.Headers))
 			for i, v := range r.Set.Headers {
-				s[i] = ExternalFunctionHeader(v)
+				s[i] = ExternalFunctionHeader{
+					Name:  v.Name,
+					Value: v.Value,
+				}
 			}
 			opts.Set.Headers = s
 		}
 		if r.Set.ContextHeaders != nil {
 			s := make([]ExternalFunctionContextHeader, len(r.Set.ContextHeaders))
 			for i, v := range r.Set.ContextHeaders {
-				s[i] = ExternalFunctionContextHeader(v)
+				s[i] = ExternalFunctionContextHeader{
+					ContextFunction: v.ContextFunction,
+				}
 			}
 			opts.Set.ContextHeaders = s
 		}
@@ -126,28 +139,6 @@ func (r *ShowExternalFunctionRequest) toOpts() *ShowExternalFunctionOptions {
 }
 
 func (r externalFunctionRow) convert() *ExternalFunction {
-	e := &ExternalFunction{
-		CreatedOn:          r.CreatedOn,
-		Name:               r.Name,
-		SchemaName:         r.SchemaName,
-		IsBuiltin:          r.IsBuiltin == "Y",
-		IsAggregate:        r.IsAggregate == "Y",
-		IsAnsi:             r.IsAnsi == "Y",
-		MinNumArguments:    r.MinNumArguments,
-		MaxNumArguments:    r.MaxNumArguments,
-		Arguments:          r.Arguments,
-		Description:        r.Description,
-		CatalogName:        r.CatalogName,
-		IsTableFunction:    r.IsTableFunction == "Y",
-		ValidForClustering: r.ValidForClustering == "Y",
-		IsExternalFunction: r.IsExternalFunction == "Y",
-		Language:           r.Language,
-	}
-	if r.IsSecure.Valid {
-		e.IsSecure = r.IsSecure.String == "Y"
-	}
-	if r.IsMemoizable.Valid {
-		e.IsMemoizable = r.IsMemoizable.String == "Y"
-	}
-	return e
+	// TODO: Mapping
+	return &ExternalFunction{}
 }

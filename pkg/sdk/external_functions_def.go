@@ -79,10 +79,11 @@ var ExternalFunctionsDef = g.NewInterface(
 		OptionalIdentifier("RequestTranslator", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("REQUEST_TRANSLATOR =")).
 		OptionalIdentifier("ResponseTranslator", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RESPONSE_TRANSLATOR =")).
 		TextAssignment("AS", g.ParameterOptions().SingleQuotes().Required()).
-		WithValidation(g.ValidIdentifier, "ApiIntegration").
+		WithValidation(g.ValidIdentifier, "name").
+		WithValidation(g.ValidateValueSet, "ApiIntegration").
+		WithValidation(g.ValidIdentifierIfSet, "ApiIntegration").
 		WithValidation(g.ValidIdentifierIfSet, "RequestTranslator").
-		WithValidation(g.ValidIdentifierIfSet, "ResponseTranslator").
-		WithValidation(g.ValidIdentifier, "name"),
+		WithValidation(g.ValidIdentifierIfSet, "ResponseTranslator"),
 ).AlterOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/alter-function",
 	g.NewQueryStruct("AlterExternalFunction").

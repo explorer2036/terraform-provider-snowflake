@@ -22,6 +22,12 @@ func TestExternalFunctions_Create(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
+	t.Run("validation: must options", func(t *testing.T) {
+		opts := defaultOpts()
+
+		assertOptsInvalidJoinedErrors(t, opts, errInvalidIdentifier("CreateExternalFunctionOptions", "ApiIntegration"))
+	})
+
 	t.Run("all options", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.OrReplace = Bool(true)
