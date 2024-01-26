@@ -2,6 +2,8 @@ package sdk
 
 import (
 	"context"
+
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
 
 var _ ExternalFunctions = (*externalFunctions)(nil)
@@ -28,6 +30,14 @@ func (v *externalFunctions) Show(ctx context.Context, request *ShowExternalFunct
 	}
 	resultList := convertRows[externalFunctionRow, ExternalFunction](dbRows)
 	return resultList, nil
+}
+
+func (v *externalFunctions) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*ExternalFunction, error) {
+	externalFunctions, err := v.Show(ctx, NewShowExternalFunctionRequest().WithLike(&Like{Pattern: String(id.Name())}))
+	if err != nil {
+		return nil, err
+	}
+	return collections.FindOne(externalFunctions, func(r ExternalFunction) bool { return r.Name == id.Name() })
 }
 
 func (r *CreateExternalFunctionRequest) toOpts() *CreateExternalFunctionOptions {

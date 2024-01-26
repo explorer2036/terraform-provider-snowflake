@@ -87,7 +87,7 @@ func TestExternalFunctions_Create(t *testing.T) {
 		rs := NewSchemaObjectIdentifier("db", "schema", "response_translator")
 		opts.ResponseTranslator = &rs
 		opts.As = "https://xyz.execute-api.us-west-2.amazonaws.com/prod/remote_echo"
-		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE EXTERNAL FUNCTION %s (id NUMBER, name VARCHAR) RETURNS VARCHAR NOT NULL CALLED ON NULL INPUT IMMUTABLE COMMENT = 'comment' API_INTEGRATION = "api_integration" HEADERS = ('header1' = 'value1', 'header2' = 'value2') CONTEXT_HEADERS = (CURRENT_ACCOUNT, CURRENT_USER) MAX_BATCH_ROWS = 100 COMPRESSION = GZIP REQUEST_TRANSLATOR = %s RESPONSE_TRANSLATOR = %s AS = 'https://xyz.execute-api.us-west-2.amazonaws.com/prod/remote_echo'`, id.FullyQualifiedName(), rt.FullyQualifiedName(), rs.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE OR REPLACE SECURE EXTERNAL FUNCTION %s (id NUMBER, name VARCHAR) RETURNS VARCHAR NOT NULL CALLED ON NULL INPUT IMMUTABLE COMMENT = 'comment' API_INTEGRATION = "api_integration" HEADERS = ('header1' = 'value1', 'header2' = 'value2') CONTEXT_HEADERS = (CURRENT_ACCOUNT, CURRENT_USER) MAX_BATCH_ROWS = 100 COMPRESSION = GZIP REQUEST_TRANSLATOR = %s RESPONSE_TRANSLATOR = %s AS 'https://xyz.execute-api.us-west-2.amazonaws.com/prod/remote_echo'`, id.FullyQualifiedName(), rt.FullyQualifiedName(), rs.FullyQualifiedName())
 	})
 }
 

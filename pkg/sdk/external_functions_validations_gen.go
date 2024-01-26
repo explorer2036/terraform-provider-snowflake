@@ -29,9 +29,6 @@ func (opts *CreateExternalFunctionOptions) validate() error {
 	if opts.ResponseTranslator != nil && !ValidObjectIdentifier(opts.ResponseTranslator) {
 		errs = append(errs, errInvalidIdentifier("CreateExternalFunctionOptions", "ResponseTranslator"))
 	}
-	if !ValidObjectIdentifier(opts.name) {
-		errs = append(errs, ErrInvalidObjectIdentifier)
-	}
 	return JoinErrors(errs...)
 }
 

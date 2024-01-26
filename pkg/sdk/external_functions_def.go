@@ -78,7 +78,7 @@ var ExternalFunctionsDef = g.NewInterface(
 		OptionalTextAssignment("COMPRESSION", g.ParameterOptions()).
 		OptionalIdentifier("RequestTranslator", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("REQUEST_TRANSLATOR =")).
 		OptionalIdentifier("ResponseTranslator", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RESPONSE_TRANSLATOR =")).
-		TextAssignment("AS", g.ParameterOptions().SingleQuotes().Required()).
+		TextAssignment("AS", g.ParameterOptions().NoEquals().SingleQuotes().Required()).
 		WithValidation(g.ValidIdentifier, "name").
 		WithValidation(g.ValidateValueSet, "ApiIntegration").
 		WithValidation(g.ValidIdentifierIfSet, "ApiIntegration").
@@ -149,4 +149,4 @@ var ExternalFunctionsDef = g.NewInterface(
 		Show().
 		SQL("EXTERNAL FUNCTIONS").
 		OptionalLike(),
-)
+).ShowByIdOperation()

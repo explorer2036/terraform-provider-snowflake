@@ -9,6 +9,7 @@ type ExternalFunctions interface {
 	Create(ctx context.Context, request *CreateExternalFunctionRequest) error
 	Alter(ctx context.Context, request *AlterExternalFunctionRequest) error
 	Show(ctx context.Context, request *ShowExternalFunctionRequest) ([]ExternalFunction, error)
+	ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*ExternalFunction, error)
 }
 
 // CreateExternalFunctionOptions is based on https://docs.snowflake.com/en/sql-reference/sql/create-external-function.
@@ -31,7 +32,7 @@ type CreateExternalFunctionOptions struct {
 	Compression           *string                         `ddl:"parameter" sql:"COMPRESSION"`
 	RequestTranslator     *SchemaObjectIdentifier         `ddl:"identifier" sql:"REQUEST_TRANSLATOR ="`
 	ResponseTranslator    *SchemaObjectIdentifier         `ddl:"identifier" sql:"RESPONSE_TRANSLATOR ="`
-	As                    string                          `ddl:"parameter,single_quotes" sql:"AS"`
+	As                    string                          `ddl:"parameter,single_quotes,no_equals" sql:"AS"`
 }
 
 type ExternalFunctionArgument struct {
