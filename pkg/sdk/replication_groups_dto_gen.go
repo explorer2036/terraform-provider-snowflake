@@ -73,7 +73,7 @@ type CreateSecondaryReplicationGroupRequest struct {
 type AlterReplicationGroupRequest struct {
 	IfExists        *bool
 	name            AccountObjectIdentifier // required
-	RenameTo        *SchemaObjectIdentifier
+	RenameTo        *AccountObjectIdentifier
 	Set             *ReplicationGroupSetRequest
 	SetIntegration  *ReplicationGroupSetIntegrationRequest
 	AddDatabases    *ReplicationGroupAddDatabasesRequest

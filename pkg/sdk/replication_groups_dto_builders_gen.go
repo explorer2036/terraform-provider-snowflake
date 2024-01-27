@@ -197,7 +197,7 @@ func (s *AlterReplicationGroupRequest) WithIfExists(IfExists *bool) *AlterReplic
 	return s
 }
 
-func (s *AlterReplicationGroupRequest) WithRenameTo(RenameTo *SchemaObjectIdentifier) *AlterReplicationGroupRequest {
+func (s *AlterReplicationGroupRequest) WithRenameTo(RenameTo *AccountObjectIdentifier) *AlterReplicationGroupRequest {
 	s.RenameTo = RenameTo
 	return s
 }
@@ -409,6 +409,22 @@ func NewShowReplicationGroupRequest() *ShowReplicationGroupRequest {
 func (s *ShowReplicationGroupRequest) WithInAccount(InAccount *AccountObjectIdentifier) *ShowReplicationGroupRequest {
 	s.InAccount = InAccount
 	return s
+}
+
+func NewShowDatabasesInReplicationGroupRequest(
+	name AccountObjectIdentifier,
+) *ShowDatabasesInReplicationGroupRequest {
+	s := ShowDatabasesInReplicationGroupRequest{}
+	s.name = name
+	return &s
+}
+
+func NewShowSharesInReplicationGroupRequest(
+	name AccountObjectIdentifier,
+) *ShowSharesInReplicationGroupRequest {
+	s := ShowSharesInReplicationGroupRequest{}
+	s.name = name
+	return &s
 }
 
 func NewDropReplicationGroupRequest(

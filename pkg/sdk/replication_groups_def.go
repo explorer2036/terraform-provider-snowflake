@@ -246,7 +246,7 @@ var ReplicationGroupsDef = g.NewInterface(
 		SQL("REPLICATION GROUP").
 		IfExists().
 		Name().
-		Identifier("RenameTo", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("RENAME TO")).
+		Identifier("RenameTo", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("RENAME TO")).
 		OptionalQueryStructField(
 			"Set",
 			replicationGroupSet,
@@ -302,7 +302,7 @@ var ReplicationGroupsDef = g.NewInterface(
 		OptionalSQL("RESUME").
 		WithValidation(g.ValidIdentifier, "name").
 		WithValidation(g.ValidIdentifierIfSet, "RenameTo").
-		WithValidation(g.ExactlyOneValueSet, "Set", "SetIntegration", "AddDatabases", "RemoveDatabases", "MoveDatabases", "AddShares", "RemoveShares", "MoveShares", "AddAccounts", "RemoveAccounts", "Refresh", "Suspend", "Resume"),
+		WithValidation(g.ExactlyOneValueSet, "RenameTo", "Set", "SetIntegration", "AddDatabases", "RemoveDatabases", "MoveDatabases", "AddShares", "RemoveShares", "MoveShares", "AddAccounts", "RemoveAccounts", "Refresh", "Suspend", "Resume"),
 ).ShowOperation(
 	"https://docs.snowflake.com/en/sql-reference/sql/show-replication-groups",
 	dbReplicationGroupRow,

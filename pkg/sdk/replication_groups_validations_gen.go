@@ -60,8 +60,8 @@ func (opts *AlterReplicationGroupOptions) validate() error {
 	if opts.RenameTo != nil && !ValidObjectIdentifier(opts.RenameTo) {
 		errs = append(errs, ErrInvalidObjectIdentifier)
 	}
-	if !exactlyOneValueSet(opts.Set, opts.SetIntegration, opts.AddDatabases, opts.RemoveDatabases, opts.MoveDatabases, opts.AddShares, opts.RemoveShares, opts.MoveShares, opts.AddAccounts, opts.RemoveAccounts, opts.Refresh, opts.Suspend, opts.Resume) {
-		errs = append(errs, errExactlyOneOf("AlterReplicationGroupOptions", "Set", "SetIntegration", "AddDatabases", "RemoveDatabases", "MoveDatabases", "AddShares", "RemoveShares", "MoveShares", "AddAccounts", "RemoveAccounts", "Refresh", "Suspend", "Resume"))
+	if !exactlyOneValueSet(opts.RenameTo, opts.Set, opts.SetIntegration, opts.AddDatabases, opts.RemoveDatabases, opts.MoveDatabases, opts.AddShares, opts.RemoveShares, opts.MoveShares, opts.AddAccounts, opts.RemoveAccounts, opts.Refresh, opts.Suspend, opts.Resume) {
+		errs = append(errs, errExactlyOneOf("AlterReplicationGroupOptions", "RenameTo", "Set", "SetIntegration", "AddDatabases", "RemoveDatabases", "MoveDatabases", "AddShares", "RemoveShares", "MoveShares", "AddAccounts", "RemoveAccounts", "Refresh", "Suspend", "Resume"))
 	}
 	if valueSet(opts.Set) {
 		if valueSet(opts.Set.ObjectTypes) {

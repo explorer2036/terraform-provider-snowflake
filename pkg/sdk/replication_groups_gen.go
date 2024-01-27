@@ -91,7 +91,7 @@ type AlterReplicationGroupOptions struct {
 	replicationGroup bool                             `ddl:"static" sql:"REPLICATION GROUP"`
 	IfExists         *bool                            `ddl:"keyword" sql:"IF EXISTS"`
 	name             AccountObjectIdentifier          `ddl:"identifier"`
-	RenameTo         *SchemaObjectIdentifier          `ddl:"identifier" sql:"RENAME TO"`
+	RenameTo         *AccountObjectIdentifier         `ddl:"identifier" sql:"RENAME TO"`
 	Set              *ReplicationGroupSet             `ddl:"keyword" sql:"SET"`
 	SetIntegration   *ReplicationGroupSetIntegration  `ddl:"keyword" sql:"SET"`
 	AddDatabases     *ReplicationGroupAddDatabases    `ddl:"keyword"`
@@ -172,16 +172,16 @@ type ShowReplicationGroupOptions struct {
 type ShowDatabasesInReplicationGroupOptions struct {
 	show              bool                    `ddl:"static" sql:"SHOW"`
 	databases         bool                    `ddl:"static" sql:"DATABASES"`
-	in                bool                    `ddl:"keyword" sql:"IN"`
-	replicationGroups bool                    `ddl:"static" sql:"REPLICATION GROUPS"`
+	in                bool                    `ddl:"static" sql:"IN"`
+	replicationGroups bool                    `ddl:"static" sql:"REPLICATION GROUP"`
 	name              AccountObjectIdentifier `ddl:"identifier"`
 }
 
 type ShowSharesInReplicationGroupOptions struct {
 	show              bool                    `ddl:"static" sql:"SHOW"`
 	shares            bool                    `ddl:"static" sql:"SHARES"`
-	in                bool                    `ddl:"keyword" sql:"IN"`
-	replicationGroups bool                    `ddl:"static" sql:"REPLICATION GROUPS"`
+	in                bool                    `ddl:"static" sql:"IN"`
+	replicationGroups bool                    `ddl:"static" sql:"REPLICATION GROUP"`
 	name              AccountObjectIdentifier `ddl:"identifier"`
 }
 
