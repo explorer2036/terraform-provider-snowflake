@@ -14,10 +14,10 @@ type CreateReplicationGroupRequest struct {
 	IfNotExists             *bool
 	name                    AccountObjectIdentifier // required
 	ObjectTypes             ReplicationGroupObjectTypesRequest
-	AllowedDatabases        []ReplicationGroupDatabaseRequest
-	AllowedShares           []ReplicationGroupShareRequest
+	AllowedDatabases        []AccountObjectIdentifier
+	AllowedShares           []AccountObjectIdentifier
 	AllowedIntegrationTypes []ReplicationGroupIntegrationTypeRequest
-	AllowedAccounts         []ReplicationGroupAccountRequest
+	AllowedAccounts         []AccountObjectIdentifier
 	IgnoreEditionCheck      *bool
 	ReplicationSchedule     *ReplicationGroupScheduleRequest
 }
@@ -34,20 +34,8 @@ type ReplicationGroupObjectTypesRequest struct {
 	Warehouses        *bool
 }
 
-type ReplicationGroupDatabaseRequest struct {
-	Database string
-}
-
-type ReplicationGroupShareRequest struct {
-	Share string
-}
-
 type ReplicationGroupIntegrationTypeRequest struct {
 	IntegrationType string
-}
-
-type ReplicationGroupAccountRequest struct {
-	Account string
 }
 
 type ReplicationGroupScheduleRequest struct {
@@ -91,8 +79,8 @@ type AlterReplicationGroupRequest struct {
 
 type ReplicationGroupSetRequest struct {
 	ObjectTypes          *ReplicationGroupObjectTypesRequest
-	AllowedDatabases     []ReplicationGroupDatabaseRequest
-	AllowedShares        []ReplicationGroupShareRequest
+	AllowedDatabases     []AccountObjectIdentifier
+	AllowedShares        []AccountObjectIdentifier
 	ReplicationSchedule  *ReplicationGroupScheduleRequest
 	EnableEtlReplication *bool
 }
@@ -104,38 +92,38 @@ type ReplicationGroupSetIntegrationRequest struct {
 }
 
 type ReplicationGroupAddDatabasesRequest struct {
-	Databases []ReplicationGroupDatabaseRequest
+	Add []AccountObjectIdentifier
 }
 
 type ReplicationGroupRemoveDatabasesRequest struct {
-	Databases []ReplicationGroupDatabaseRequest
+	Remove []AccountObjectIdentifier
 }
 
 type ReplicationGroupMoveDatabasesRequest struct {
-	Databases []ReplicationGroupDatabaseRequest
-	MoveTo    *AccountObjectIdentifier
+	MoveDatabases []AccountObjectIdentifier
+	MoveTo        *AccountObjectIdentifier
 }
 
 type ReplicationGroupAddSharesRequest struct {
-	Shares []ReplicationGroupShareRequest
+	Add []AccountObjectIdentifier
 }
 
 type ReplicationGroupRemoveSharesRequest struct {
-	Shares []ReplicationGroupShareRequest
+	Remove []AccountObjectIdentifier
 }
 
 type ReplicationGroupMoveSharesRequest struct {
-	Shares []ReplicationGroupShareRequest
-	MoveTo *AccountObjectIdentifier
+	MoveShares []AccountObjectIdentifier
+	MoveTo     *AccountObjectIdentifier
 }
 
 type ReplicationGroupAddAccountsRequest struct {
-	Accounts           []ReplicationGroupAccountRequest
+	Add                []AccountObjectIdentifier
 	IgnoreEditionCheck *bool
 }
 
 type ReplicationGroupRemoveAccountsRequest struct {
-	Accounts []ReplicationGroupAccountRequest
+	Remove []AccountObjectIdentifier
 }
 
 type ShowReplicationGroupRequest struct {

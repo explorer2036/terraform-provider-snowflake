@@ -23,10 +23,10 @@ type CreateReplicationGroupOptions struct {
 	IfNotExists             *bool                             `ddl:"keyword" sql:"IF NOT EXISTS"`
 	name                    AccountObjectIdentifier           `ddl:"identifier"`
 	ObjectTypes             ReplicationGroupObjectTypes       `ddl:"list,no_parentheses" sql:"OBJECT_TYPES ="`
-	AllowedDatabases        []ReplicationGroupDatabase        `ddl:"parameter,no_parentheses" sql:"ALLOWED_DATABASES"`
-	AllowedShares           []ReplicationGroupShare           `ddl:"parameter,no_parentheses" sql:"ALLOWED_SHARES"`
+	AllowedDatabases        []AccountObjectIdentifier         `ddl:"parameter,no_parentheses" sql:"ALLOWED_DATABASES"`
+	AllowedShares           []AccountObjectIdentifier         `ddl:"parameter,no_parentheses" sql:"ALLOWED_SHARES"`
 	AllowedIntegrationTypes []ReplicationGroupIntegrationType `ddl:"parameter,no_parentheses" sql:"ALLOWED_INTEGRATION_TYPES"`
-	AllowedAccounts         []ReplicationGroupAccount         `ddl:"parameter,no_parentheses" sql:"ALLOWED_ACCOUNTS"`
+	AllowedAccounts         []AccountObjectIdentifier         `ddl:"parameter,no_parentheses" sql:"ALLOWED_ACCOUNTS"`
 	IgnoreEditionCheck      *bool                             `ddl:"keyword" sql:"IGNORE EDITION CHECK"`
 	ReplicationSchedule     *ReplicationGroupSchedule         `ddl:"parameter,single_quotes" sql:"REPLICATION_SCHEDULE"`
 }
@@ -43,20 +43,8 @@ type ReplicationGroupObjectTypes struct {
 	Warehouses        *bool `ddl:"keyword" sql:"WAREHOUSES"`
 }
 
-type ReplicationGroupDatabase struct {
-	Database string `ddl:"keyword"`
-}
-
-type ReplicationGroupShare struct {
-	Share string `ddl:"keyword"`
-}
-
 type ReplicationGroupIntegrationType struct {
 	IntegrationType string `ddl:"keyword"`
-}
-
-type ReplicationGroupAccount struct {
-	Account string `ddl:"keyword"`
 }
 
 type ReplicationGroupSchedule struct {
@@ -109,8 +97,8 @@ type AlterReplicationGroupOptions struct {
 
 type ReplicationGroupSet struct {
 	ObjectTypes          *ReplicationGroupObjectTypes `ddl:"list,no_parentheses" sql:"OBJECT_TYPES ="`
-	AllowedDatabases     []ReplicationGroupDatabase   `ddl:"parameter,no_parentheses" sql:"ALLOWED_DATABASES"`
-	AllowedShares        []ReplicationGroupShare      `ddl:"parameter,no_parentheses" sql:"ALLOWED_SHARES"`
+	AllowedDatabases     []AccountObjectIdentifier    `ddl:"parameter,no_parentheses" sql:"ALLOWED_DATABASES"`
+	AllowedShares        []AccountObjectIdentifier    `ddl:"parameter,no_parentheses" sql:"ALLOWED_SHARES"`
 	ReplicationSchedule  *ReplicationGroupSchedule    `ddl:"parameter,single_quotes" sql:"REPLICATION_SCHEDULE"`
 	EnableEtlReplication *bool                        `ddl:"parameter" sql:"ENABLE_ETL_REPLICATION"`
 }
@@ -122,43 +110,43 @@ type ReplicationGroupSetIntegration struct {
 }
 
 type ReplicationGroupAddDatabases struct {
-	Databases          []ReplicationGroupDatabase `ddl:"parameter,no_parentheses,no_equals" sql:"ADD"`
-	toAllowedDatabases bool                       `ddl:"static" sql:"TO ALLOWED_DATABASES"`
+	Add                []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"ADD"`
+	toAllowedDatabases bool                      `ddl:"static" sql:"TO ALLOWED_DATABASES"`
 }
 
 type ReplicationGroupRemoveDatabases struct {
-	Databases            []ReplicationGroupDatabase `ddl:"parameter,no_parentheses,no_equals" sql:"REMOVE"`
-	fromAllowedDatabases bool                       `ddl:"static" sql:"FROM ALLOWED_DATABASES"`
+	Remove               []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"REMOVE"`
+	fromAllowedDatabases bool                      `ddl:"static" sql:"FROM ALLOWED_DATABASES"`
 }
 
 type ReplicationGroupMoveDatabases struct {
-	Databases []ReplicationGroupDatabase `ddl:"parameter,no_parentheses,no_equals" sql:"MOVE DATABASES"`
-	MoveTo    *AccountObjectIdentifier   `ddl:"identifier" sql:"TO REPLICATION GROUP"`
+	MoveDatabases []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"MOVE DATABASES"`
+	MoveTo        *AccountObjectIdentifier  `ddl:"identifier" sql:"TO REPLICATION GROUP"`
 }
 
 type ReplicationGroupAddShares struct {
-	Shares          []ReplicationGroupShare `ddl:"parameter,no_parentheses,no_equals" sql:"ADD"`
-	toAllowedShares bool                    `ddl:"static" sql:"TO ALLOWED_SHARES"`
+	Add             []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"ADD"`
+	toAllowedShares bool                      `ddl:"static" sql:"TO ALLOWED_SHARES"`
 }
 
 type ReplicationGroupRemoveShares struct {
-	Shares            []ReplicationGroupShare `ddl:"parameter,no_parentheses,no_equals" sql:"REMOVE"`
-	fromAllowedShares bool                    `ddl:"static" sql:"FROM ALLOWED_SHARES"`
+	Remove            []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"REMOVE"`
+	fromAllowedShares bool                      `ddl:"static" sql:"FROM ALLOWED_SHARES"`
 }
 
 type ReplicationGroupMoveShares struct {
-	Shares []ReplicationGroupShare  `ddl:"parameter,no_parentheses,no_equals" sql:"MOVE SHARES"`
-	MoveTo *AccountObjectIdentifier `ddl:"identifier" sql:"TO REPLICATION GROUP"`
+	MoveShares []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"MOVE SHARES"`
+	MoveTo     *AccountObjectIdentifier  `ddl:"identifier" sql:"TO REPLICATION GROUP"`
 }
 
 type ReplicationGroupAddAccounts struct {
-	Accounts           []ReplicationGroupAccount `ddl:"parameter,no_parentheses,no_equals" sql:"ADD"`
+	Add                []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"ADD"`
 	toAllowedAccounts  bool                      `ddl:"static" sql:"TO ALLOWED_ACCOUNTS"`
 	IgnoreEditionCheck *bool                     `ddl:"keyword" sql:"IGNORE EDITION CHECK"`
 }
 
 type ReplicationGroupRemoveAccounts struct {
-	Accounts            []ReplicationGroupAccount `ddl:"parameter,no_parentheses,no_equals" sql:"REMOVE"`
+	Remove              []AccountObjectIdentifier `ddl:"parameter,no_parentheses,no_equals" sql:"REMOVE"`
 	fromAllowedAccounts bool                      `ddl:"static" sql:"FROM ALLOWED_ACCOUNTS"`
 }
 

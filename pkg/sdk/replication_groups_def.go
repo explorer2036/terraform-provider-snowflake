@@ -76,16 +76,8 @@ var replicationGroupSet = g.NewQueryStruct("ReplicationGroupSet").
 		replicationGroupObjectTypes,
 		g.ListOptions().NoParentheses().SQL("OBJECT_TYPES ="),
 	).
-	ListQueryStructField(
-		"AllowedDatabases",
-		replicationGroupDatabase,
-		g.ParameterOptions().NoParentheses().SQL("ALLOWED_DATABASES"),
-	).
-	ListQueryStructField(
-		"AllowedShares",
-		replicationGroupShare,
-		g.ParameterOptions().NoParentheses().SQL("ALLOWED_SHARES"),
-	).
+	ListAssignment("ALLOWED_DATABASES", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses()).
+	ListAssignment("ALLOWED_SHARES", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses()).
 	OptionalQueryStructField(
 		"ReplicationSchedule",
 		replicationGroupSchedule,
@@ -111,76 +103,39 @@ var replicationGroupSetIntegration = g.NewQueryStruct("ReplicationGroupSetIntegr
 	)
 
 var replicationGroupAddDatabases = g.NewQueryStruct("ReplicationGroupAddDatabases").
-	ListQueryStructField(
-		"Databases",
-		replicationGroupDatabase,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("ADD"),
-	).
+	ListAssignment("ADD", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	SQL("TO ALLOWED_DATABASES")
 
 var replicationGroupRemoveDatabases = g.NewQueryStruct("ReplicationGroupRemoveDatabases").
-	ListQueryStructField(
-		"Databases",
-		replicationGroupDatabase,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("REMOVE"),
-	).
+	ListAssignment("REMOVE", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	SQL("FROM ALLOWED_DATABASES")
 
 var replicationGroupMoveDatabases = g.NewQueryStruct("ReplicationGroupMoveDatabases").
-	ListQueryStructField(
-		"Databases",
-		replicationGroupDatabase,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("MOVE DATABASES"),
-	).
+	ListAssignment("MOVE DATABASES", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	Identifier("MoveTo", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("TO REPLICATION GROUP"))
 
 var replicationGroupAddShares = g.NewQueryStruct("ReplicationGroupAddShares").
-	ListQueryStructField(
-		"Shares",
-		replicationGroupShare,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("ADD"),
-	).
+	ListAssignment("ADD", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	SQL("TO ALLOWED_SHARES")
 
 var replicationGroupRemoveShares = g.NewQueryStruct("ReplicationGroupRemoveShares").
-	ListQueryStructField(
-		"Shares",
-		replicationGroupShare,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("REMOVE"),
-	).
+	ListAssignment("REMOVE", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	SQL("FROM ALLOWED_SHARES")
 
 var replicationGroupMoveShares = g.NewQueryStruct("ReplicationGroupMoveShares").
-	ListQueryStructField(
-		"Shares",
-		replicationGroupShare,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("MOVE SHARES"),
-	).
+	ListAssignment("MOVE SHARES", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	Identifier("MoveTo", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("TO REPLICATION GROUP"))
 
 var replicationGroupAddAccounts = g.NewQueryStruct("ReplicationGroupAddAccounts").
-	ListQueryStructField(
-		"Accounts",
-		replicationGroupAccount,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("ADD"),
-	).
+	ListAssignment("ADD", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	SQL("TO ALLOWED_ACCOUNTS").
 	OptionalSQL("IGNORE EDITION CHECK")
 
 var replicationGroupRemoveAccounts = g.NewQueryStruct("ReplicationGroupRemoveAccounts").
-	ListQueryStructField(
-		"Accounts",
-		replicationGroupAccount,
-		g.ParameterOptions().NoParentheses().NoEquals().SQL("REMOVE"),
-	).
+	ListAssignment("REMOVE", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses().NoEquals()).
 	SQL("FROM ALLOWED_ACCOUNTS")
 
-var (
-	replicationGroupDatabase        = g.NewQueryStruct("ReplicationGroupDatabase").Text("Database", g.KeywordOptions())
-	replicationGroupShare           = g.NewQueryStruct("ReplicationGroupShare").Text("Share", g.KeywordOptions())
-	replicationGroupAccount         = g.NewQueryStruct("ReplicationGroupAccount").Text("Account", g.KeywordOptions())
-	replicationGroupIntegrationType = g.NewQueryStruct("ReplicationGroupIntegrationType").Text("IntegrationType", g.KeywordOptions())
-)
+var replicationGroupIntegrationType = g.NewQueryStruct("ReplicationGroupIntegrationType").Text("IntegrationType", g.KeywordOptions())
 
 var ReplicationGroupsDef = g.NewInterface(
 	"ReplicationGroups",
@@ -198,26 +153,14 @@ var ReplicationGroupsDef = g.NewInterface(
 			replicationGroupObjectTypes,
 			g.ListOptions().NoParentheses().SQL("OBJECT_TYPES ="),
 		).
-		ListQueryStructField(
-			"AllowedDatabases",
-			replicationGroupDatabase,
-			g.ParameterOptions().NoParentheses().SQL("ALLOWED_DATABASES"),
-		).
-		ListQueryStructField(
-			"AllowedShares",
-			replicationGroupShare,
-			g.ParameterOptions().NoParentheses().SQL("ALLOWED_SHARES"),
-		).
+		ListAssignment("ALLOWED_DATABASES", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses()).
+		ListAssignment("ALLOWED_SHARES", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses()).
 		ListQueryStructField(
 			"AllowedIntegrationTypes",
 			replicationGroupIntegrationType,
 			g.ParameterOptions().NoParentheses().SQL("ALLOWED_INTEGRATION_TYPES"),
 		).
-		ListQueryStructField(
-			"AllowedAccounts",
-			replicationGroupAccount,
-			g.ParameterOptions().NoParentheses().SQL("ALLOWED_ACCOUNTS"),
-		).
+		ListAssignment("ALLOWED_ACCOUNTS", "AccountObjectIdentifier", g.ParameterOptions().NoParentheses()).
 		OptionalSQL("IGNORE EDITION CHECK").
 		OptionalQueryStructField(
 			"ReplicationSchedule",

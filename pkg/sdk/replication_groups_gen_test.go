@@ -52,21 +52,13 @@ func TestReplicationGroups_Create(t *testing.T) {
 			Databases: Bool(true),
 			Shares:    Bool(true),
 		}
-		opts.AllowedDatabases = []ReplicationGroupDatabase{
-			{
-				Database: "db1",
-			},
-			{
-				Database: "db2",
-			},
+		opts.AllowedDatabases = []AccountObjectIdentifier{
+			NewAccountObjectIdentifier("db1"),
+			NewAccountObjectIdentifier("db2"),
 		}
-		opts.AllowedShares = []ReplicationGroupShare{
-			{
-				Share: "share1",
-			},
-			{
-				Share: "share2",
-			},
+		opts.AllowedShares = []AccountObjectIdentifier{
+			NewAccountObjectIdentifier("share1"),
+			NewAccountObjectIdentifier("share2"),
 		}
 		opts.AllowedIntegrationTypes = []ReplicationGroupIntegrationType{
 			{
@@ -76,13 +68,9 @@ func TestReplicationGroups_Create(t *testing.T) {
 				IntegrationType: "API INTEGRATIONS",
 			},
 		}
-		opts.AllowedAccounts = []ReplicationGroupAccount{
-			{
-				Account: "org.acct1",
-			},
-			{
-				Account: "org.acct2",
-			},
+		opts.AllowedAccounts = []AccountObjectIdentifier{
+			NewAccountObjectIdentifier("org.acct1"),
+			NewAccountObjectIdentifier("org.acct2"),
 		}
 		opts.IgnoreEditionCheck = Bool(true)
 		opts.ReplicationSchedule = &ReplicationGroupSchedule{
@@ -91,7 +79,7 @@ func TestReplicationGroups_Create(t *testing.T) {
 				TimeZone:   "UTC",
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `CREATE REPLICATION GROUP IF NOT EXISTS %s OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = db1, db2 ALLOWED_SHARES = share1, share2 ALLOWED_INTEGRATION_TYPES = SECURITY INTEGRATIONS, API INTEGRATIONS ALLOWED_ACCOUNTS = org.acct1, org.acct2 IGNORE EDITION CHECK REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE REPLICATION GROUP IF NOT EXISTS %s OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = "db1", "db2" ALLOWED_SHARES = "share1", "share2" ALLOWED_INTEGRATION_TYPES = SECURITY INTEGRATIONS, API INTEGRATIONS ALLOWED_ACCOUNTS = "org.acct1", "org.acct2" IGNORE EDITION CHECK REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC'`, id.FullyQualifiedName())
 	})
 
 	t.Run("create secondary replication group", func(t *testing.T) {
@@ -148,116 +136,84 @@ func TestReplicationGroups_Alter(t *testing.T) {
 	t.Run("alter: add, remove, move databases", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.AddDatabases = &ReplicationGroupAddDatabases{
-			Databases: []ReplicationGroupDatabase{
-				{
-					Database: "db1",
-				},
-				{
-					Database: "db2",
-				},
+			Add: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("db1"),
+				NewAccountObjectIdentifier("db2"),
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD db1, db2 TO ALLOWED_DATABASES`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD "db1", "db2" TO ALLOWED_DATABASES`, id.FullyQualifiedName())
 
 		opts = defaultOpts()
 		opts.RemoveDatabases = &ReplicationGroupRemoveDatabases{
-			Databases: []ReplicationGroupDatabase{
-				{
-					Database: "db1",
-				},
-				{
-					Database: "db2",
-				},
+			Remove: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("db1"),
+				NewAccountObjectIdentifier("db2"),
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE db1, db2 FROM ALLOWED_DATABASES`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE "db1", "db2" FROM ALLOWED_DATABASES`, id.FullyQualifiedName())
 
 		opts = defaultOpts()
 		to := RandomAccountObjectIdentifier()
 		opts.MoveDatabases = &ReplicationGroupMoveDatabases{
-			Databases: []ReplicationGroupDatabase{
-				{
-					Database: "db1",
-				},
-				{
-					Database: "db2",
-				},
+			MoveDatabases: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("db1"),
+				NewAccountObjectIdentifier("db2"),
 			},
 			MoveTo: &to,
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s MOVE DATABASES db1, db2 TO REPLICATION GROUP %s`, id.FullyQualifiedName(), to.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s MOVE DATABASES "db1", "db2" TO REPLICATION GROUP %s`, id.FullyQualifiedName(), to.FullyQualifiedName())
 	})
 
 	t.Run("alter: add, remove accounts", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.AddAccounts = &ReplicationGroupAddAccounts{
-			Accounts: []ReplicationGroupAccount{
-				{
-					Account: "org.account1",
-				},
-				{
-					Account: "org.account2",
-				},
+			Add: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("org.acct1"),
+				NewAccountObjectIdentifier("org.acct2"),
 			},
 			IgnoreEditionCheck: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD org.account1, org.account2 TO ALLOWED_ACCOUNTS IGNORE EDITION CHECK`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD "org.acct1", "org.acct2" TO ALLOWED_ACCOUNTS IGNORE EDITION CHECK`, id.FullyQualifiedName())
 
 		opts = defaultOpts()
 		opts.RemoveAccounts = &ReplicationGroupRemoveAccounts{
-			Accounts: []ReplicationGroupAccount{
-				{
-					Account: "org.account1",
-				},
-				{
-					Account: "org.account2",
-				},
+			Remove: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("org.acct1"),
+				NewAccountObjectIdentifier("org.acct2"),
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE org.account1, org.account2 FROM ALLOWED_ACCOUNTS`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE "org.acct1", "org.acct2" FROM ALLOWED_ACCOUNTS`, id.FullyQualifiedName())
 	})
 
 	t.Run("alter: add, remove, move shares", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.AddShares = &ReplicationGroupAddShares{
-			Shares: []ReplicationGroupShare{
-				{
-					Share: "share1",
-				},
-				{
-					Share: "share2",
-				},
+			Add: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("share1"),
+				NewAccountObjectIdentifier("share2"),
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD share1, share2 TO ALLOWED_SHARES`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD "share1", "share2" TO ALLOWED_SHARES`, id.FullyQualifiedName())
 
 		opts = defaultOpts()
 		opts.RemoveShares = &ReplicationGroupRemoveShares{
-			Shares: []ReplicationGroupShare{
-				{
-					Share: "share1",
-				},
-				{
-					Share: "share2",
-				},
+			Remove: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("share1"),
+				NewAccountObjectIdentifier("share2"),
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE share1, share2 FROM ALLOWED_SHARES`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE "share1", "share2" FROM ALLOWED_SHARES`, id.FullyQualifiedName())
 
 		opts = defaultOpts()
 		to := RandomAccountObjectIdentifier()
 		opts.MoveShares = &ReplicationGroupMoveShares{
-			Shares: []ReplicationGroupShare{
-				{
-					Share: "share1",
-				},
-				{
-					Share: "share2",
-				},
+			MoveShares: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("share1"),
+				NewAccountObjectIdentifier("share2"),
 			},
 			MoveTo: &to,
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s MOVE SHARES share1, share2 TO REPLICATION GROUP %s`, id.FullyQualifiedName(), to.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s MOVE SHARES "share1", "share2" TO REPLICATION GROUP %s`, id.FullyQualifiedName(), to.FullyQualifiedName())
 	})
 
 	t.Run("alter: set options", func(t *testing.T) {
@@ -267,21 +223,13 @@ func TestReplicationGroups_Alter(t *testing.T) {
 				Databases: Bool(true),
 				Shares:    Bool(true),
 			},
-			AllowedDatabases: []ReplicationGroupDatabase{
-				{
-					Database: "db1",
-				},
-				{
-					Database: "db2",
-				},
+			AllowedDatabases: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("db1"),
+				NewAccountObjectIdentifier("db2"),
 			},
-			AllowedShares: []ReplicationGroupShare{
-				{
-					Share: "share1",
-				},
-				{
-					Share: "share2",
-				},
+			AllowedShares: []AccountObjectIdentifier{
+				NewAccountObjectIdentifier("share1"),
+				NewAccountObjectIdentifier("share2"),
 			},
 			ReplicationSchedule: &ReplicationGroupSchedule{
 				CronExpression: &ScheduleCronExpression{
@@ -291,7 +239,7 @@ func TestReplicationGroups_Alter(t *testing.T) {
 			},
 			EnableEtlReplication: Bool(true),
 		}
-		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s SET OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = db1, db2 ALLOWED_SHARES = share1, share2 REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC' ENABLE_ETL_REPLICATION = true`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s SET OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = "db1", "db2" ALLOWED_SHARES = "share1", "share2" REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC' ENABLE_ETL_REPLICATION = true`, id.FullyQualifiedName())
 	})
 
 	t.Run("alter: set integration options", func(t *testing.T) {

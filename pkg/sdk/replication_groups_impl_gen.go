@@ -75,6 +75,10 @@ func (r *CreateReplicationGroupRequest) toOpts() *CreateReplicationGroupOptions 
 		IfNotExists: r.IfNotExists,
 		name:        r.name,
 
+		AllowedDatabases: r.AllowedDatabases,
+		AllowedShares:    r.AllowedShares,
+
+		AllowedAccounts:    r.AllowedAccounts,
 		IgnoreEditionCheck: r.IgnoreEditionCheck,
 	}
 	opts.ObjectTypes = ReplicationGroupObjectTypes{
@@ -88,33 +92,12 @@ func (r *CreateReplicationGroupRequest) toOpts() *CreateReplicationGroupOptions 
 		Users:             r.ObjectTypes.Users,
 		Warehouses:        r.ObjectTypes.Warehouses,
 	}
-	if r.AllowedDatabases != nil {
-		s := make([]ReplicationGroupDatabase, len(r.AllowedDatabases))
-		for i, v := range r.AllowedDatabases {
-			s[i] = ReplicationGroupDatabase(v)
-		}
-		opts.AllowedDatabases = s
-	}
-	if r.AllowedShares != nil {
-		s := make([]ReplicationGroupShare, len(r.AllowedShares))
-		for i, v := range r.AllowedShares {
-			s[i] = ReplicationGroupShare(v)
-		}
-		opts.AllowedShares = s
-	}
 	if r.AllowedIntegrationTypes != nil {
 		s := make([]ReplicationGroupIntegrationType, len(r.AllowedIntegrationTypes))
 		for i, v := range r.AllowedIntegrationTypes {
 			s[i] = ReplicationGroupIntegrationType(v)
 		}
 		opts.AllowedIntegrationTypes = s
-	}
-	if r.AllowedAccounts != nil {
-		s := make([]ReplicationGroupAccount, len(r.AllowedAccounts))
-		for i, v := range r.AllowedAccounts {
-			s[i] = ReplicationGroupAccount(v)
-		}
-		opts.AllowedAccounts = s
 	}
 	if r.ReplicationSchedule != nil {
 		opts.ReplicationSchedule = &ReplicationGroupSchedule{}
@@ -154,6 +137,9 @@ func (r *AlterReplicationGroupRequest) toOpts() *AlterReplicationGroupOptions {
 	}
 	if r.Set != nil {
 		opts.Set = &ReplicationGroupSet{
+			AllowedDatabases: r.Set.AllowedDatabases,
+			AllowedShares:    r.Set.AllowedShares,
+
 			EnableEtlReplication: r.Set.EnableEtlReplication,
 		}
 		if r.Set.ObjectTypes != nil {
@@ -168,20 +154,6 @@ func (r *AlterReplicationGroupRequest) toOpts() *AlterReplicationGroupOptions {
 				Users:             r.Set.ObjectTypes.Users,
 				Warehouses:        r.Set.ObjectTypes.Warehouses,
 			}
-		}
-		if r.Set.AllowedDatabases != nil {
-			s := make([]ReplicationGroupDatabase, len(r.Set.AllowedDatabases))
-			for i, v := range r.Set.AllowedDatabases {
-				s[i] = ReplicationGroupDatabase(v)
-			}
-			opts.Set.AllowedDatabases = s
-		}
-		if r.Set.AllowedShares != nil {
-			s := make([]ReplicationGroupShare, len(r.Set.AllowedShares))
-			for i, v := range r.Set.AllowedShares {
-				s[i] = ReplicationGroupShare(v)
-			}
-			opts.Set.AllowedShares = s
 		}
 		if r.Set.ReplicationSchedule != nil {
 			opts.Set.ReplicationSchedule = &ReplicationGroupSchedule{}
@@ -236,89 +208,46 @@ func (r *AlterReplicationGroupRequest) toOpts() *AlterReplicationGroupOptions {
 		}
 	}
 	if r.AddDatabases != nil {
-		opts.AddDatabases = &ReplicationGroupAddDatabases{}
-		if r.AddDatabases.Databases != nil {
-			s := make([]ReplicationGroupDatabase, len(r.AddDatabases.Databases))
-			for i, v := range r.AddDatabases.Databases {
-				s[i] = ReplicationGroupDatabase(v)
-			}
-			opts.AddDatabases.Databases = s
+		opts.AddDatabases = &ReplicationGroupAddDatabases{
+			Add: r.AddDatabases.Add,
 		}
 	}
 	if r.RemoveDatabases != nil {
-		opts.RemoveDatabases = &ReplicationGroupRemoveDatabases{}
-		if r.RemoveDatabases.Databases != nil {
-			s := make([]ReplicationGroupDatabase, len(r.RemoveDatabases.Databases))
-			for i, v := range r.RemoveDatabases.Databases {
-				s[i] = ReplicationGroupDatabase(v)
-			}
-			opts.RemoveDatabases.Databases = s
+		opts.RemoveDatabases = &ReplicationGroupRemoveDatabases{
+			Remove: r.RemoveDatabases.Remove,
 		}
 	}
 	if r.MoveDatabases != nil {
 		opts.MoveDatabases = &ReplicationGroupMoveDatabases{
-			MoveTo: r.MoveDatabases.MoveTo,
-		}
-		if r.MoveDatabases.Databases != nil {
-			s := make([]ReplicationGroupDatabase, len(r.MoveDatabases.Databases))
-			for i, v := range r.MoveDatabases.Databases {
-				s[i] = ReplicationGroupDatabase(v)
-			}
-			opts.MoveDatabases.Databases = s
+			MoveDatabases: r.MoveDatabases.MoveDatabases,
+			MoveTo:        r.MoveDatabases.MoveTo,
 		}
 	}
 	if r.AddShares != nil {
-		opts.AddShares = &ReplicationGroupAddShares{}
-		if r.AddShares.Shares != nil {
-			s := make([]ReplicationGroupShare, len(r.AddShares.Shares))
-			for i, v := range r.AddShares.Shares {
-				s[i] = ReplicationGroupShare(v)
-			}
-			opts.AddShares.Shares = s
+		opts.AddShares = &ReplicationGroupAddShares{
+			Add: r.AddShares.Add,
 		}
 	}
 	if r.RemoveShares != nil {
-		opts.RemoveShares = &ReplicationGroupRemoveShares{}
-		if r.RemoveShares.Shares != nil {
-			s := make([]ReplicationGroupShare, len(r.RemoveShares.Shares))
-			for i, v := range r.RemoveShares.Shares {
-				s[i] = ReplicationGroupShare(v)
-			}
-			opts.RemoveShares.Shares = s
+		opts.RemoveShares = &ReplicationGroupRemoveShares{
+			Remove: r.RemoveShares.Remove,
 		}
 	}
 	if r.MoveShares != nil {
 		opts.MoveShares = &ReplicationGroupMoveShares{
-			MoveTo: r.MoveShares.MoveTo,
-		}
-		if r.MoveShares.Shares != nil {
-			s := make([]ReplicationGroupShare, len(r.MoveShares.Shares))
-			for i, v := range r.MoveShares.Shares {
-				s[i] = ReplicationGroupShare(v)
-			}
-			opts.MoveShares.Shares = s
+			MoveShares: r.MoveShares.MoveShares,
+			MoveTo:     r.MoveShares.MoveTo,
 		}
 	}
 	if r.AddAccounts != nil {
 		opts.AddAccounts = &ReplicationGroupAddAccounts{
+			Add:                r.AddAccounts.Add,
 			IgnoreEditionCheck: r.AddAccounts.IgnoreEditionCheck,
-		}
-		if r.AddAccounts.Accounts != nil {
-			s := make([]ReplicationGroupAccount, len(r.AddAccounts.Accounts))
-			for i, v := range r.AddAccounts.Accounts {
-				s[i] = ReplicationGroupAccount(v)
-			}
-			opts.AddAccounts.Accounts = s
 		}
 	}
 	if r.RemoveAccounts != nil {
-		opts.RemoveAccounts = &ReplicationGroupRemoveAccounts{}
-		if r.RemoveAccounts.Accounts != nil {
-			s := make([]ReplicationGroupAccount, len(r.RemoveAccounts.Accounts))
-			for i, v := range r.RemoveAccounts.Accounts {
-				s[i] = ReplicationGroupAccount(v)
-			}
-			opts.RemoveAccounts.Accounts = s
+		opts.RemoveAccounts = &ReplicationGroupRemoveAccounts{
+			Remove: r.RemoveAccounts.Remove,
 		}
 	}
 	return opts

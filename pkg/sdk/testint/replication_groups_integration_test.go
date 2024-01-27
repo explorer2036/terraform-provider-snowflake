@@ -33,16 +33,16 @@ func TestInt_ReplicationGroups(t *testing.T) {
 		ot := sdk.NewReplicationGroupObjectTypesRequest().
 			WithDatabases(sdk.Bool(true)).
 			WithShares(sdk.Bool(true))
-		drs := []sdk.ReplicationGroupDatabaseRequest{
-			*sdk.NewReplicationGroupDatabaseRequest().WithDatabase(db1.Name),
-			*sdk.NewReplicationGroupDatabaseRequest().WithDatabase(db2.Name),
+		drs := []sdk.AccountObjectIdentifier{
+			sdk.NewAccountObjectIdentifier(db1.Name),
+			sdk.NewAccountObjectIdentifier(db2.Name),
 		}
-		srs := []sdk.ReplicationGroupShareRequest{
-			*sdk.NewReplicationGroupShareRequest().WithShare(share1.Name.Name()),
-			*sdk.NewReplicationGroupShareRequest().WithShare(share2.Name.Name()),
+		srs := []sdk.AccountObjectIdentifier{
+			sdk.NewAccountObjectIdentifier(share1.Name.Name()),
+			sdk.NewAccountObjectIdentifier(share2.Name.Name()),
 		}
-		as := []sdk.ReplicationGroupAccountRequest{
-			*sdk.NewReplicationGroupAccountRequest().WithAccount("SFDEVREL.CLOUD_ENGINEERING2"),
+		as := []sdk.AccountObjectIdentifier{
+			sdk.NewAccountObjectIdentifier("SFDEVREL.CLOUD_ENGINEERING2"),
 		}
 		schedule := sdk.NewReplicationGroupScheduleRequest().WithIntervalMinutes(sdk.NewScheduleIntervalMinutesRequest(10))
 		request := sdk.NewCreateReplicationGroupRequest(id).

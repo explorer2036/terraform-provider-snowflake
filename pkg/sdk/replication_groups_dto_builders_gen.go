@@ -22,12 +22,12 @@ func (s *CreateReplicationGroupRequest) WithObjectTypes(ObjectTypes ReplicationG
 	return s
 }
 
-func (s *CreateReplicationGroupRequest) WithAllowedDatabases(AllowedDatabases []ReplicationGroupDatabaseRequest) *CreateReplicationGroupRequest {
+func (s *CreateReplicationGroupRequest) WithAllowedDatabases(AllowedDatabases []AccountObjectIdentifier) *CreateReplicationGroupRequest {
 	s.AllowedDatabases = AllowedDatabases
 	return s
 }
 
-func (s *CreateReplicationGroupRequest) WithAllowedShares(AllowedShares []ReplicationGroupShareRequest) *CreateReplicationGroupRequest {
+func (s *CreateReplicationGroupRequest) WithAllowedShares(AllowedShares []AccountObjectIdentifier) *CreateReplicationGroupRequest {
 	s.AllowedShares = AllowedShares
 	return s
 }
@@ -37,7 +37,7 @@ func (s *CreateReplicationGroupRequest) WithAllowedIntegrationTypes(AllowedInteg
 	return s
 }
 
-func (s *CreateReplicationGroupRequest) WithAllowedAccounts(AllowedAccounts []ReplicationGroupAccountRequest) *CreateReplicationGroupRequest {
+func (s *CreateReplicationGroupRequest) WithAllowedAccounts(AllowedAccounts []AccountObjectIdentifier) *CreateReplicationGroupRequest {
 	s.AllowedAccounts = AllowedAccounts
 	return s
 }
@@ -101,39 +101,12 @@ func (s *ReplicationGroupObjectTypesRequest) WithWarehouses(Warehouses *bool) *R
 	return s
 }
 
-func NewReplicationGroupDatabaseRequest() *ReplicationGroupDatabaseRequest {
-	return &ReplicationGroupDatabaseRequest{}
-}
-
-func (s *ReplicationGroupDatabaseRequest) WithDatabase(Database string) *ReplicationGroupDatabaseRequest {
-	s.Database = Database
-	return s
-}
-
-func NewReplicationGroupShareRequest() *ReplicationGroupShareRequest {
-	return &ReplicationGroupShareRequest{}
-}
-
-func (s *ReplicationGroupShareRequest) WithShare(Share string) *ReplicationGroupShareRequest {
-	s.Share = Share
-	return s
-}
-
 func NewReplicationGroupIntegrationTypeRequest() *ReplicationGroupIntegrationTypeRequest {
 	return &ReplicationGroupIntegrationTypeRequest{}
 }
 
 func (s *ReplicationGroupIntegrationTypeRequest) WithIntegrationType(IntegrationType string) *ReplicationGroupIntegrationTypeRequest {
 	s.IntegrationType = IntegrationType
-	return s
-}
-
-func NewReplicationGroupAccountRequest() *ReplicationGroupAccountRequest {
-	return &ReplicationGroupAccountRequest{}
-}
-
-func (s *ReplicationGroupAccountRequest) WithAccount(Account string) *ReplicationGroupAccountRequest {
-	s.Account = Account
 	return s
 }
 
@@ -276,12 +249,12 @@ func (s *ReplicationGroupSetRequest) WithObjectTypes(ObjectTypes *ReplicationGro
 	return s
 }
 
-func (s *ReplicationGroupSetRequest) WithAllowedDatabases(AllowedDatabases []ReplicationGroupDatabaseRequest) *ReplicationGroupSetRequest {
+func (s *ReplicationGroupSetRequest) WithAllowedDatabases(AllowedDatabases []AccountObjectIdentifier) *ReplicationGroupSetRequest {
 	s.AllowedDatabases = AllowedDatabases
 	return s
 }
 
-func (s *ReplicationGroupSetRequest) WithAllowedShares(AllowedShares []ReplicationGroupShareRequest) *ReplicationGroupSetRequest {
+func (s *ReplicationGroupSetRequest) WithAllowedShares(AllowedShares []AccountObjectIdentifier) *ReplicationGroupSetRequest {
 	s.AllowedShares = AllowedShares
 	return s
 }
@@ -319,8 +292,8 @@ func NewReplicationGroupAddDatabasesRequest() *ReplicationGroupAddDatabasesReque
 	return &ReplicationGroupAddDatabasesRequest{}
 }
 
-func (s *ReplicationGroupAddDatabasesRequest) WithDatabases(Databases []ReplicationGroupDatabaseRequest) *ReplicationGroupAddDatabasesRequest {
-	s.Databases = Databases
+func (s *ReplicationGroupAddDatabasesRequest) WithAdd(Add []AccountObjectIdentifier) *ReplicationGroupAddDatabasesRequest {
+	s.Add = Add
 	return s
 }
 
@@ -328,8 +301,8 @@ func NewReplicationGroupRemoveDatabasesRequest() *ReplicationGroupRemoveDatabase
 	return &ReplicationGroupRemoveDatabasesRequest{}
 }
 
-func (s *ReplicationGroupRemoveDatabasesRequest) WithDatabases(Databases []ReplicationGroupDatabaseRequest) *ReplicationGroupRemoveDatabasesRequest {
-	s.Databases = Databases
+func (s *ReplicationGroupRemoveDatabasesRequest) WithRemove(Remove []AccountObjectIdentifier) *ReplicationGroupRemoveDatabasesRequest {
+	s.Remove = Remove
 	return s
 }
 
@@ -337,8 +310,8 @@ func NewReplicationGroupMoveDatabasesRequest() *ReplicationGroupMoveDatabasesReq
 	return &ReplicationGroupMoveDatabasesRequest{}
 }
 
-func (s *ReplicationGroupMoveDatabasesRequest) WithDatabases(Databases []ReplicationGroupDatabaseRequest) *ReplicationGroupMoveDatabasesRequest {
-	s.Databases = Databases
+func (s *ReplicationGroupMoveDatabasesRequest) WithMoveDatabases(MoveDatabases []AccountObjectIdentifier) *ReplicationGroupMoveDatabasesRequest {
+	s.MoveDatabases = MoveDatabases
 	return s
 }
 
@@ -351,8 +324,8 @@ func NewReplicationGroupAddSharesRequest() *ReplicationGroupAddSharesRequest {
 	return &ReplicationGroupAddSharesRequest{}
 }
 
-func (s *ReplicationGroupAddSharesRequest) WithShares(Shares []ReplicationGroupShareRequest) *ReplicationGroupAddSharesRequest {
-	s.Shares = Shares
+func (s *ReplicationGroupAddSharesRequest) WithAdd(Add []AccountObjectIdentifier) *ReplicationGroupAddSharesRequest {
+	s.Add = Add
 	return s
 }
 
@@ -360,8 +333,8 @@ func NewReplicationGroupRemoveSharesRequest() *ReplicationGroupRemoveSharesReque
 	return &ReplicationGroupRemoveSharesRequest{}
 }
 
-func (s *ReplicationGroupRemoveSharesRequest) WithShares(Shares []ReplicationGroupShareRequest) *ReplicationGroupRemoveSharesRequest {
-	s.Shares = Shares
+func (s *ReplicationGroupRemoveSharesRequest) WithRemove(Remove []AccountObjectIdentifier) *ReplicationGroupRemoveSharesRequest {
+	s.Remove = Remove
 	return s
 }
 
@@ -369,8 +342,8 @@ func NewReplicationGroupMoveSharesRequest() *ReplicationGroupMoveSharesRequest {
 	return &ReplicationGroupMoveSharesRequest{}
 }
 
-func (s *ReplicationGroupMoveSharesRequest) WithShares(Shares []ReplicationGroupShareRequest) *ReplicationGroupMoveSharesRequest {
-	s.Shares = Shares
+func (s *ReplicationGroupMoveSharesRequest) WithMoveShares(MoveShares []AccountObjectIdentifier) *ReplicationGroupMoveSharesRequest {
+	s.MoveShares = MoveShares
 	return s
 }
 
@@ -383,8 +356,8 @@ func NewReplicationGroupAddAccountsRequest() *ReplicationGroupAddAccountsRequest
 	return &ReplicationGroupAddAccountsRequest{}
 }
 
-func (s *ReplicationGroupAddAccountsRequest) WithAccounts(Accounts []ReplicationGroupAccountRequest) *ReplicationGroupAddAccountsRequest {
-	s.Accounts = Accounts
+func (s *ReplicationGroupAddAccountsRequest) WithAdd(Add []AccountObjectIdentifier) *ReplicationGroupAddAccountsRequest {
+	s.Add = Add
 	return s
 }
 
@@ -397,8 +370,8 @@ func NewReplicationGroupRemoveAccountsRequest() *ReplicationGroupRemoveAccountsR
 	return &ReplicationGroupRemoveAccountsRequest{}
 }
 
-func (s *ReplicationGroupRemoveAccountsRequest) WithAccounts(Accounts []ReplicationGroupAccountRequest) *ReplicationGroupRemoveAccountsRequest {
-	s.Accounts = Accounts
+func (s *ReplicationGroupRemoveAccountsRequest) WithRemove(Remove []AccountObjectIdentifier) *ReplicationGroupRemoveAccountsRequest {
+	s.Remove = Remove
 	return s
 }
 
