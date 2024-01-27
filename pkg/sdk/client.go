@@ -61,6 +61,7 @@ type Client struct {
 	Procedures          Procedures
 	ResourceMonitors    ResourceMonitors
 	Roles               Roles
+	ReplicationGroups   ReplicationGroups
 	RowAccessPolicies   RowAccessPolicies
 	Schemas             Schemas
 	SessionPolicies     SessionPolicies
@@ -208,6 +209,7 @@ func (c *Client) initialize() {
 	c.ResourceMonitors = &resourceMonitors{client: c}
 	c.Roles = &roles{client: c}
 	c.RowAccessPolicies = &rowAccessPolicies{client: c}
+	c.ReplicationGroups = &replicationGroups{client: c}
 	c.Schemas = &schemas{client: c}
 	c.SessionPolicies = &sessionPolicies{client: c}
 	c.Sessions = &sessions{client: c}
