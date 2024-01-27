@@ -98,6 +98,22 @@ func (opts *ShowReplicationGroupOptions) validate() error {
 	return JoinErrors(errs...)
 }
 
+func (opts *ShowDatabasesInReplicationGroupOptions) validate() error {
+	if opts == nil {
+		return ErrNilOptions
+	}
+	var errs []error
+	return JoinErrors(errs...)
+}
+
+func (opts *ShowSharesInReplicationGroupOptions) validate() error {
+	if opts == nil {
+		return ErrNilOptions
+	}
+	var errs []error
+	return JoinErrors(errs...)
+}
+
 func (opts *DropReplicationGroupOptions) validate() error {
 	if opts == nil {
 		return ErrNilOptions

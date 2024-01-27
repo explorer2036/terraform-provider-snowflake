@@ -11,6 +11,8 @@ type ReplicationGroups interface {
 	Alter(ctx context.Context, request *AlterReplicationGroupRequest) error
 	Show(ctx context.Context, request *ShowReplicationGroupRequest) ([]ReplicationGroup, error)
 	ShowByID(ctx context.Context, id AccountObjectIdentifier) (*ReplicationGroup, error)
+	ShowDatabases(ctx context.Context, request *ShowDatabasesInReplicationGroupRequest) ([]DatabaseInReplicationGroup, error)
+	ShowShares(ctx context.Context, request *ShowSharesInReplicationGroupRequest) ([]ShareInReplicationGroup, error)
 	Drop(ctx context.Context, request *DropReplicationGroupRequest) error
 }
 
@@ -167,6 +169,22 @@ type ShowReplicationGroupOptions struct {
 	InAccount         *AccountObjectIdentifier `ddl:"identifier" sql:"IN ACCOUNT"`
 }
 
+type ShowDatabasesInReplicationGroupOptions struct {
+	show              bool                    `ddl:"static" sql:"SHOW"`
+	databases         bool                    `ddl:"static" sql:"DATABASES"`
+	in                bool                    `ddl:"keyword" sql:"IN"`
+	replicationGroups bool                    `ddl:"static" sql:"REPLICATION GROUPS"`
+	name              AccountObjectIdentifier `ddl:"identifier"`
+}
+
+type ShowSharesInReplicationGroupOptions struct {
+	show              bool                    `ddl:"static" sql:"SHOW"`
+	shares            bool                    `ddl:"static" sql:"SHARES"`
+	in                bool                    `ddl:"keyword" sql:"IN"`
+	replicationGroups bool                    `ddl:"static" sql:"REPLICATION GROUPS"`
+	name              AccountObjectIdentifier `ddl:"identifier"`
+}
+
 type replicationGroupRow struct {
 	SnowflakeRegion         string         `db:"snowflake_region"`
 	CreatedOn               string         `db:"created_on"`
@@ -205,6 +223,60 @@ type ReplicationGroup struct {
 	SecondaryState          string
 	NextScheduledRefresh    string
 	Owner                   string
+}
+
+type databaseInReplicationGroupRow struct {
+	CreatedOn     string         `db:"created_on"`
+	Name          string         `db:"name"`
+	IsDefault     string         `db:"is_default"`
+	IsCurrent     string         `db:"is_current"`
+	Origin        string         `db:"origin"`
+	Owner         string         `db:"owner"`
+	Comment       string         `db:"comment"`
+	Options       string         `db:"options"`
+	RetentionTime int            `db:"retention_time"`
+	Kind          string         `db:"kind"`
+	Budget        sql.NullString `db:"budget"`
+	OwnerRoleType string         `db:"owner_role_type"`
+}
+
+type DatabaseInReplicationGroup struct {
+	CreatedOn     string
+	Name          string
+	IsDefault     bool
+	IsCurrent     bool
+	Origin        string
+	Owner         string
+	Comment       string
+	Options       string
+	RetentionTime int
+	Kind          string
+	Budget        string
+	OwnerRoleType string
+}
+
+type shareInReplicationGroupRow struct {
+	CreatedOn         string `db:"created_on"`
+	Kind              string `db:"kind"`
+	OwnerAccount      string `db:"owner_account"`
+	Name              string `db:"name"`
+	DatabaseName      string `db:"database_name"`
+	To                string `db:"to"`
+	Owner             string `db:"owner"`
+	Comment           string `db:"comment"`
+	ListingGlobalName string `db:"listing_global_name"`
+}
+
+type ShareInReplicationGroup struct {
+	CreatedOn         string
+	Kind              string
+	OwnerAccount      string
+	Name              string
+	DatabaseName      string
+	To                string
+	Owner             string
+	Comment           string
+	ListingGlobalName string
 }
 
 // DropReplicationGroupOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-replication-group.

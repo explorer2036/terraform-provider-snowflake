@@ -27,6 +27,20 @@ func TestReplicationGroups_Create(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, errAtLeastOneOf("CreateReplicationGroupOptions.ObjectTypes", "AccountParameters", "Databases", "Integrations", "NetworkPolicies", "ResourceMonitors", "Roles", "Shares", "Users", "Warehouses"))
 	})
 
+	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.ReplicationSchedule = &ReplicationGroupSchedule{
+			IntervalMinutes: &ScheduleIntervalMinutes{
+				Minutes: 10,
+			},
+			CronExpression: &ScheduleCronExpression{
+				Expression: "10 * * * *",
+				TimeZone:   "America/New_York",
+			},
+		}
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("CreateReplicationGroupOptions.ReplicationSchedule", "IntervalMinutes", "CronExpression"))
+	})
+
 	t.Run("all options", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.IfNotExists = Bool(true)
@@ -50,6 +64,14 @@ func TestReplicationGroups_Create(t *testing.T) {
 				Share: "share2",
 			},
 		}
+		opts.AllowedIntegrationTypes = []ReplicationGroupIntegrationType{
+			{
+				IntegrationType: "SECURITY INTEGRATIONS",
+			},
+			{
+				IntegrationType: "API INTEGRATIONS",
+			},
+		}
 		opts.AllowedAccounts = []ReplicationGroupAccount{
 			{
 				Account: "org.acct1",
@@ -65,6 +87,62 @@ func TestReplicationGroups_Create(t *testing.T) {
 				TimeZone:   "UTC",
 			},
 		}
-		assertOptsValidAndSQLEquals(t, opts, `CREATE REPLICATION GROUP IF NOT EXISTS %s OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = db1, db2 ALLOWED_SHARES = share1, share2 ALLOWED_ACCOUNTS = org.acct1, org.acct2 IGNORE EDITION CHECK REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC'`, id.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, `CREATE REPLICATION GROUP IF NOT EXISTS %s OBJECT_TYPES = DATABASES, SHARES ALLOWED_DATABASES = db1, db2 ALLOWED_SHARES = share1, share2 ALLOWED_INTEGRATION_TYPES = SECURITY INTEGRATIONS, API INTEGRATIONS ALLOWED_ACCOUNTS = org.acct1, org.acct2 IGNORE EDITION CHECK REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC'`, id.FullyQualifiedName())
 	})
+}
+
+func TestReplicationGroups_Drop(t *testing.T) {
+	id := RandomAccountObjectIdentifier()
+
+	defaultOpts := func() *DropReplicationGroupOptions {
+		return &DropReplicationGroupOptions{
+			name: id,
+		}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *DropReplicationGroupOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewAccountObjectIdentifier("")
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.IfExists = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `DROP REPLICATION GROUP IF EXISTS %s`, id.FullyQualifiedName())
+	})
+}
+
+func TestReplicationGroups_Show(t *testing.T) {
+	defaultOpts := func() *ShowReplicationGroupOptions {
+		return &ShowReplicationGroupOptions{}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		var opts *ShowReplicationGroupOptions = nil
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("basic", func(t *testing.T) {
+		opts := defaultOpts()
+		assertOptsValidAndSQLEquals(t, opts, `SHOW REPLICATION GROUPS`)
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		account := RandomAccountObjectIdentifier()
+		opts.InAccount = &account
+		assertOptsValidAndSQLEquals(t, opts, `SHOW REPLICATION GROUPS IN ACCOUNT %s`, account.FullyQualifiedName())
+	})
+
+	// t.Run("show database in replication group", func(t *testing.T) {
+	// 	opts := defaultOpts()
+	// 	opts.ShowShares = Bool(true)
+	// 	assertOptsValidAndSQLEquals(t, opts, `SHOW REPLICATION GROUPS SHOW SHARES`)
+	// })
 }

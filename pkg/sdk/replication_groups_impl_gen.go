@@ -37,6 +37,26 @@ func (v *replicationGroups) Show(ctx context.Context, request *ShowReplicationGr
 	return resultList, nil
 }
 
+func (v *replicationGroups) ShowDatabases(ctx context.Context, request *ShowDatabasesInReplicationGroupRequest) ([]DatabaseInReplicationGroup, error) {
+	opts := request.toOpts()
+	dbRows, err := validateAndQuery[databaseInReplicationGroupRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	resultList := convertRows[databaseInReplicationGroupRow, DatabaseInReplicationGroup](dbRows)
+	return resultList, nil
+}
+
+func (v *replicationGroups) ShowShares(ctx context.Context, request *ShowSharesInReplicationGroupRequest) ([]ShareInReplicationGroup, error) {
+	opts := request.toOpts()
+	dbRows, err := validateAndQuery[shareInReplicationGroupRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	resultList := convertRows[shareInReplicationGroupRow, ShareInReplicationGroup](dbRows)
+	return resultList, nil
+}
+
 func (v *replicationGroups) ShowByID(ctx context.Context, id AccountObjectIdentifier) (*ReplicationGroup, error) {
 	replicationGroups, err := v.Show(ctx, NewShowReplicationGroupRequest())
 	if err != nil {
@@ -312,8 +332,81 @@ func (r *ShowReplicationGroupRequest) toOpts() *ShowReplicationGroupOptions {
 }
 
 func (r replicationGroupRow) convert() *ReplicationGroup {
-	// TODO: Mapping
-	return &ReplicationGroup{}
+	e := &ReplicationGroup{
+		SnowflakeRegion:         r.SnowflakeRegion,
+		CreatedOn:               r.CreatedOn,
+		AccountName:             r.AccountName,
+		Name:                    r.Name,
+		Type:                    r.Type,
+		IsPrimary:               r.IsPrimary == "Y",
+		Primary:                 r.Primary,
+		ObjectTypes:             r.ObjectTypes,
+		AllowedIntegrationTypes: r.AllowedIntegrationTypes,
+		AllowedAccounts:         r.AllowedAccounts,
+		OrganizationName:        r.OrganizationName,
+		AccountLocator:          r.AccountLocator,
+		ReplicationSchedule:     r.ReplicationSchedule,
+		Owner:                   r.Owner,
+	}
+	if r.Comment.Valid {
+		e.Comment = r.Comment.String
+	}
+	if r.SecondaryState.Valid {
+		e.SecondaryState = r.SecondaryState.String
+	}
+	if r.NextScheduledRefresh.Valid {
+		e.NextScheduledRefresh = r.NextScheduledRefresh.String
+	}
+	return e
+}
+
+func (r *ShowDatabasesInReplicationGroupRequest) toOpts() *ShowDatabasesInReplicationGroupOptions {
+	opts := &ShowDatabasesInReplicationGroupOptions{
+		name: r.name,
+	}
+	return opts
+}
+
+func (r databaseInReplicationGroupRow) convert() *DatabaseInReplicationGroup {
+	e := &DatabaseInReplicationGroup{
+		CreatedOn:     r.CreatedOn,
+		Name:          r.Name,
+		IsDefault:     r.IsDefault == "Y",
+		IsCurrent:     r.IsCurrent == "Y",
+		Origin:        r.Origin,
+		Owner:         r.Owner,
+		Comment:       r.Comment,
+		Options:       r.Options,
+		RetentionTime: r.RetentionTime,
+		Kind:          r.Kind,
+		OwnerRoleType: r.OwnerRoleType,
+	}
+	if r.Budget.Valid {
+		e.Budget = r.Budget.String
+	}
+	return e
+}
+
+func (r *ShowSharesInReplicationGroupRequest) toOpts() *ShowSharesInReplicationGroupOptions {
+	opts := &ShowSharesInReplicationGroupOptions{
+		name: r.name,
+	}
+	return opts
+}
+
+func (r shareInReplicationGroupRow) convert() *ShareInReplicationGroup {
+	e := &ShareInReplicationGroup{
+		CreatedOn:         r.CreatedOn,
+		Kind:              r.Kind,
+		OwnerAccount:      r.OwnerAccount,
+		Name:              r.Name,
+		DatabaseName:      r.DatabaseName,
+		To:                r.To,
+		Owner:             r.Owner,
+		Comment:           r.Comment,
+		ListingGlobalName: r.ListingGlobalName,
+	}
+	return e
 }
 
 func (r *DropReplicationGroupRequest) toOpts() *DropReplicationGroupOptions {

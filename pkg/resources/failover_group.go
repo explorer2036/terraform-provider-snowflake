@@ -164,7 +164,7 @@ func CreateFailoverGroup(d *schema.ResourceData, meta interface{}) error {
 		sourceFailoverGroupName := fromReplica["name"].(string)
 
 		primaryFailoverGroupID := sdk.NewExternalObjectIdentifier(sdk.NewAccountIdentifier(organizationName, sourceAccountName), sdk.NewAccountObjectIdentifier(sourceFailoverGroupName))
-		err := client.FailoverGroups.CreateSecondaryReplicationGroup(ctx, id, primaryFailoverGroupID, nil)
+		err := client.FailoverGroups.CreateSecondaryFailoverGroup(ctx, id, primaryFailoverGroupID, nil)
 		if err != nil {
 			return err
 		}

@@ -142,6 +142,14 @@ type ShowReplicationGroupRequest struct {
 	InAccount *AccountObjectIdentifier
 }
 
+type ShowDatabasesInReplicationGroupRequest struct {
+	name AccountObjectIdentifier // required
+}
+
+type ShowSharesInReplicationGroupRequest struct {
+	name AccountObjectIdentifier // required
+}
+
 type DropReplicationGroupRequest struct {
 	IfExists *bool
 	name     AccountObjectIdentifier // required
