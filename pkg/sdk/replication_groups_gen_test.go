@@ -145,6 +145,121 @@ func TestReplicationGroups_Alter(t *testing.T) {
 		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s RENAME TO %s`, id.FullyQualifiedName(), target.FullyQualifiedName())
 	})
 
+	t.Run("alter: add, remove, move databases", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.AddDatabases = &ReplicationGroupAddDatabases{
+			Databases: []ReplicationGroupDatabase{
+				{
+					Database: "db1",
+				},
+				{
+					Database: "db2",
+				},
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD db1, db2 TO ALLOWED_DATABASES`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.RemoveDatabases = &ReplicationGroupRemoveDatabases{
+			Databases: []ReplicationGroupDatabase{
+				{
+					Database: "db1",
+				},
+				{
+					Database: "db2",
+				},
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE db1, db2 FROM ALLOWED_DATABASES`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		to := RandomAccountObjectIdentifier()
+		opts.MoveDatabases = &ReplicationGroupMoveDatabases{
+			Databases: []ReplicationGroupDatabase{
+				{
+					Database: "db1",
+				},
+				{
+					Database: "db2",
+				},
+			},
+			MoveTo: &to,
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s MOVE DATABASES db1, db2 TO REPLICATION GROUP %s`, id.FullyQualifiedName(), to.FullyQualifiedName())
+	})
+
+	t.Run("alter: add, remove accounts", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.AddAccounts = &ReplicationGroupAddAccounts{
+			Accounts: []ReplicationGroupAccount{
+				{
+					Account: "org.account1",
+				},
+				{
+					Account: "org.account2",
+				},
+			},
+			IgnoreEditionCheck: Bool(true),
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD org.account1, org.account2 TO ALLOWED_ACCOUNTS IGNORE EDITION CHECK`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.RemoveAccounts = &ReplicationGroupRemoveAccounts{
+			Accounts: []ReplicationGroupAccount{
+				{
+					Account: "org.account1",
+				},
+				{
+					Account: "org.account2",
+				},
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE org.account1, org.account2 FROM ALLOWED_ACCOUNTS`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: add, remove, move shares", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.AddShares = &ReplicationGroupAddShares{
+			Shares: []ReplicationGroupShare{
+				{
+					Share: "share1",
+				},
+				{
+					Share: "share2",
+				},
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s ADD share1, share2 TO ALLOWED_SHARES`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.RemoveShares = &ReplicationGroupRemoveShares{
+			Shares: []ReplicationGroupShare{
+				{
+					Share: "share1",
+				},
+				{
+					Share: "share2",
+				},
+			},
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REMOVE share1, share2 FROM ALLOWED_SHARES`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		to := RandomAccountObjectIdentifier()
+		opts.MoveShares = &ReplicationGroupMoveShares{
+			Shares: []ReplicationGroupShare{
+				{
+					Share: "share1",
+				},
+				{
+					Share: "share2",
+				},
+			},
+			MoveTo: &to,
+		}
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s MOVE SHARES share1, share2 TO REPLICATION GROUP %s`, id.FullyQualifiedName(), to.FullyQualifiedName())
+	})
+
 	t.Run("alter: set options", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Set = &ReplicationGroupSet{
@@ -202,6 +317,20 @@ func TestReplicationGroups_Alter(t *testing.T) {
 			},
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s SET OBJECT_TYPES = DATABASES, SHARES ALLOWED_INTEGRATION_TYPES = SECURITY INTEGRATIONS, API INTEGRATIONS REPLICATION_SCHEDULE = 'USING CRON 0 0 10-20 * TUE,THU UTC'`, id.FullyQualifiedName())
+	})
+
+	t.Run("alter: refresh, suspend, resume", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Refresh = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s REFRESH`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.Suspend = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s SUSPEND`, id.FullyQualifiedName())
+
+		opts = defaultOpts()
+		opts.Resume = Bool(true)
+		assertOptsValidAndSQLEquals(t, opts, `ALTER REPLICATION GROUP IF EXISTS %s RESUME`, id.FullyQualifiedName())
 	})
 }
 
