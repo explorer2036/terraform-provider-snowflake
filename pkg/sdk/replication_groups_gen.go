@@ -187,7 +187,7 @@ type replicationGroupRow struct {
 	AllowedAccounts         string         `db:"allowed_accounts"`
 	OrganizationName        string         `db:"organization_name"`
 	AccountLocator          string         `db:"account_locator"`
-	ReplicationSchedule     string         `db:"replication_schedule"`
+	ReplicationSchedule     sql.NullString `db:"replication_schedule"`
 	SecondaryState          sql.NullString `db:"secondary_state"`
 	NextScheduledRefresh    sql.NullString `db:"next_scheduled_refresh"`
 	Owner                   string         `db:"owner"`

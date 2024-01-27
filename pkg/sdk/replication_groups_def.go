@@ -18,7 +18,7 @@ var dbReplicationGroupRow = g.DbStruct("replicationGroupRow").
 	Field("allowed_accounts", "string").
 	Field("organization_name", "string").
 	Field("account_locator", "string").
-	Field("replication_schedule", "string").
+	Field("replication_schedule", "sql.NullString").
 	Field("secondary_state", "sql.NullString").
 	Field("next_scheduled_refresh", "sql.NullString").
 	Field("owner", "string")

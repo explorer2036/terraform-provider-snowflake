@@ -274,7 +274,6 @@ func (r replicationGroupRow) convert() *ReplicationGroup {
 		AllowedAccounts:         r.AllowedAccounts,
 		OrganizationName:        r.OrganizationName,
 		AccountLocator:          r.AccountLocator,
-		ReplicationSchedule:     r.ReplicationSchedule,
 		Owner:                   r.Owner,
 	}
 	if r.Comment.Valid {
@@ -282,6 +281,9 @@ func (r replicationGroupRow) convert() *ReplicationGroup {
 	}
 	if r.SecondaryState.Valid {
 		e.SecondaryState = r.SecondaryState.String
+	}
+	if r.ReplicationSchedule.Valid {
+		e.ReplicationSchedule = r.ReplicationSchedule.String
 	}
 	if r.NextScheduledRefresh.Valid {
 		e.NextScheduledRefresh = r.NextScheduledRefresh.String
