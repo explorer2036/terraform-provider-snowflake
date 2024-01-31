@@ -1,6 +1,8 @@
 package sdk
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestExternalFunctions_Create(t *testing.T) {
 	id := RandomSchemaObjectIdentifier()
@@ -129,15 +131,17 @@ func TestExternalFunctions_Alter(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterExternalFunctionOptions", "Set", "Unset"))
 	})
 
-	t.Run("alter: set", func(t *testing.T) {
+	t.Run("alter: set api integration", func(t *testing.T) {
 		opts := defaultOpts()
 		integration := NewAccountObjectIdentifier("api_integration")
 		opts.Set = &ExternalFunctionSet{
 			ApiIntegration: &integration,
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER FUNCTION IF EXISTS %s (VARCHAR, NUMBER) SET API_INTEGRATION = "api_integration"`, id.FullyQualifiedName())
+	})
 
-		opts = defaultOpts()
+	t.Run("alter: set headers", func(t *testing.T) {
+		opts := defaultOpts()
 		opts.Set = &ExternalFunctionSet{
 			Headers: []ExternalFunctionHeader{
 				{
@@ -151,20 +155,26 @@ func TestExternalFunctions_Alter(t *testing.T) {
 			},
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER FUNCTION IF EXISTS %s (VARCHAR, NUMBER) SET HEADERS = ('header1' = 'value1', 'header2' = 'value2')`, id.FullyQualifiedName())
+	})
 
-		opts = defaultOpts()
+	t.Run("alter: set max batch rows", func(t *testing.T) {
+		opts := defaultOpts()
 		opts.Set = &ExternalFunctionSet{
 			MaxBatchRows: Int(100),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER FUNCTION IF EXISTS %s (VARCHAR, NUMBER) SET MAX_BATCH_ROWS = 100`, id.FullyQualifiedName())
+	})
 
-		opts = defaultOpts()
+	t.Run("alter: set compression", func(t *testing.T) {
+		opts := defaultOpts()
 		opts.Set = &ExternalFunctionSet{
 			Compression: String("GZIP"),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER FUNCTION IF EXISTS %s (VARCHAR, NUMBER) SET COMPRESSION = GZIP`, id.FullyQualifiedName())
+	})
 
-		opts = defaultOpts()
+	t.Run("alter: set context headers", func(t *testing.T) {
+		opts := defaultOpts()
 		opts.Set = &ExternalFunctionSet{
 			ContextHeaders: []ExternalFunctionContextHeader{
 				{
@@ -176,15 +186,19 @@ func TestExternalFunctions_Alter(t *testing.T) {
 			},
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER FUNCTION IF EXISTS %s (VARCHAR, NUMBER) SET CONTEXT_HEADERS = (CURRENT_ACCOUNT, CURRENT_USER)`, id.FullyQualifiedName())
+	})
 
-		opts = defaultOpts()
+	t.Run("alter: set request translator", func(t *testing.T) {
+		opts := defaultOpts()
 		rt := RandomSchemaObjectIdentifier()
 		opts.Set = &ExternalFunctionSet{
 			RequestTranslator: &rt,
 		}
 		assertOptsValidAndSQLEquals(t, opts, `ALTER FUNCTION IF EXISTS %s (VARCHAR, NUMBER) SET REQUEST_TRANSLATOR = %s`, id.FullyQualifiedName(), rt.FullyQualifiedName())
+	})
 
-		opts = defaultOpts()
+	t.Run("alter: set response translator", func(t *testing.T) {
+		opts := defaultOpts()
 		st := RandomSchemaObjectIdentifier()
 		opts.Set = &ExternalFunctionSet{
 			ResponseTranslator: &st,

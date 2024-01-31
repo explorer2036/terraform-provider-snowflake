@@ -6,13 +6,13 @@ import g "github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/poc/gen
 
 var externalFunctionArgument = g.NewQueryStruct("ExternalFunctionArgument").
 	Text("ArgName", g.KeywordOptions().NoQuotes().Required()).
-	PredefinedQueryStructField("ArgDataType", "DataType", g.KeywordOptions().NoQuotes().Required())
+	PredefinedQueryStructField("ArgDataType", g.KindOfT[DataType](), g.KeywordOptions().NoQuotes().Required())
 
 var externalFunctionHeader = g.NewQueryStruct("ExternalFunctionHeader").
 	Text("Name", g.KeywordOptions().SingleQuotes().Required()).
-	PredefinedQueryStructField("Value", "string", g.ParameterOptions().SingleQuotes().Required())
+	PredefinedQueryStructField("Value", g.KindOfT[string](), g.ParameterOptions().SingleQuotes().Required())
 
-var externalFunctionContextHeader = g.NewQueryStruct("ExternalFunctionContextHeader").Text("ContextFunction", g.KeywordOptions().NoQuotes())
+var externalFunctionContextHeader = g.NewQueryStruct("ExternalFunctionContextHeader").Text("ContextFunction", g.KeywordOptions().NoQuotes().Required())
 
 var externalFunctionSet = g.NewQueryStruct("ExternalFunctionSet").
 	OptionalIdentifier("ApiIntegration", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("API_INTEGRATION =")).
@@ -58,10 +58,10 @@ var ExternalFunctionsDef = g.NewInterface(
 			"Arguments",
 			externalFunctionArgument,
 			g.ListOptions().MustParentheses()).
-		PredefinedQueryStructField("ResultDataType", "DataType", g.ParameterOptions().NoEquals().SQL("RETURNS").Required()).
-		PredefinedQueryStructField("ReturnNullValues", "*ReturnNullValues", g.KeywordOptions()).
-		PredefinedQueryStructField("NullInputBehavior", "*NullInputBehavior", g.KeywordOptions()).
-		PredefinedQueryStructField("ReturnResultsBehavior", "*ReturnResultsBehavior", g.KeywordOptions()).
+		PredefinedQueryStructField("ResultDataType", g.KindOfT[DataType](), g.KeywordOptions().SQL("RETURNS").Required()).
+		PredefinedQueryStructField("ReturnNullValues", g.KindOfTPointer[ReturnNullValues](), g.KeywordOptions()).
+		PredefinedQueryStructField("NullInputBehavior", g.KindOfTPointer[NullInputBehavior](), g.KeywordOptions()).
+		PredefinedQueryStructField("ReturnResultsBehavior", g.KindOfTPointer[ReturnResultsBehavior](), g.KeywordOptions()).
 		OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
 		Identifier("ApiIntegration", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("API_INTEGRATION =").Required()).
 		ListQueryStructField(
@@ -92,7 +92,7 @@ var ExternalFunctionsDef = g.NewInterface(
 		SQL("FUNCTION").
 		IfExists().
 		Name().
-		PredefinedQueryStructField("ArgumentDataTypes", "[]DataType", g.KeywordOptions().MustParentheses().Required()).
+		PredefinedQueryStructField("ArgumentDataTypes", g.KindOfTSlice[DataType](), g.KeywordOptions().MustParentheses().Required()).
 		OptionalQueryStructField(
 			"Set",
 			externalFunctionSet,
@@ -149,4 +149,19 @@ var ExternalFunctionsDef = g.NewInterface(
 		Show().
 		SQL("EXTERNAL FUNCTIONS").
 		OptionalLike(),
-).ShowByIdOperation()
+).ShowByIdOperation().DescribeOperation(
+	g.DescriptionMappingKindSlice,
+	"https://docs.snowflake.com/en/sql-reference/sql/desc-function",
+	g.DbStruct("externalFunctionPropertyRow").
+		Field("property", "string").
+		Field("value", "string"),
+	g.PlainStruct("ExternalFunctionProperty").
+		Field("Property", "string").
+		Field("Value", "string"),
+	g.NewQueryStruct("DescribeExternalFunction").
+		Describe().
+		SQL("FUNCTION").
+		Name().
+		PredefinedQueryStructField("ArgumentDataTypes", g.KindOfTSlice[DataType](), g.KeywordOptions().MustParentheses().Required()).
+		WithValidation(g.ValidIdentifier, "name"),
+)

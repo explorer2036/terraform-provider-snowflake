@@ -2,6 +2,9 @@ package sdk
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
@@ -32,12 +35,30 @@ func (v *externalFunctions) Show(ctx context.Context, request *ShowExternalFunct
 	return resultList, nil
 }
 
-func (v *externalFunctions) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*ExternalFunction, error) {
+func (v *externalFunctions) ShowByID(ctx context.Context, id SchemaObjectIdentifier, arguments []DataType) (*ExternalFunction, error) {
 	externalFunctions, err := v.Show(ctx, NewShowExternalFunctionRequest().WithLike(&Like{Pattern: String(id.Name())}))
 	if err != nil {
 		return nil, err
 	}
-	return collections.FindOne(externalFunctions, func(r ExternalFunction) bool { return r.Name == id.Name() })
+	return collections.FindOne(externalFunctions, func(r ExternalFunction) bool {
+		if r.Name != id.Name() || r.CatalogName != id.DatabaseName() || r.SchemaName != id.SchemaName() {
+			return false
+		}
+
+		d, _ := json.Marshal(r)
+		fmt.Printf("r: %v\n", string(d))
+		fmt.Printf("arguments: %v\n", arguments)
+		var sb strings.Builder
+		sb.WriteString("(")
+		for i, argument := range arguments {
+			sb.WriteString(string(argument))
+			if i < len(arguments)-1 {
+				sb.WriteString(", ")
+			}
+		}
+		sb.WriteString(")")
+		return strings.Contains(r.Arguments, sb.String())
+	})
 }
 
 func (r *CreateExternalFunctionRequest) toOpts() *CreateExternalFunctionOptions {

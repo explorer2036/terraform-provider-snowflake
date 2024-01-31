@@ -74,3 +74,8 @@ type ExternalFunctionUnsetRequest struct {
 type ShowExternalFunctionRequest struct {
 	Like *Like
 }
+
+type ShowByIDExternalFunctionRequest struct {
+	Like              *Like
+	ArgumentDataTypes []DataType
+}
