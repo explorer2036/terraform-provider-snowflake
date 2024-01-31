@@ -2,8 +2,6 @@ package sdk
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
@@ -41,13 +39,11 @@ func (v *externalFunctions) ShowByID(ctx context.Context, id SchemaObjectIdentif
 		return nil, err
 	}
 	return collections.FindOne(externalFunctions, func(r ExternalFunction) bool {
-		if r.Name != id.Name() || r.CatalogName != id.DatabaseName() || r.SchemaName != id.SchemaName() {
+		database := strings.Trim(r.CatalogName, `"`)
+		schema := strings.Trim(r.SchemaName, `"`)
+		if r.Name != id.Name() || database != id.DatabaseName() || schema != id.SchemaName() {
 			return false
 		}
-
-		d, _ := json.Marshal(r)
-		fmt.Printf("r: %v\n", string(d))
-		fmt.Printf("arguments: %v\n", arguments)
 		var sb strings.Builder
 		sb.WriteString("(")
 		for i, argument := range arguments {
@@ -59,6 +55,15 @@ func (v *externalFunctions) ShowByID(ctx context.Context, id SchemaObjectIdentif
 		sb.WriteString(")")
 		return strings.Contains(r.Arguments, sb.String())
 	})
+}
+
+func (v *externalFunctions) Describe(ctx context.Context, request *DescribeExternalFunctionRequest) ([]ExternalFunctionProperty, error) {
+	opts := request.toOpts()
+	rows, err := validateAndQuery[externalFunctionPropertyRow](v.client, ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+	return convertRows[externalFunctionPropertyRow, ExternalFunctionProperty](rows), nil
 }
 
 func (r *CreateExternalFunctionRequest) toOpts() *CreateExternalFunctionOptions {
@@ -184,4 +189,19 @@ func (r externalFunctionRow) convert() *ExternalFunction {
 		e.IsDataMetric = r.IsDataMetric.String == "Y"
 	}
 	return e
+}
+
+func (r *DescribeExternalFunctionRequest) toOpts() *DescribeExternalFunctionOptions {
+	opts := &DescribeExternalFunctionOptions{
+		name:              r.name,
+		ArgumentDataTypes: r.ArgumentDataTypes,
+	}
+	return opts
+}
+
+func (r externalFunctionPropertyRow) convert() *ExternalFunctionProperty {
+	return &ExternalFunctionProperty{
+		Property: r.Property,
+		Value:    r.Value,
+	}
 }

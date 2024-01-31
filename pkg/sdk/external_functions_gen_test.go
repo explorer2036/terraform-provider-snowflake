@@ -38,7 +38,7 @@ func TestExternalFunctions_Create(t *testing.T) {
 		opts.RequestTranslator = &rt
 		st := NewSchemaObjectIdentifier("", "", "")
 		opts.ResponseTranslator = &st
-		assertOptsInvalidJoinedErrors(t, opts, errInvalidIdentifier("CreateExternalFunctionOptions", "ApiIntegration"))
+		assertOptsInvalidJoinedErrors(t, opts, errNotSet("CreateExternalFunctionOptions", "ApiIntegration"))
 		assertOptsInvalidJoinedErrors(t, opts, errInvalidIdentifier("CreateExternalFunctionOptions", "RequestTranslator"))
 		assertOptsInvalidJoinedErrors(t, opts, errInvalidIdentifier("CreateExternalFunctionOptions", "ResponseTranslator"))
 	})
@@ -115,12 +115,7 @@ func TestExternalFunctions_Alter(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
 	})
 
-	t.Run("validation: exactly one field should be present", func(t *testing.T) {
-		opts := defaultOpts()
-		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterExternalFunctionOptions", "Set", "Unset"))
-	})
-
-	t.Run("validation: exactly one field should be present", func(t *testing.T) {
+	t.Run("validation: exactly one field from [opts.Set opts.Unset] should be present", func(t *testing.T) {
 		opts := defaultOpts()
 		opts.Set = &ExternalFunctionSet{
 			MaxBatchRows: Int(100),
@@ -129,6 +124,24 @@ func TestExternalFunctions_Alter(t *testing.T) {
 			MaxBatchRows: Bool(true),
 		}
 		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterExternalFunctionOptions", "Set", "Unset"))
+	})
+
+	t.Run("validation: exactly one field from [opts.Set.ApiIntegration opts.Set.Headers opts.Set.ContextHeaders opts.Set.MaxBatchRows opts.Set.Compression opts.Set.RequestTranslator opts.Set.ResponseTranslator] should be present", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.Set = &ExternalFunctionSet{
+			MaxBatchRows: Int(100),
+			Headers: []ExternalFunctionHeader{
+				{
+					Name:  "header1",
+					Value: "value1",
+				},
+				{
+					Name:  "header2",
+					Value: "value2",
+				},
+			},
+		}
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterExternalFunctionOptions.Set", "ApiIntegration", "Headers", "ContextHeaders", "MaxBatchRows", "Compression", "RequestTranslator", "ResponseTranslator"))
 	})
 
 	t.Run("alter: set api integration", func(t *testing.T) {
@@ -260,5 +273,37 @@ func TestExternalFunctions_Show(t *testing.T) {
 			Pattern: String("pattern"),
 		}
 		assertOptsValidAndSQLEquals(t, opts, `SHOW EXTERNAL FUNCTIONS LIKE 'pattern'`)
+	})
+}
+
+func TestExternalFunctions_Describe(t *testing.T) {
+	id := RandomSchemaObjectIdentifier()
+
+	defaultOpts := func() *DescribeExternalFunctionOptions {
+		return &DescribeExternalFunctionOptions{
+			name: id,
+		}
+	}
+
+	t.Run("validation: nil options", func(t *testing.T) {
+		opts := (*DescribeExternalFunctionOptions)(nil)
+		assertOptsInvalidJoinedErrors(t, opts, ErrNilOptions)
+	})
+
+	t.Run("validation: incorrect identifier", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.name = NewSchemaObjectIdentifier("", "", "")
+		assertOptsInvalidJoinedErrors(t, opts, ErrInvalidObjectIdentifier)
+	})
+
+	t.Run("no arguments", func(t *testing.T) {
+		opts := defaultOpts()
+		assertOptsValidAndSQLEquals(t, opts, `DESCRIBE FUNCTION %s ()`, id.FullyQualifiedName())
+	})
+
+	t.Run("all options", func(t *testing.T) {
+		opts := defaultOpts()
+		opts.ArgumentDataTypes = []DataType{DataTypeVARCHAR, DataTypeNumber}
+		assertOptsValidAndSQLEquals(t, opts, `DESCRIBE FUNCTION %s (VARCHAR, NUMBER)`, id.FullyQualifiedName())
 	})
 }

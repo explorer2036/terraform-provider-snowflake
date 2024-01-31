@@ -58,7 +58,7 @@ var ExternalFunctionsDef = g.NewInterface(
 			"Arguments",
 			externalFunctionArgument,
 			g.ListOptions().MustParentheses()).
-		PredefinedQueryStructField("ResultDataType", g.KindOfT[DataType](), g.KeywordOptions().SQL("RETURNS").Required()).
+		PredefinedQueryStructField("ResultDataType", g.KindOfT[DataType](), g.ParameterOptions().NoEquals().SQL("RETURNS").Required()).
 		PredefinedQueryStructField("ReturnNullValues", g.KindOfTPointer[ReturnNullValues](), g.KeywordOptions()).
 		PredefinedQueryStructField("NullInputBehavior", g.KindOfTPointer[NullInputBehavior](), g.KeywordOptions()).
 		PredefinedQueryStructField("ReturnResultsBehavior", g.KindOfTPointer[ReturnResultsBehavior](), g.KeywordOptions()).
@@ -81,7 +81,6 @@ var ExternalFunctionsDef = g.NewInterface(
 		TextAssignment("AS", g.ParameterOptions().NoEquals().SingleQuotes().Required()).
 		WithValidation(g.ValidIdentifier, "name").
 		WithValidation(g.ValidateValueSet, "ApiIntegration").
-		WithValidation(g.ValidIdentifierIfSet, "ApiIntegration").
 		WithValidation(g.ValidIdentifierIfSet, "RequestTranslator").
 		WithValidation(g.ValidateValueSet, "As").
 		WithValidation(g.ValidIdentifierIfSet, "ResponseTranslator"),
