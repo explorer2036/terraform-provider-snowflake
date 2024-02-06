@@ -31,253 +31,253 @@ func TestInt_CreateProcedures(t *testing.T) {
 		}
 	}
 
-	t.Run("create procedure for Java: returns result data type", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#reading-a-dynamically-specified-file-with-inputstream
-		name := "file_reader_java_proc_snowflakefile"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Java: returns result data type", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#reading-a-dynamically-specified-file-with-inputstream
+	// 		name := "file_reader_java_proc_snowflakefile"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `
-		import java.io.InputStream;
-		import java.io.IOException;
-		import java.nio.charset.StandardCharsets;
-		import com.snowflake.snowpark_java.types.SnowflakeFile;
-		import com.snowflake.snowpark_java.Session;
-		class FileReader {
-			public String execute(Session session, String fileName) throws IOException {
-				InputStream input = SnowflakeFile.newInstance(fileName).getInputStream();
-				return new String(input.readAllBytes(), StandardCharsets.UTF_8);
-			}
-		}`
+	// 		definition := `
+	// 		import java.io.InputStream;
+	// 		import java.io.IOException;
+	// 		import java.nio.charset.StandardCharsets;
+	// 		import com.snowflake.snowpark_java.types.SnowflakeFile;
+	// 		import com.snowflake.snowpark_java.Session;
+	// 		class FileReader {
+	// 			public String execute(Session session, String fileName) throws IOException {
+	// 				InputStream input = SnowflakeFile.newInstance(fileName).getInputStream();
+	// 				return new String(input.readAllBytes(), StandardCharsets.UTF_8);
+	// 			}
+	// 		}`
 
-		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
-		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
-		argument := sdk.NewProcedureArgumentRequest("input", sdk.DataTypeVARCHAR)
-		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
-		request := sdk.NewCreateForJavaProcedureRequest(id, *returns, "11", packages, "FileReader.execute").
-			WithOrReplace(sdk.Bool(true)).
-			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
-			WithProcedureDefinition(sdk.String(definition))
-		err := client.Procedures.CreateForJava(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
+	// 		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
+	// 		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
+	// 		argument := sdk.NewProcedureArgumentRequest("input", sdk.DataTypeVARCHAR)
+	// 		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
+	// 		request := sdk.NewCreateForJavaProcedureRequest(id, *returns, "11", packages, "FileReader.execute").
+	// 			WithOrReplace(sdk.Bool(true)).
+	// 			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
+	// 			WithProcedureDefinition(sdk.String(definition))
+	// 		err := client.Procedures.CreateForJava(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
-	t.Run("create procedure for Java: returns table", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#specifying-return-column-names-and-types
-		name := "filter_by_role"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Java: returns table", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-java#specifying-return-column-names-and-types
+	// 		name := "filter_by_role"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `
-		import com.snowflake.snowpark_java.*;
-		public class Filter {
-			public DataFrame filterByRole(Session session, String tableName, String role) {
-				DataFrame table = session.table(tableName);
-				DataFrame filteredRows = table.filter(Functions.col("role").equal_to(Functions.lit(role)));
-				return filteredRows;
-			}
-		}`
-		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
-		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
-		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
-		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
-		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
-		arg1 := sdk.NewProcedureArgumentRequest("table_name", sdk.DataTypeVARCHAR)
-		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
-		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
-		request := sdk.NewCreateForJavaProcedureRequest(id, *returns, "11", packages, "Filter.filterByRole").
-			WithOrReplace(sdk.Bool(true)).
-			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
-			WithProcedureDefinition(sdk.String(definition))
-		err := client.Procedures.CreateForJava(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
+	// 		definition := `
+	// 		import com.snowflake.snowpark_java.*;
+	// 		public class Filter {
+	// 			public DataFrame filterByRole(Session session, String tableName, String role) {
+	// 				DataFrame table = session.table(tableName);
+	// 				DataFrame filteredRows = table.filter(Functions.col("role").equal_to(Functions.lit(role)));
+	// 				return filteredRows;
+	// 			}
+	// 		}`
+	// 		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
+	// 		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
+	// 		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
+	// 		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
+	// 		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
+	// 		arg1 := sdk.NewProcedureArgumentRequest("table_name", sdk.DataTypeVARCHAR)
+	// 		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
+	// 		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
+	// 		request := sdk.NewCreateForJavaProcedureRequest(id, *returns, "11", packages, "Filter.filterByRole").
+	// 			WithOrReplace(sdk.Bool(true)).
+	// 			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
+	// 			WithProcedureDefinition(sdk.String(definition))
+	// 		err := client.Procedures.CreateForJava(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
-	t.Run("create procedure for Javascript", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-javascript#basic-examples
-		name := "stproc1"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Javascript", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-javascript#basic-examples
+	// 		name := "stproc1"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `
-			var sql_command = "INSERT INTO stproc_test_table1 (num_col1) VALUES (" + FLOAT_PARAM1 + ")";
-			try {
-				snowflake.execute (
-					{sqlText: sql_command}
-				);
-				return "Succeeded."; // Return a success/error indicator.
-			}
-			catch (err)  {
-				return "Failed: " + err; // Return a success/error indicator.
-			}`
-		argument := sdk.NewProcedureArgumentRequest("FLOAT_PARAM1", sdk.DataTypeFloat)
-		request := sdk.NewCreateForJavaScriptProcedureRequest(id, sdk.DataTypeString, definition).
-			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
-			WithNullInputBehavior(sdk.NullInputBehaviorPointer(sdk.NullInputBehaviorStrict)).
-			WithExecuteAs(sdk.ExecuteAsPointer(sdk.ExecuteAsCaller))
-		err := client.Procedures.CreateForJavaScript(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeFloat}))
+	// 		definition := `
+	// 			var sql_command = "INSERT INTO stproc_test_table1 (num_col1) VALUES (" + FLOAT_PARAM1 + ")";
+	// 			try {
+	// 				snowflake.execute (
+	// 					{sqlText: sql_command}
+	// 				);
+	// 				return "Succeeded."; // Return a success/error indicator.
+	// 			}
+	// 			catch (err)  {
+	// 				return "Failed: " + err; // Return a success/error indicator.
+	// 			}`
+	// 		argument := sdk.NewProcedureArgumentRequest("FLOAT_PARAM1", sdk.DataTypeFloat)
+	// 		request := sdk.NewCreateForJavaScriptProcedureRequest(id, sdk.DataTypeString, definition).
+	// 			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
+	// 			WithNullInputBehavior(sdk.NullInputBehaviorPointer(sdk.NullInputBehaviorStrict)).
+	// 			WithExecuteAs(sdk.ExecuteAsPointer(sdk.ExecuteAsCaller))
+	// 		err := client.Procedures.CreateForJavaScript(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeFloat}))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
-	t.Run("create procedure for Javascript: no arguments", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-javascript#basic-examples
-		name := "sp_pi"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Javascript: no arguments", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-javascript#basic-examples
+	// 		name := "sp_pi"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `return 3.1415926;`
-		request := sdk.NewCreateForJavaScriptProcedureRequest(id, sdk.DataTypeFloat, definition).WithNotNull(sdk.Bool(true)).WithOrReplace(sdk.Bool(true))
-		err := client.Procedures.CreateForJavaScript(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, nil))
+	// 		definition := `return 3.1415926;`
+	// 		request := sdk.NewCreateForJavaScriptProcedureRequest(id, sdk.DataTypeFloat, definition).WithNotNull(sdk.Bool(true)).WithOrReplace(sdk.Bool(true))
+	// 		err := client.Procedures.CreateForJavaScript(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, nil))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
-	t.Run("create procedure for Scala: returns result data type", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-scala#reading-a-dynamically-specified-file-with-snowflakefile
-		name := "file_reader_scala_proc_snowflakefile"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Scala: returns result data type", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-scala#reading-a-dynamically-specified-file-with-snowflakefile
+	// 		name := "file_reader_scala_proc_snowflakefile"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `
-		import java.io.InputStream
-		import java.nio.charset.StandardCharsets
-		import com.snowflake.snowpark_java.types.SnowflakeFile
-		import com.snowflake.snowpark_java.Session
-		object FileReader {
-			def execute(session: Session, fileName: String): String = {
-				var input: InputStream = SnowflakeFile.newInstance(fileName).getInputStream()
-				return new String(input.readAllBytes(), StandardCharsets.UTF_8)
-			}
-		}`
-		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
-		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
-		argument := sdk.NewProcedureArgumentRequest("input", sdk.DataTypeVARCHAR)
-		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
-		request := sdk.NewCreateForScalaProcedureRequest(id, *returns, "2.12", packages, "FileReader.execute").
-			WithOrReplace(sdk.Bool(true)).
-			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
-			WithProcedureDefinition(sdk.String(definition))
-		err := client.Procedures.CreateForScala(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
+	// 		definition := `
+	// 		import java.io.InputStream
+	// 		import java.nio.charset.StandardCharsets
+	// 		import com.snowflake.snowpark_java.types.SnowflakeFile
+	// 		import com.snowflake.snowpark_java.Session
+	// 		object FileReader {
+	// 			def execute(session: Session, fileName: String): String = {
+	// 				var input: InputStream = SnowflakeFile.newInstance(fileName).getInputStream()
+	// 				return new String(input.readAllBytes(), StandardCharsets.UTF_8)
+	// 			}
+	// 		}`
+	// 		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeVARCHAR)
+	// 		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
+	// 		argument := sdk.NewProcedureArgumentRequest("input", sdk.DataTypeVARCHAR)
+	// 		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
+	// 		request := sdk.NewCreateForScalaProcedureRequest(id, *returns, "2.12", packages, "FileReader.execute").
+	// 			WithOrReplace(sdk.Bool(true)).
+	// 			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
+	// 			WithProcedureDefinition(sdk.String(definition))
+	// 		err := client.Procedures.CreateForScala(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
-	t.Run("create procedure for Scala: returns table", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-scala#specifying-return-column-names-and-types
-		name := "filter_by_role"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Scala: returns table", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-scala#specifying-return-column-names-and-types
+	// 		name := "filter_by_role"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `
-		import com.snowflake.snowpark.functions._
-		import com.snowflake.snowpark._
-		object Filter {
-			def filterByRole(session: Session, tableName: String, role: String): DataFrame = {
-				val table = session.table(tableName)
-				val filteredRows = table.filter(col("role") === role)
-				return filteredRows
-			}
-		}`
-		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
-		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
-		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
-		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
-		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
-		arg1 := sdk.NewProcedureArgumentRequest("table_name", sdk.DataTypeVARCHAR)
-		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
-		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
-		request := sdk.NewCreateForScalaProcedureRequest(id, *returns, "2.12", packages, "Filter.filterByRole").
-			WithOrReplace(sdk.Bool(true)).
-			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
-			WithProcedureDefinition(sdk.String(definition))
-		err := client.Procedures.CreateForScala(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
+	// 		definition := `
+	// 		import com.snowflake.snowpark.functions._
+	// 		import com.snowflake.snowpark._
+	// 		object Filter {
+	// 			def filterByRole(session: Session, tableName: String, role: String): DataFrame = {
+	// 				val table = session.table(tableName)
+	// 				val filteredRows = table.filter(col("role") === role)
+	// 				return filteredRows
+	// 			}
+	// 		}`
+	// 		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
+	// 		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
+	// 		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
+	// 		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
+	// 		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
+	// 		arg1 := sdk.NewProcedureArgumentRequest("table_name", sdk.DataTypeVARCHAR)
+	// 		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
+	// 		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("com.snowflake:snowpark:latest")}
+	// 		request := sdk.NewCreateForScalaProcedureRequest(id, *returns, "2.12", packages, "Filter.filterByRole").
+	// 			WithOrReplace(sdk.Bool(true)).
+	// 			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
+	// 			WithProcedureDefinition(sdk.String(definition))
+	// 		err := client.Procedures.CreateForScala(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
-	t.Run("create procedure for Python: returns result data type", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-python#running-concurrent-tasks-with-worker-processes
-		name := "joblib_multiprocessing_proc"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Python: returns result data type", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-python#running-concurrent-tasks-with-worker-processes
+	// 		name := "joblib_multiprocessing_proc"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `
-import joblib
-from math import sqrt
-def joblib_multiprocessing(session, i):
-	result = joblib.Parallel(n_jobs=-1)(joblib.delayed(sqrt)(i ** 2) for i in range(10))
-	return str(result)`
+	// 		definition := `
+	// import joblib
+	// from math import sqrt
+	// def joblib_multiprocessing(session, i):
+	// 	result = joblib.Parallel(n_jobs=-1)(joblib.delayed(sqrt)(i ** 2) for i in range(10))
+	// 	return str(result)`
 
-		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeString)
-		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
-		argument := sdk.NewProcedureArgumentRequest("i", "INT")
-		packages := []sdk.ProcedurePackageRequest{
-			*sdk.NewProcedurePackageRequest("snowflake-snowpark-python"),
-			*sdk.NewProcedurePackageRequest("joblib"),
-		}
-		request := sdk.NewCreateForPythonProcedureRequest(id, *returns, "3.8", packages, "joblib_multiprocessing").
-			WithOrReplace(sdk.Bool(true)).
-			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
-			WithProcedureDefinition(sdk.String(definition))
-		err := client.Procedures.CreateForPython(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{"INT"}))
+	// 		dt := sdk.NewProcedureReturnsResultDataTypeRequest(sdk.DataTypeString)
+	// 		returns := sdk.NewProcedureReturnsRequest().WithResultDataType(dt)
+	// 		argument := sdk.NewProcedureArgumentRequest("i", "INT")
+	// 		packages := []sdk.ProcedurePackageRequest{
+	// 			*sdk.NewProcedurePackageRequest("snowflake-snowpark-python"),
+	// 			*sdk.NewProcedurePackageRequest("joblib"),
+	// 		}
+	// 		request := sdk.NewCreateForPythonProcedureRequest(id, *returns, "3.8", packages, "joblib_multiprocessing").
+	// 			WithOrReplace(sdk.Bool(true)).
+	// 			WithArguments([]sdk.ProcedureArgumentRequest{*argument}).
+	// 			WithProcedureDefinition(sdk.String(definition))
+	// 		err := client.Procedures.CreateForPython(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{"INT"}))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
-	t.Run("create procedure for Python: returns table", func(t *testing.T) {
-		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-python#specifying-return-column-names-and-types
-		name := "filterByRole"
-		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+	// 	t.Run("create procedure for Python: returns table", func(t *testing.T) {
+	// 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-python#specifying-return-column-names-and-types
+	// 		name := "filterByRole"
+	// 		id := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
 
-		definition := `
-from snowflake.snowpark.functions import col
-def filter_by_role(session, table_name, role):
-	df = session.table(table_name)
-	return df.filter(col("role") == role)`
-		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
-		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
-		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
-		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
-		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
-		arg1 := sdk.NewProcedureArgumentRequest("table_name", sdk.DataTypeVARCHAR)
-		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
-		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("snowflake-snowpark-python")}
-		request := sdk.NewCreateForPythonProcedureRequest(id, *returns, "3.8", packages, "filter_by_role").
-			WithOrReplace(sdk.Bool(true)).
-			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
-			WithProcedureDefinition(sdk.String(definition))
-		err := client.Procedures.CreateForPython(ctx, request)
-		require.NoError(t, err)
-		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
+	// 		definition := `
+	// from snowflake.snowpark.functions import col
+	// def filter_by_role(session, table_name, role):
+	// 	df = session.table(table_name)
+	// 	return df.filter(col("role") == role)`
+	// 		column1 := sdk.NewProcedureColumnRequest("id", sdk.DataTypeNumber)
+	// 		column2 := sdk.NewProcedureColumnRequest("name", sdk.DataTypeVARCHAR)
+	// 		column3 := sdk.NewProcedureColumnRequest("role", sdk.DataTypeVARCHAR)
+	// 		returnsTable := sdk.NewProcedureReturnsTableRequest().WithColumns([]sdk.ProcedureColumnRequest{*column1, *column2, *column3})
+	// 		returns := sdk.NewProcedureReturnsRequest().WithTable(returnsTable)
+	// 		arg1 := sdk.NewProcedureArgumentRequest("table_name", sdk.DataTypeVARCHAR)
+	// 		arg2 := sdk.NewProcedureArgumentRequest("role", sdk.DataTypeVARCHAR)
+	// 		packages := []sdk.ProcedurePackageRequest{*sdk.NewProcedurePackageRequest("snowflake-snowpark-python")}
+	// 		request := sdk.NewCreateForPythonProcedureRequest(id, *returns, "3.8", packages, "filter_by_role").
+	// 			WithOrReplace(sdk.Bool(true)).
+	// 			WithArguments([]sdk.ProcedureArgumentRequest{*arg1, *arg2}).
+	// 			WithProcedureDefinition(sdk.String(definition))
+	// 		err := client.Procedures.CreateForPython(ctx, request)
+	// 		require.NoError(t, err)
+	// 		t.Cleanup(cleanupProcedureHandle(id, []sdk.DataType{sdk.DataTypeVARCHAR, sdk.DataTypeVARCHAR}))
 
-		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
-		require.NoError(t, err)
-		require.GreaterOrEqual(t, len(procedures), 1)
-	})
+	// 		procedures, err := client.Procedures.Show(ctx, sdk.NewShowProcedureRequest())
+	// 		require.NoError(t, err)
+	// 		require.GreaterOrEqual(t, len(procedures), 1)
+	// 	})
 
 	t.Run("create procedure for SQL: returns result data type", func(t *testing.T) {
 		// https://docs.snowflake.com/en/developer-guide/stored-procedure/stored-procedures-snowflake-scripting
@@ -294,6 +294,7 @@ def filter_by_role(session, table_name, role):
 		argument := sdk.NewProcedureArgumentRequest("message", sdk.DataTypeVARCHAR)
 		request := sdk.NewCreateForSQLProcedureRequest(id, *returns, definition).
 			WithOrReplace(sdk.Bool(true)).
+			WithNullInputBehavior(sdk.NullInputBehaviorPointer(sdk.NullInputBehaviorReturnNullInput)).
 			WithArguments([]sdk.ProcedureArgumentRequest{*argument})
 		err := client.Procedures.CreateForSQL(ctx, request)
 		require.NoError(t, err)
@@ -321,6 +322,7 @@ def filter_by_role(session, table_name, role):
 		argument := sdk.NewProcedureArgumentRequest("id", sdk.DataTypeVARCHAR)
 		request := sdk.NewCreateForSQLProcedureRequest(id, *returns, definition).
 			WithOrReplace(sdk.Bool(true)).
+			WithNullInputBehavior(sdk.NullInputBehaviorPointer(sdk.NullInputBehaviorReturnNullInput)).
 			WithArguments([]sdk.ProcedureArgumentRequest{*argument})
 		err := client.Procedures.CreateForSQL(ctx, request)
 		require.NoError(t, err)

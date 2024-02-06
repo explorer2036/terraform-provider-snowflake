@@ -5,7 +5,6 @@ resource "snowflake_procedure" "p" {
   language            = "SQL"
   return_type         = "VARCHAR"
   execute_as          = "CALLER"
-  null_input_behavior = "RETURNS NULL ON NULL INPUT"
   comment             = var.comment
   statement           = <<EOT
     BEGIN

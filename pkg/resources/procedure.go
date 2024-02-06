@@ -124,15 +124,16 @@ var procedureSchema = map[string]*schema.Schema{
 		ValidateFunc: validation.StringInSlice([]string{"CALLED ON NULL INPUT", "RETURNS NULL ON NULL INPUT"}, false),
 		Description:  "Specifies the behavior of the procedure when called with null inputs.",
 	},
-	"return_behavior": {
-		Type:         schema.TypeString,
-		Optional:     true,
-		Default:      "VOLATILE",
-		ForceNew:     true,
-		ValidateFunc: validation.StringInSlice([]string{"VOLATILE", "IMMUTABLE"}, false),
-		Description:  "Specifies the behavior of the function when returning results",
-		Deprecated:   "These keywords are deprecated for stored procedures. These keywords are not intended to apply to stored procedures. In a future release, these keywords will be removed from the documentation.",
-	},
+	// TODO: remove the return_behavior otherwise `import` of acceptance tests not works
+	// "return_behavior": {
+	// 	Type:         schema.TypeString,
+	// 	Optional:     true,
+	// 	Default:      "VOLATILE",
+	// 	ForceNew:     true,
+	// 	ValidateFunc: validation.StringInSlice([]string{"VOLATILE", "IMMUTABLE"}, false),
+	// 	Description:  "Specifies the behavior of the function when returning results",
+	// 	Deprecated:   "These keywords are deprecated for stored procedures. These keywords are not intended to apply to stored procedures. In a future release, these keywords will be removed from the documentation.",
+	// },
 	"comment": {
 		Type:        schema.TypeString,
 		Optional:    true,
@@ -423,9 +424,6 @@ func createSQLProcedure(ctx context.Context, d *schema.ResourceData, meta interf
 			req.WithExecuteAs(sdk.Pointer(sdk.ExecuteAsCaller))
 		}
 	}
-	if v, ok := d.GetOk("null_input_behavior"); ok {
-		req.WithNullInputBehavior(sdk.Pointer(sdk.NullInputBehavior(v.(string))))
-	}
 	if v, ok := d.GetOk("comment"); ok {
 		req.WithComment(sdk.String(v.(string)))
 	}
@@ -483,7 +481,7 @@ func createPythonProcedure(ctx context.Context, d *schema.ResourceData, meta int
 		}
 	}
 
-	// TODO: [ { CALLED ON NULL INPUT | { RETURNS NULL ON NULL INPUT | STRICT } } ] not works for java, scala and python
+	// TODO: [ { CALLED ON NULL INPUT | { RETURNS NULL ON NULL INPUT | STRICT } } ] not works for sql, java, scala and python
 	// if v, ok := d.GetOk("null_input_behavior"); ok {
 	// 	req.WithNullInputBehavior(sdk.Pointer(sdk.NullInputBehavior(v.(string))))
 	// }
