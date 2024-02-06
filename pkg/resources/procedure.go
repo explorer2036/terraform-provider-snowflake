@@ -482,7 +482,7 @@ func createPythonProcedure(ctx context.Context, d *schema.ResourceData, meta int
 		}
 	}
 
-	// TODO: [ { CALLED ON NULL INPUT | { RETURNS NULL ON NULL INPUT | STRICT } } ] not works for sql, java, scala and python
+	// TODO: [ { CALLED ON NULL INPUT | { RETURNS NULL ON NULL INPUT | STRICT } } ] not works for java, scala and python
 	// if v, ok := d.GetOk("null_input_behavior"); ok {
 	// 	req.WithNullInputBehavior(sdk.Pointer(sdk.NullInputBehavior(v.(string))))
 	// }
