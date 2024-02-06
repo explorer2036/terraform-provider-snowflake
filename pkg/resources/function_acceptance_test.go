@@ -168,11 +168,9 @@ func testAccFunction(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "comment", "Terraform acceptance test"),
 
 					// computed attributes
-					resource.TestCheckResourceAttrSet(resourceName, "null_input_behavior"),
 					resource.TestCheckResourceAttrSet(resourceName, "return_type"),
 					resource.TestCheckResourceAttrSet(resourceName, "statement"),
-					resource.TestCheckResourceAttrSet(resourceName, "execute_as"),
-					resource.TestCheckResourceAttrSet(resourceName, "secure"),
+					resource.TestCheckResourceAttrSet(resourceName, "is_secure"),
 				),
 			},
 
@@ -189,13 +187,17 @@ func testAccFunction(t *testing.T) {
 			},
 
 			// test - import
-			// {
-			// 	ConfigDirectory:   config.TestStepDirectory(),
-			// 	ConfigVariables:   variableSet2,
-			// 	ResourceName:      resourceName,
-			// 	ImportState:       true,
-			// 	ImportStateVerify: true,
-			// },
+			{
+				ConfigDirectory:   config.TestStepDirectory(),
+				ConfigVariables:   variableSet2,
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
+}
+
+func TestAcc_Function_SQL(t *testing.T) {
+	testAccFunction(t)
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
-var languages = []string{"javascript", "java", "sql", "python"}
+var languages = []string{"javascript", "scala", "java", "sql", "python"}
 
 var functionSchema = map[string]*schema.Schema{
 	"name": {
@@ -75,7 +75,7 @@ var functionSchema = map[string]*schema.Schema{
 	"statement": {
 		Type:             schema.TypeString,
 		Required:         true,
-		Description:      "Specifies the javascript / java / sql / python code used to create the function.",
+		Description:      "Specifies the javascript / java / scala / sql / python code used to create the function.",
 		ForceNew:         true,
 		DiffSuppressFunc: DiffSuppressStatement,
 	},
@@ -179,7 +179,7 @@ func CreateContextFunction(ctx context.Context, d *schema.ResourceData, meta int
 		return createPythonFunction(ctx, d, meta)
 	case "SCALA":
 		return createScalaFunction(ctx, d, meta)
-	case "": // SQL if language is not set
+	case "", "SQL": // SQL if language is not set
 		return createSQLFunction(ctx, d, meta)
 	default:
 		return diag.Diagnostics{
