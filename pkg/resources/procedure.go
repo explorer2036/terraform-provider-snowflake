@@ -400,13 +400,11 @@ func createSQLProcedure(ctx context.Context, d *schema.ResourceData, meta interf
 	database := d.Get("database").(string)
 	schemaObjectId := sdk.NewSchemaObjectIdentifier(database, schema, name)
 
-	returnType := d.Get("return_type").(string)
-	returnDataType, diags := convertProcedureDataType(returnType)
+	returns, diags := parseProcedureSQLReturnsRequest(d.Get("return_type").(string))
 	if diags != nil {
 		return diags
 	}
 	procedureDefinition := d.Get("statement").(string)
-	returns := sdk.NewProcedureSQLReturnsRequest().WithResultDataType(sdk.NewProcedureReturnsResultDataTypeRequest(returnDataType))
 	req := sdk.NewCreateForSQLProcedureRequest(schemaObjectId, *returns, procedureDefinition)
 	args, diags := getProcedureArguments(d)
 	if diags != nil {
@@ -423,6 +421,9 @@ func createSQLProcedure(ctx context.Context, d *schema.ResourceData, meta interf
 		} else if strings.ToUpper(v.(string)) == "CALLER" {
 			req.WithExecuteAs(sdk.Pointer(sdk.ExecuteAsCaller))
 		}
+	}
+	if v, ok := d.GetOk("null_input_behavior"); ok {
+		req.WithNullInputBehavior(sdk.Pointer(sdk.NullInputBehavior(v.(string))))
 	}
 	if v, ok := d.GetOk("comment"); ok {
 		req.WithComment(sdk.String(v.(string)))
@@ -808,6 +809,28 @@ func convertProcedureColumns(s string) ([]sdk.ProcedureColumn, diag.Diagnostics)
 
 func parseProcedureReturnsRequest(s string) (*sdk.ProcedureReturnsRequest, diag.Diagnostics) {
 	returns := sdk.NewProcedureReturnsRequest()
+	if strings.HasPrefix(strings.ToLower(s), "table") {
+		columns, diags := convertProcedureColumns(s)
+		if diags != nil {
+			return nil, diags
+		}
+		var cr []sdk.ProcedureColumnRequest
+		for _, item := range columns {
+			cr = append(cr, *sdk.NewProcedureColumnRequest(item.ColumnName, item.ColumnDataType))
+		}
+		returns.WithTable(sdk.NewProcedureReturnsTableRequest().WithColumns(cr))
+	} else {
+		returnDataType, diags := convertProcedureDataType(s)
+		if diags != nil {
+			return nil, diags
+		}
+		returns.WithResultDataType(sdk.NewProcedureReturnsResultDataTypeRequest(returnDataType))
+	}
+	return returns, nil
+}
+
+func parseProcedureSQLReturnsRequest(s string) (*sdk.ProcedureSQLReturnsRequest, diag.Diagnostics) {
+	returns := sdk.NewProcedureSQLReturnsRequest()
 	if strings.HasPrefix(strings.ToLower(s), "table") {
 		columns, diags := convertProcedureColumns(s)
 		if diags != nil {

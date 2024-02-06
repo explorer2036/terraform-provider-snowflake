@@ -3,8 +3,8 @@ resource "snowflake_procedure" "p" {
   schema              = var.schema
   name                = var.name
   arguments {
-			name = "arg1"
-			type = "VARCHAR"
+		name = "arg1"
+		type = "VARCHAR"
 	}
 	arguments {
 		name = "arg2"

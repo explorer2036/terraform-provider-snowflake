@@ -3,8 +3,8 @@ resource "snowflake_procedure" "p" {
   schema              = var.schema
   name                = var.name
   arguments {
-			name = "arg1"
-			type = "VARCHAR"
+		name = "arg1"
+		type = "VARCHAR"
 	}
 	arguments {
 		name = "arg2"
@@ -13,7 +13,6 @@ resource "snowflake_procedure" "p" {
   language            = "JAVASCRIPT"
   return_type         = "VARCHAR"
   execute_as          = "CALLER"
-  null_input_behavior = "RETURNS NULL ON NULL INPUT"
   comment             = var.comment
   statement           = <<EOT
 var x = 1

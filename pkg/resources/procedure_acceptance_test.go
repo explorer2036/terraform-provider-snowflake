@@ -45,7 +45,6 @@ func testAccProcedure(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "comment", "Terraform acceptance test"),
 
 					// computed attributes
-					resource.TestCheckResourceAttrSet(resourceName, "null_input_behavior"),
 					resource.TestCheckResourceAttrSet(resourceName, "return_type"),
 					resource.TestCheckResourceAttrSet(resourceName, "statement"),
 					resource.TestCheckResourceAttrSet(resourceName, "execute_as"),
@@ -65,14 +64,14 @@ func testAccProcedure(t *testing.T) {
 				),
 			},
 
-			// test - import - TODO: fix the error: ImportStateVerify attributes not equivalent
-			// {
-			// 	ConfigDirectory:   config.TestStepDirectory(),
-			// 	ConfigVariables:   variableSet2,
-			// 	ResourceName:      resourceName,
-			// 	ImportState:       true,
-			// 	ImportStateVerify: true,
-			// },
+			// test - import
+			{
+				ConfigDirectory:   config.TestStepDirectory(),
+				ConfigVariables:   variableSet2,
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -95,4 +94,76 @@ func TestAcc_Procedure_Java(t *testing.T) {
 
 func TestAcc_Procedure_Scala(t *testing.T) {
 	testAccProcedure(t)
+}
+
+func TestAcc_Procedure_complex(t *testing.T) {
+	name := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
+	resourceName := "snowflake_procedure.p"
+	m := func() map[string]config.Variable {
+		return map[string]config.Variable{
+			"name":     config.StringVariable(name),
+			"database": config.StringVariable(acc.TestDatabaseName),
+			"schema":   config.StringVariable(acc.TestSchemaName),
+			"comment":  config.StringVariable("Terraform acceptance test"),
+		}
+	}
+	variableSet2 := m()
+	variableSet2["comment"] = config.StringVariable("Terraform acceptance test - updated")
+
+	statement := "var x = 1\nreturn x\n"
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		PreCheck:                 func() { acc.TestAccPreCheck(t) },
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
+		CheckDestroy: testAccCheckDynamicTableDestroy,
+		Steps: []resource.TestStep{
+			{
+				ConfigDirectory: config.TestStepDirectory(),
+				ConfigVariables: m(),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", name),
+					resource.TestCheckResourceAttr(resourceName, "database", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr(resourceName, "schema", acc.TestSchemaName),
+					resource.TestCheckResourceAttr(resourceName, "comment", "Terraform acceptance test"),
+					resource.TestCheckResourceAttr(resourceName, "statement", statement),
+					resource.TestCheckResourceAttr(resourceName, "execute_as", "CALLER"),
+					resource.TestCheckResourceAttr(resourceName, "arguments.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "arguments.0.name", "ARG1"),
+					resource.TestCheckResourceAttr(resourceName, "arguments.0.type", "VARCHAR"),
+					resource.TestCheckResourceAttr(resourceName, "arguments.1.name", "ARG2"),
+					resource.TestCheckResourceAttr(resourceName, "arguments.1.type", "DATE"),
+					resource.TestCheckResourceAttr(resourceName, "null_input_behavior", "RETURNS NULL ON NULL INPUT"),
+
+					// computed attributes
+					resource.TestCheckResourceAttrSet(resourceName, "return_type"),
+					resource.TestCheckResourceAttrSet(resourceName, "statement"),
+					resource.TestCheckResourceAttrSet(resourceName, "execute_as"),
+					resource.TestCheckResourceAttrSet(resourceName, "secure"),
+				),
+			},
+
+			// test - change comment
+			{
+				ConfigDirectory: config.TestStepDirectory(),
+				ConfigVariables: variableSet2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", name),
+					resource.TestCheckResourceAttr(resourceName, "database", acc.TestDatabaseName),
+					resource.TestCheckResourceAttr(resourceName, "schema", acc.TestSchemaName),
+					resource.TestCheckResourceAttr(resourceName, "comment", "Terraform acceptance test - updated"),
+				),
+			},
+
+			// test - import
+			{
+				ConfigDirectory:   config.TestStepDirectory(),
+				ConfigVariables:   variableSet2,
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
 }
