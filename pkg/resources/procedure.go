@@ -605,10 +605,6 @@ func ReadContextProcedure(ctx context.Context, d *schema.ResourceData, meta inte
 			if err := d.Set("null_input_behavior", desc.Value); err != nil {
 				return diag.FromErr(err)
 			}
-		case "volatility":
-			if err := d.Set("return_behavior", desc.Value); err != nil {
-				return diag.FromErr(err)
-			}
 		case "body":
 			if err := d.Set("statement", desc.Value); err != nil {
 				return diag.FromErr(err)
