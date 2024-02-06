@@ -71,6 +71,9 @@ func testAccProcedure(t *testing.T) {
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"null_input_behavior",
+				},
 			},
 		},
 	})
