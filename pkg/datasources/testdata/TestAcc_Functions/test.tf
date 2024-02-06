@@ -37,8 +37,8 @@ resource "snowflake_function" "test_function_two" {
   return_type = "varchar"
   language    = "JAVASCRIPT"
   statement   = <<-EOF
-		var X=1
-		return X
+		var x = 1
+		return x
   EOF
 }
 
