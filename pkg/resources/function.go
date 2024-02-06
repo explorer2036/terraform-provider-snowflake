@@ -3,7 +3,6 @@ package resources
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -540,9 +539,6 @@ func ReadContextFunction(ctx context.Context, d *schema.ResourceData, meta inter
 			},
 		}
 	}
-	details, _ := json.Marshal(functionDetails)
-	fmt.Printf("details: %s\n", details)
-
 	for _, desc := range functionDetails {
 		switch desc.Property {
 		case "signature":
