@@ -10,21 +10,22 @@ resource "snowflake_procedure" "p" {
     name = "ROLE"
     type = "VARCHAR"
   }
-  language            = "JAVA"
+  language            = "SCALA"
   return_type         = "TABLE (ID NUMBER, NAME VARCHAR, ROLE VARCHAR)"
-  runtime_version     = "11"
+  runtime_version     = "2.12"
   packages            = ["com.snowflake:snowpark:1.9.0"]
   handler             = "Filter.filterByRole"
   execute_as          = "CALLER"
   comment             = var.comment
   statement           = <<EOT
-    import com.snowflake.snowpark_java.*;
-    public class Filter {
-      public DataFrame filterByRole(Session session, String tableName, String role) {
-        DataFrame table = session.table(tableName);
-        DataFrame filteredRows = table.filter(Functions.col("role").equal_to(Functions.lit(role)));
-        return filteredRows;
-      }
-    }
+		import com.snowflake.snowpark.functions._
+		import com.snowflake.snowpark._
+		object Filter {
+			def filterByRole(session: Session, tableName: String, role: String): DataFrame = {
+				val table = session.table(tableName)
+				val filteredRows = table.filter(col("role") === role)
+				return filteredRows
+			}
+		}
   EOT
 }

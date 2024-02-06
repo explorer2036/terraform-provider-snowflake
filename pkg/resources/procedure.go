@@ -217,20 +217,16 @@ func createJavaProcedure(ctx context.Context, d *schema.ResourceData, meta inter
 	schema := d.Get("schema").(string)
 	database := d.Get("database").(string)
 	schemaObjectId := sdk.NewSchemaObjectIdentifier(database, schema, name)
-	returnType := d.Get("return_type").(string)
-	returnDataType, diags := convertProcedureDataType(returnType)
+
+	returns, diags := parseProcedureReturnsRequest(d.Get("return_type").(string))
 	if diags != nil {
 		return diags
 	}
 	procedureDefinition := d.Get("statement").(string)
-
-	returns := sdk.NewProcedureReturnsRequest().WithResultDataType(sdk.NewProcedureReturnsResultDataTypeRequest(returnDataType))
 	runtimeVersion := d.Get("runtime_version").(string)
-
 	packages := []sdk.ProcedurePackageRequest{}
-	pkgs := d.Get("packages").([]interface{})
-	for _, pkg := range pkgs {
-		packages = append(packages, *sdk.NewProcedurePackageRequest(pkg.(string)))
+	for _, item := range d.Get("packages").([]interface{}) {
+		packages = append(packages, *sdk.NewProcedurePackageRequest(item.(string)))
 	}
 	handler := d.Get("handler").(string)
 	req := sdk.NewCreateForJavaProcedureRequest(schemaObjectId, *returns, runtimeVersion, packages, handler)
@@ -251,9 +247,7 @@ func createJavaProcedure(ctx context.Context, d *schema.ResourceData, meta inter
 			req.WithExecuteAs(sdk.Pointer(sdk.ExecuteAsCaller))
 		}
 	}
-	if v, ok := d.GetOk("null_input_behavior"); ok {
-		req.WithNullInputBehavior(sdk.Pointer(sdk.NullInputBehavior(v.(string))))
-	}
+
 	if v, ok := d.GetOk("comment"); ok {
 		req.WithComment(sdk.String(v.(string)))
 	}
@@ -287,13 +281,13 @@ func createJavaScriptProcedure(ctx context.Context, d *schema.ResourceData, meta
 	schema := d.Get("schema").(string)
 	database := d.Get("database").(string)
 	schemaObjectId := sdk.NewSchemaObjectIdentifier(database, schema, name)
+
 	returnType := d.Get("return_type").(string)
 	returnDataType, diags := convertProcedureDataType(returnType)
 	if diags != nil {
 		return diags
 	}
 	procedureDefinition := d.Get("statement").(string)
-
 	req := sdk.NewCreateForJavaScriptProcedureRequest(schemaObjectId, returnDataType, procedureDefinition)
 	args, diags := getProcedureArguments(d)
 	if diags != nil {
@@ -340,20 +334,16 @@ func createScalaProcedure(ctx context.Context, d *schema.ResourceData, meta inte
 	schema := d.Get("schema").(string)
 	database := d.Get("database").(string)
 	schemaObjectId := sdk.NewSchemaObjectIdentifier(database, schema, name)
-	returnType := d.Get("return_type").(string)
-	returnDataType, diags := convertProcedureDataType(returnType)
+
+	returns, diags := parseProcedureReturnsRequest(d.Get("return_type").(string))
 	if diags != nil {
 		return diags
 	}
 	procedureDefinition := d.Get("statement").(string)
-
-	returns := sdk.NewProcedureReturnsRequest().WithResultDataType(sdk.NewProcedureReturnsResultDataTypeRequest(returnDataType))
 	runtimeVersion := d.Get("runtime_version").(string)
-
 	packages := []sdk.ProcedurePackageRequest{}
-	pkgs := d.Get("packages").([]interface{})
-	for _, pkg := range pkgs {
-		packages = append(packages, *sdk.NewProcedurePackageRequest(pkg.(string)))
+	for _, item := range d.Get("packages").([]interface{}) {
+		packages = append(packages, *sdk.NewProcedurePackageRequest(item.(string)))
 	}
 	handler := d.Get("handler").(string)
 	req := sdk.NewCreateForScalaProcedureRequest(schemaObjectId, *returns, runtimeVersion, packages, handler)
@@ -374,9 +364,7 @@ func createScalaProcedure(ctx context.Context, d *schema.ResourceData, meta inte
 			req.WithExecuteAs(sdk.Pointer(sdk.ExecuteAsCaller))
 		}
 	}
-	if v, ok := d.GetOk("null_input_behavior"); ok {
-		req.WithNullInputBehavior(sdk.Pointer(sdk.NullInputBehavior(v.(string))))
-	}
+
 	if v, ok := d.GetOk("comment"); ok {
 		req.WithComment(sdk.String(v.(string)))
 	}
@@ -410,13 +398,13 @@ func createSQLProcedure(ctx context.Context, d *schema.ResourceData, meta interf
 	schema := d.Get("schema").(string)
 	database := d.Get("database").(string)
 	schemaObjectId := sdk.NewSchemaObjectIdentifier(database, schema, name)
+
 	returnType := d.Get("return_type").(string)
 	returnDataType, diags := convertProcedureDataType(returnType)
 	if diags != nil {
 		return diags
 	}
 	procedureDefinition := d.Get("statement").(string)
-
 	returns := sdk.NewProcedureSQLReturnsRequest().WithResultDataType(sdk.NewProcedureReturnsResultDataTypeRequest(returnDataType))
 	req := sdk.NewCreateForSQLProcedureRequest(schemaObjectId, *returns, procedureDefinition)
 	args, diags := getProcedureArguments(d)
@@ -464,33 +452,16 @@ func createPythonProcedure(ctx context.Context, d *schema.ResourceData, meta int
 	schema := d.Get("schema").(string)
 	database := d.Get("database").(string)
 	schemaObjectId := sdk.NewSchemaObjectIdentifier(database, schema, name)
-	returns := sdk.NewProcedureReturnsRequest()
 
-	returnType := d.Get("return_type").(string)
-	if strings.HasPrefix(strings.ToLower(returnType), "table") {
-		columns, diags := convertProcedureColumns(returnType)
-		if diags != nil {
-			return diags
-		}
-		var cr []sdk.ProcedureColumnRequest
-		for _, item := range columns {
-			cr = append(cr, *sdk.NewProcedureColumnRequest(item.ColumnName, item.ColumnDataType))
-		}
-		returns.WithTable(sdk.NewProcedureReturnsTableRequest().WithColumns(cr))
-	} else {
-		returnDataType, diags := convertProcedureDataType(returnType)
-		if diags != nil {
-			return diags
-		}
-		returns.WithResultDataType(sdk.NewProcedureReturnsResultDataTypeRequest(returnDataType))
+	returns, diags := parseProcedureReturnsRequest(d.Get("return_type").(string))
+	if diags != nil {
+		return diags
 	}
-
 	procedureDefinition := d.Get("statement").(string)
 	runtimeVersion := d.Get("runtime_version").(string)
 	packages := []sdk.ProcedurePackageRequest{}
-	pkgs := d.Get("packages").([]interface{})
-	for _, pkg := range pkgs {
-		packages = append(packages, *sdk.NewProcedurePackageRequest(pkg.(string)))
+	for _, item := range d.Get("packages").([]interface{}) {
+		packages = append(packages, *sdk.NewProcedurePackageRequest(item.(string)))
 	}
 	handler := d.Get("handler").(string)
 	req := sdk.NewCreateForPythonProcedureRequest(schemaObjectId, *returns, runtimeVersion, packages, handler)
@@ -512,7 +483,7 @@ func createPythonProcedure(ctx context.Context, d *schema.ResourceData, meta int
 		}
 	}
 
-	// TODO: [ { CALLED ON NULL INPUT | { RETURNS NULL ON NULL INPUT | STRICT } } ] not works for python
+	// TODO: [ { CALLED ON NULL INPUT | { RETURNS NULL ON NULL INPUT | STRICT } } ] not works for java, scala and python
 	// if v, ok := d.GetOk("null_input_behavior"); ok {
 	// 	req.WithNullInputBehavior(sdk.Pointer(sdk.NullInputBehavior(v.(string))))
 	// }
@@ -835,4 +806,26 @@ func convertProcedureColumns(s string) ([]sdk.ProcedureColumn, diag.Diagnostics)
 		}
 	}
 	return columns, nil
+}
+
+func parseProcedureReturnsRequest(s string) (*sdk.ProcedureReturnsRequest, diag.Diagnostics) {
+	returns := sdk.NewProcedureReturnsRequest()
+	if strings.HasPrefix(strings.ToLower(s), "table") {
+		columns, diags := convertProcedureColumns(s)
+		if diags != nil {
+			return nil, diags
+		}
+		var cr []sdk.ProcedureColumnRequest
+		for _, item := range columns {
+			cr = append(cr, *sdk.NewProcedureColumnRequest(item.ColumnName, item.ColumnDataType))
+		}
+		returns.WithTable(sdk.NewProcedureReturnsTableRequest().WithColumns(cr))
+	} else {
+		returnDataType, diags := convertProcedureDataType(s)
+		if diags != nil {
+			return nil, diags
+		}
+		returns.WithResultDataType(sdk.NewProcedureReturnsResultDataTypeRequest(returnDataType))
+	}
+	return returns, nil
 }

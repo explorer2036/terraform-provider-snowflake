@@ -1,7 +1,6 @@
 package resources_test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -94,78 +93,6 @@ func TestAcc_Procedure_Java(t *testing.T) {
 	testAccProcedure(t)
 }
 
-func procedureConfig(name string, databaseName string, schemaName string) string {
-	return fmt.Sprintf(`
-	resource "snowflake_procedure" "test_proc_simple" {
-		name = "%s"
-		database = "%s"
-		schema   = "%s"
-		return_type = "varchar"
-		language = "javascript"
-		statement = <<-EOF
-			return "Hi"
-		EOF
-	}
-
-	resource "snowflake_procedure" "test_proc" {
-		name = "%s"
-		database = "%s"
-		schema   = "%s"
-		arguments {
-			name = "arg1"
-			type = "varchar"
-		}
-		comment = "Terraform acceptance test"
-		language = "javascript"
-		return_type = "varchar"
-		statement = <<-EOF
-			var X=3
-			return X
-		EOF
-	}
-
-	resource "snowflake_procedure" "test_proc_complex" {
-		name = "%s"
-		database = "%s"
-		schema   = "%s"
-		arguments {
-			name = "arg1"
-			type = "varchar"
-		}
-		arguments {
-			name = "arg2"
-			type = "DATE"
-		}
-		comment = "Proc with 2 args"
-		return_type = "VARCHAR"
-		execute_as = "CALLER"
-		null_input_behavior = "RETURNS NULL ON NULL INPUT"
-		language = "javascript"
-		statement = <<-EOF
-			var X=1
-			return X
-		EOF
-	}
-
-	resource "snowflake_procedure" "test_proc_sql" {
-		name = "%s_sql"
-		database = "%s"
-		schema   = "%s"
-		language = "SQL"
-		return_type         = "INTEGER"
-		execute_as          = "CALLER"
-		null_input_behavior = "RETURNS NULL ON NULL INPUT"
-		statement           = <<EOT
-			declare
-				x integer;
-				y integer;
-			begin
-				x := 3;
-				y := x * x;
-				return y;
-			end;
-		EOT
-	  }
-	`, name, databaseName, schemaName, name, databaseName, schemaName, name, databaseName, schemaName, name, databaseName, schemaName,
-	)
+func TestAcc_Procedure_Scala(t *testing.T) {
+	testAccProcedure(t)
 }
