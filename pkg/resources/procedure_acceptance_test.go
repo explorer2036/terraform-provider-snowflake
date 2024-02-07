@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfversion"
 )
 
-func testAccProcedure(t *testing.T) {
+func testAccProcedure(t *testing.T, configDirectory string) {
 	t.Helper()
 
 	name := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
@@ -36,7 +36,7 @@ func testAccProcedure(t *testing.T) {
 		CheckDestroy: testAccCheckDynamicTableDestroy,
 		Steps: []resource.TestStep{
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory(configDirectory),
 				ConfigVariables: m(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -54,7 +54,7 @@ func testAccProcedure(t *testing.T) {
 
 			// test - change comment
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory(configDirectory),
 				ConfigVariables: variableSet2,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -66,7 +66,7 @@ func testAccProcedure(t *testing.T) {
 
 			// test - import
 			{
-				ConfigDirectory:   config.TestStepDirectory(),
+				ConfigDirectory:   acc.ConfigurationDirectory(configDirectory),
 				ConfigVariables:   variableSet2,
 				ResourceName:      resourceName,
 				ImportState:       true,
@@ -80,23 +80,23 @@ func testAccProcedure(t *testing.T) {
 }
 
 func TestAcc_Procedure_SQL(t *testing.T) {
-	testAccProcedure(t)
+	testAccProcedure(t, "TestAcc_Procedure/sql")
 }
 
 func TestAcc_Procedure_Python(t *testing.T) {
-	testAccProcedure(t)
+	testAccProcedure(t, "TestAcc_Procedure/python")
 }
 
 func TestAcc_Procedure_Javascript(t *testing.T) {
-	testAccProcedure(t)
+	testAccProcedure(t, "TestAcc_Procedure/javascript")
 }
 
 func TestAcc_Procedure_Java(t *testing.T) {
-	testAccProcedure(t)
+	testAccProcedure(t, "TestAcc_Procedure/java")
 }
 
 func TestAcc_Procedure_Scala(t *testing.T) {
-	testAccProcedure(t)
+	testAccProcedure(t, "TestAcc_Procedure/scala")
 }
 
 func TestAcc_Procedure_complex(t *testing.T) {
@@ -123,7 +123,7 @@ func TestAcc_Procedure_complex(t *testing.T) {
 		CheckDestroy: testAccCheckDynamicTableDestroy,
 		Steps: []resource.TestStep{
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory("TestAcc_Procedure/complex"),
 				ConfigVariables: m(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -149,7 +149,7 @@ func TestAcc_Procedure_complex(t *testing.T) {
 
 			// test - change comment
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory("TestAcc_Procedure/complex"),
 				ConfigVariables: variableSet2,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -161,7 +161,7 @@ func TestAcc_Procedure_complex(t *testing.T) {
 
 			// test - import
 			{
-				ConfigDirectory:   config.TestStepDirectory(),
+				ConfigDirectory:   acc.ConfigurationDirectory("TestAcc_Procedure/complex"),
 				ConfigVariables:   variableSet2,
 				ResourceName:      resourceName,
 				ImportState:       true,
