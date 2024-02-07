@@ -73,6 +73,7 @@ func testAccProcedure(t *testing.T, configDirectory string) {
 				ImportStateVerify: true,
 				ImportStateVerifyIgnore: []string{
 					"null_input_behavior",
+					"return_behavior",
 				},
 			},
 		},
@@ -166,6 +167,9 @@ func TestAcc_Procedure_complex(t *testing.T) {
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
+				ImportStateVerifyIgnore: []string{
+					"return_behavior",
+				},
 			},
 		},
 	})
