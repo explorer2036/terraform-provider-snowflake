@@ -11,7 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfversion"
 )
 
-func testAccFunction(t *testing.T) {
+func testAccFunction(t *testing.T, configDirectory string) {
 	t.Helper()
 
 	name := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
@@ -36,7 +36,7 @@ func testAccFunction(t *testing.T) {
 		CheckDestroy: testAccCheckDynamicTableDestroy,
 		Steps: []resource.TestStep{
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory(configDirectory),
 				ConfigVariables: m(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -53,7 +53,7 @@ func testAccFunction(t *testing.T) {
 
 			// test - change comment
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory(configDirectory),
 				ConfigVariables: variableSet2,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -65,7 +65,7 @@ func testAccFunction(t *testing.T) {
 
 			// test - import
 			{
-				ConfigDirectory:   config.TestStepDirectory(),
+				ConfigDirectory:   acc.ConfigurationDirectory(configDirectory),
 				ConfigVariables:   variableSet2,
 				ResourceName:      resourceName,
 				ImportState:       true,
@@ -81,23 +81,23 @@ func testAccFunction(t *testing.T) {
 }
 
 func TestAcc_Function_Javascript(t *testing.T) {
-	testAccFunction(t)
+	testAccFunction(t, "TestAcc_Function/javascript")
 }
 
 func TestAcc_Function_SQL(t *testing.T) {
-	testAccFunction(t)
+	testAccFunction(t, "TestAcc_Function/sql")
 }
 
 func TestAcc_Function_Java(t *testing.T) {
-	testAccFunction(t)
+	testAccFunction(t, "TestAcc_Function/java")
 }
 
 func TestAcc_Function_Scala(t *testing.T) {
-	testAccFunction(t)
+	testAccFunction(t, "TestAcc_Function/scala")
 }
 
 func TestAcc_Function_Python(t *testing.T) {
-	testAccFunction(t)
+	testAccFunction(t, "TestAcc_Function/python")
 }
 
 func TestAcc_Function_complex(t *testing.T) {
@@ -124,7 +124,7 @@ func TestAcc_Function_complex(t *testing.T) {
 		CheckDestroy: testAccCheckDynamicTableDestroy,
 		Steps: []resource.TestStep{
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory("TestAcc_Function/complex"),
 				ConfigVariables: m(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -149,7 +149,7 @@ func TestAcc_Function_complex(t *testing.T) {
 
 			// test - change comment
 			{
-				ConfigDirectory: config.TestStepDirectory(),
+				ConfigDirectory: acc.ConfigurationDirectory("TestAcc_Function/complex"),
 				ConfigVariables: variableSet2,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", name),
@@ -161,7 +161,7 @@ func TestAcc_Function_complex(t *testing.T) {
 
 			// test - import
 			{
-				ConfigDirectory:   config.TestStepDirectory(),
+				ConfigDirectory:   acc.ConfigurationDirectory("TestAcc_Function/complex"),
 				ConfigVariables:   variableSet2,
 				ResourceName:      resourceName,
 				ImportState:       true,
