@@ -110,7 +110,6 @@ func CreateTagAssociation(d *schema.ResourceData, meta interface{}) error {
 	objectDatabase, objectSchema, objectName := expandObjectIdentifier(d.Get("object_identifier"))
 	fullyQualifierObjectIdentifier := snowflakeValidation.FormatFullyQualifiedObjectID(objectDatabase, objectSchema, objectName)
 
-	fmt.Printf("qualified object identifier: %s\n", fullyQualifierObjectIdentifier)
 	builder := snowflake.NewTagAssociationBuilder(tagID).WithObjectIdentifier(fullyQualifierObjectIdentifier).WithObjectType(objectType).WithTagValue(tagValue)
 
 	q := builder.Create()
