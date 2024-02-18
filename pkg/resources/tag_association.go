@@ -1,11 +1,14 @@
 package resources
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
@@ -229,4 +232,54 @@ func DeleteTagAssociation(d *schema.ResourceData, meta interface{}) error {
 	d.SetId("")
 
 	return nil
+}
+
+const (
+	tagIDDelimiter = '|'
+)
+
+type TagID struct {
+	DatabaseName string
+	SchemaName   string
+	TagName      string
+}
+
+// String() takes in a schemaID object and returns a pipe-delimited string:
+// DatabaseName|SchemaName|TagName.
+func (ti *TagID) String() (string, error) {
+	var buf bytes.Buffer
+	csvWriter := csv.NewWriter(&buf)
+	csvWriter.Comma = schemaIDDelimiter
+	dataIdentifiers := [][]string{{ti.DatabaseName, ti.SchemaName, ti.TagName}}
+
+	if err := csvWriter.WriteAll(dataIdentifiers); err != nil {
+		return "", err
+	}
+	strTagID := strings.TrimSpace(buf.String())
+	return strTagID, nil
+}
+
+// tagIDFromString() takes in a pipe-delimited string: DatabaseName|tagName
+// and returns a tagID object.
+func tagIDFromString(stringID string) (*TagID, error) {
+	reader := csv.NewReader(strings.NewReader(stringID))
+	reader.Comma = tagIDDelimiter
+	lines, err := reader.ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("not CSV compatible")
+	}
+
+	if len(lines) != 1 {
+		return nil, fmt.Errorf("1 line per schema")
+	}
+	if len(lines[0]) != 3 {
+		return nil, fmt.Errorf("3 fields allowed")
+	}
+
+	tagResult := &TagID{
+		DatabaseName: lines[0][0],
+		SchemaName:   lines[0][1],
+		TagName:      lines[0][2],
+	}
+	return tagResult, nil
 }
