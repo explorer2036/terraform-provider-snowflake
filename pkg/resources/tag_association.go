@@ -8,6 +8,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -100,6 +101,21 @@ func TagAssociation() *schema.Resource {
 			Create: schema.DefaultTimeout(70 * time.Minute),
 		},
 	}
+}
+
+func CreateContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	// db := meta.(*sql.DB)
+	// client := sdk.NewClientFromDB(db)
+	// tagId := d.Get("tag_id").(string)
+	// objectType := d.Get("object_type").(string)
+	// tagValue := d.Get("tag_value").(string)
+	// objectDatabase, objectSchema, objectName := expandObjectIdentifier(d.Get("object_identifier"))
+
+	return ReadContextTagAssociation(ctx, d, meta)
+}
+
+func ReadContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	return diag.Errorf("cannot read tag association")
 }
 
 // CreateTagAssociation implements schema.CreateFunc.

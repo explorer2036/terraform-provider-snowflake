@@ -277,3 +277,32 @@ func TestInt_Tags(t *testing.T) {
 		assert.Equal(t, 0, len(tags))
 	})
 }
+
+func TestInt_TagsSetAndUnset(t *testing.T) {
+	client := testClient(t)
+	ctx := testContext(t)
+
+	databaseTest, schemaTest := testDb(t), testSchema(t)
+
+	table, cleanupTable := createTable(t, client, databaseTest, schemaTest)
+	defer cleanupTable()
+	tag, cleanupTag := createTag(t, client, databaseTest, schemaTest)
+	t.Cleanup(cleanupTag)
+
+	set := sdk.NewSetTagRequest(sdk.ObjectTypeTable, table.ID()).WithSetTags([]sdk.TagAssociation{
+		{
+			Name:  tag.ID(),
+			Value: "v1",
+		},
+	})
+	err := client.Tags.Set(ctx, set)
+	require.NoError(t, err)
+
+	value, err := client.SystemFunctions.GetTag(ctx, tag.ID(), table.ID(), sdk.ObjectTypeTable)
+	require.NoError(t, err)
+	assert.Equal(t, "v1", value)
+
+	unset := sdk.NewUnsetTagRequest(sdk.ObjectTypeTable, table.ID()).WithUnsetTags([]sdk.ObjectIdentifier{tag.ID()})
+	err = client.Tags.Unset(ctx, unset)
+	require.NoError(t, err)
+}
