@@ -3,7 +3,6 @@ package resources
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -14,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/helpers"
-	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/snowflake"
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
 	snowflakeValidation "github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/validation"
 )
 
@@ -88,10 +87,10 @@ var tagAssociationSchema = map[string]*schema.Schema{
 // TagAssociation returns a pointer to the resource representing a schema.
 func TagAssociation() *schema.Resource {
 	return &schema.Resource{
-		Create: CreateTagAssociation,
-		Read:   ReadTagAssociation,
-		Update: UpdateTagAssociation,
-		Delete: DeleteTagAssociation,
+		CreateContext: CreateContextTagAssociation,
+		ReadContext:   ReadContextTagAssociation,
+		UpdateContext: UpdateContextTagAssociation,
+		DeleteContext: DeleteContextTagAssociation,
 
 		Schema: tagAssociationSchema,
 		Importer: &schema.ResourceImporter{
@@ -103,138 +102,113 @@ func TagAssociation() *schema.Resource {
 	}
 }
 
-func CreateContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	// db := meta.(*sql.DB)
-	// client := sdk.NewClientFromDB(db)
-	// tagId := d.Get("tag_id").(string)
-	// objectType := d.Get("object_type").(string)
-	// tagValue := d.Get("tag_value").(string)
-	// objectDatabase, objectSchema, objectName := expandObjectIdentifier(d.Get("object_identifier"))
+func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectIdentifier, sdk.ObjectIdentifier, sdk.ObjectType) {
+	tag := d.Get("tag_id").(string)
+	objectIdentifier := d.Get("object_identifier")
+	objectType := sdk.ObjectType(d.Get("object_type").(string))
 
-	return ReadContextTagAssociation(ctx, d, meta)
-}
+	tagDatabase, tagSchema, tagName := snowflakeValidation.ParseFullyQualifiedObjectID(tag)
+	tid := sdk.NewSchemaObjectIdentifier(tagDatabase, tagSchema, tagName)
 
-func ReadContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	return diag.Errorf("cannot read tag association")
-}
-
-// CreateTagAssociation implements schema.CreateFunc.
-func CreateTagAssociation(d *schema.ResourceData, meta interface{}) error {
-	db := meta.(*sql.DB)
-	tagID := d.Get("tag_id").(string)
-	objectType := d.Get("object_type").(string)
-	tagValue := d.Get("tag_value").(string)
-	objectDatabase, objectSchema, objectName := expandObjectIdentifier(d.Get("object_identifier"))
+	objectDatabase, objectSchema, objectName := expandObjectIdentifier(objectIdentifier)
 	fullyQualifierObjectIdentifier := snowflakeValidation.FormatFullyQualifiedObjectID(objectDatabase, objectSchema, objectName)
+	oid := sdk.NewObjectIdentifierFromFullyQualifiedName(fullyQualifierObjectIdentifier)
 
-	builder := snowflake.NewTagAssociationBuilder(tagID).WithObjectIdentifier(fullyQualifierObjectIdentifier).WithObjectType(objectType).WithTagValue(tagValue)
+	return tid, oid, objectType
+}
 
-	q := builder.Create()
-	if err := snowflake.Exec(db, q); err != nil {
-		return fmt.Errorf("error associating tag to object: [%v] with command: [%v], tag_id [%v]", fullyQualifierObjectIdentifier, q, tagID)
+func CreateContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	db := meta.(*sql.DB)
+	client := sdk.NewClientFromDB(db)
+	tagValue := d.Get("tag_value").(string)
+
+	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
+	request := sdk.NewSetTagRequest(ot, oid).WithSetTags([]sdk.TagAssociation{
+		{
+			Name:  tid,
+			Value: tagValue,
+		},
+	})
+	if err := client.Tags.Set(ctx, request); err != nil {
+		return diag.FromErr(err)
 	}
-
 	skipValidate := d.Get("skip_validation").(bool)
 	if !skipValidate {
 		log.Println("[DEBUG] validating tag creation")
-
-		if err := retry.RetryContext(context.Background(), d.Timeout(schema.TimeoutCreate)-time.Minute, func() *retry.RetryError {
-			resp, err := snowflake.ListTagAssociations(builder, db)
+		if err := retry.RetryContext(ctx, d.Timeout(schema.TimeoutCreate)-time.Minute, func() *retry.RetryError {
+			tags, err := client.SystemFunctions.GetTags(ctx, tid, oid, ot)
 			if err != nil {
-				return retry.NonRetryableError(fmt.Errorf("error: %w", err))
+				return retry.NonRetryableError(fmt.Errorf("error getting tags: %w", err))
 			}
-
 			// if length of response is zero, tag association was not found. retry for up to 70 minutes
-			if len(resp) == 0 {
+			if len(tags) == 0 {
 				return retry.RetryableError(fmt.Errorf("expected tag association to be created but not yet created"))
 			}
 			return nil
 		}); err != nil {
-			return fmt.Errorf("error validating tag association")
+			return diag.FromErr(fmt.Errorf("error validating tag creation: %w", err))
 		}
 	}
-
-	d.SetId(helpers.EncodeSnowflakeID(builder.GetTagDatabase(), builder.GetTagSchema(), builder.GetTagName()))
-	return ReadTagAssociation(d, meta)
+	d.SetId(helpers.EncodeSnowflakeID(tid.DatabaseName(), tid.SchemaName(), tid.Name()))
+	return ReadContextTagAssociation(ctx, d, meta)
 }
 
-// ReadTagAssociation implements schema.ReadFunc.
-func ReadTagAssociation(d *schema.ResourceData, meta interface{}) error {
+func ReadContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	diags := diag.Diagnostics{}
 	db := meta.(*sql.DB)
+	client := sdk.NewClientFromDB(db)
 
-	tagID := d.Get("tag_id").(string)
-	objectType := d.Get("object_type").(string)
-	objectDatabase, objectSchema, objectName := expandObjectIdentifier(d.Get("object_identifier"))
-	fullyQualifierObjectIdentifier := snowflakeValidation.FormatFullyQualifiedObjectID(objectDatabase, objectSchema, objectName)
-
-	q := snowflake.NewTagAssociationBuilder(tagID).WithObjectIdentifier(fullyQualifierObjectIdentifier).WithObjectType(objectType).Show()
-	row := snowflake.QueryRow(db, q)
-
-	ta, err := snowflake.ScanTagAssociation(row)
-	if errors.Is(err, sql.ErrNoRows) {
-		// If not found, mark resource to be removed from state file during apply or refresh
-		log.Printf("[DEBUG] tag association (%s) not found", d.Id())
-		d.SetId("")
-		return nil
-	}
+	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
+	tagValue, err := client.SystemFunctions.GetTag(ctx, tid, oid, ot)
 	if err != nil {
-		// return err
-		return fmt.Errorf("error listing tag associations")
+		return diag.FromErr(err)
 	}
-
-	if err := d.Set("tag_value", ta.TagValue.String); err != nil {
-		return err
+	if err := d.Set("tag_value", tagValue); err != nil {
+		return diag.FromErr(err)
 	}
-	return nil
+	return diags
 }
 
-func UpdateTagAssociation(d *schema.ResourceData, meta interface{}) error {
+func UpdateContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	db := meta.(*sql.DB)
+	client := sdk.NewClientFromDB(db)
 
-	tagID := d.Get("tag_id").(string)
-	objectType := d.Get("object_type").(string)
-	objectDatabase, objectSchema, objectName := expandObjectIdentifier(d.Get("object_identifier"))
-	fullyQualifierObjectIdentifier := snowflakeValidation.FormatFullyQualifiedObjectID(objectDatabase, objectSchema, objectName)
-
-	builder := snowflake.NewTagAssociationBuilder(tagID).WithObjectIdentifier(fullyQualifierObjectIdentifier).WithObjectType(objectType)
-
+	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
 	if d.HasChange("skip_validation") {
 		o, n := d.GetChange("skip_validation")
 		log.Printf("[DEBUG] skip_validation changed from %v to %v", o, n)
 	}
-
 	if d.HasChange("tag_value") {
 		tagValue, ok := d.GetOk("tag_value")
-		var q string
 		if ok {
-			q = builder.WithTagValue(tagValue.(string)).Create()
+			request := sdk.NewSetTagRequest(ot, oid).WithSetTags([]sdk.TagAssociation{
+				{
+					Name:  tid,
+					Value: tagValue.(string),
+				},
+			})
+			if err := client.Tags.Set(ctx, request); err != nil {
+				return diag.FromErr(err)
+			}
 		} else {
-			q = builder.WithTagValue("").Create()
-		}
-		err := snowflake.Exec(db, q)
-		if err != nil {
-			return fmt.Errorf("error updating tag association value for object [%v]", fullyQualifierObjectIdentifier)
+			request := sdk.NewUnsetTagRequest(ot, oid).WithUnsetTags([]sdk.ObjectIdentifier{tid})
+			if err := client.Tags.Unset(ctx, request); err != nil {
+				return diag.FromErr(err)
+			}
 		}
 	}
-
-	return ReadTagAssociation(d, meta)
+	return ReadContextTagAssociation(ctx, d, meta)
 }
 
-// DeleteTagAssociation implements schema.DeleteFunc.
-func DeleteTagAssociation(d *schema.ResourceData, meta interface{}) error {
+func DeleteContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	db := meta.(*sql.DB)
+	client := sdk.NewClientFromDB(db)
 
-	tagID := d.Get("tag_id").(string)
-	objectType := d.Get("object_type").(string)
-	objectDatabase, objectSchema, objectName := expandObjectIdentifier(d.Get("object_identifier"))
-	fullyQualifierObjectIdentifier := snowflakeValidation.FormatFullyQualifiedObjectID(objectDatabase, objectSchema, objectName)
-	q := snowflake.NewTagAssociationBuilder(tagID).WithObjectIdentifier(fullyQualifierObjectIdentifier).WithObjectType(objectType).Drop()
-
-	if err := snowflake.Exec(db, q); err != nil {
-		return fmt.Errorf("error deleting tag association for object id [%s]: %w", tagID, err)
+	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
+	request := sdk.NewUnsetTagRequest(ot, oid).WithUnsetTags([]sdk.ObjectIdentifier{tid})
+	if err := client.Tags.Unset(ctx, request); err != nil {
+		return diag.FromErr(err)
 	}
-
 	d.SetId("")
-
 	return nil
 }
