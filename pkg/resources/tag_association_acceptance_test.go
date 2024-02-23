@@ -2,6 +2,7 @@ package resources_test
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 
@@ -144,6 +145,11 @@ func TestAcc_TagAssociationTableIssues1202(t *testing.T) {
 }
 
 func TestAcc_TagAssociationAccountIssues1910(t *testing.T) {
+	// SNOWFLAKE_TEST_ACCOUNT_CREATE must be set to 1 to run this test
+	if _, ok := os.LookupEnv("SNOWFLAKE_TEST_ACCOUNT_CREATE"); !ok {
+		t.Skip("Skipping TestInt_AccountCreate")
+	}
+
 	tagName := "tag-" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
 	accountName := "account_" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
 
