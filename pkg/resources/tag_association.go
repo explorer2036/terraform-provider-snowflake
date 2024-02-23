@@ -103,36 +103,48 @@ func TagAssociation() *schema.Resource {
 	}
 }
 
-func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectIdentifier, sdk.ObjectIdentifier, sdk.ObjectType) {
+func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectIdentifier, []sdk.ObjectIdentifier, sdk.ObjectType) {
 	tag := d.Get("tag_id").(string)
-	objectIdentifier := d.Get("object_identifier")
 	objectType := sdk.ObjectType(d.Get("object_type").(string))
 
 	tagDatabase, tagSchema, tagName := snowflakeValidation.ParseFullyQualifiedObjectID(tag)
 	tid := sdk.NewSchemaObjectIdentifier(tagDatabase, tagSchema, tagName)
 
-	objectDatabase, objectSchema, objectName := expandObjectIdentifier(objectIdentifier)
-	databaseName := strings.Trim(objectDatabase, `"`)
-	schemaName := strings.Trim(objectSchema, `"`)
-	name := strings.Trim(objectName, `"`)
-	if databaseName != "" && schemaName != "" {
-		if objectType == sdk.ObjectTypeColumn {
-			fields := strings.Split(name, ".")
-			if len(fields) > 1 {
-				tableName := strings.ReplaceAll(fields[0], `"`, "")
-				var parts []string
-				for i := 1; i < len(fields); i++ {
-					parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
-				}
-				columnName := strings.Join(parts, ".")
-				return tid, sdk.NewTableColumnIdentifier(databaseName, schemaName, tableName, columnName), objectType
-			}
+	identifiers := []sdk.ObjectIdentifier{}
+	for _, item := range d.Get("object_identifier").([]interface{}) {
+		m := item.(map[string]interface{})
+		name := strings.Trim(m["name"].(string), `"`)
+		var databaseName, schemaName string
+		if v, ok := m["schema"]; ok {
+			schemaName = strings.Trim(v.(string), `"`)
 		}
-		return tid, sdk.NewSchemaObjectIdentifier(databaseName, schemaName, name), objectType
-	} else if databaseName != "" {
-		return tid, sdk.NewDatabaseObjectIdentifier(databaseName, name), objectType
+		if v, ok := m["database"]; ok {
+			databaseName = strings.Trim(v.(string), `"`)
+		}
+		if databaseName != "" && schemaName != "" {
+			if objectType == sdk.ObjectTypeColumn {
+				fields := strings.Split(name, ".")
+				if len(fields) > 1 {
+					tableName := strings.ReplaceAll(fields[0], `"`, "")
+					var parts []string
+					for i := 1; i < len(fields); i++ {
+						parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
+					}
+					columnName := strings.Join(parts, ".")
+					identifiers = append(identifiers, sdk.NewTableColumnIdentifier(databaseName, schemaName, tableName, columnName))
+				} else {
+					identifiers = append(identifiers, sdk.NewSchemaObjectIdentifier(databaseName, schemaName, name))
+				}
+			} else {
+				identifiers = append(identifiers, sdk.NewSchemaObjectIdentifier(databaseName, schemaName, name))
+			}
+		} else if databaseName != "" {
+			identifiers = append(identifiers, sdk.NewDatabaseObjectIdentifier(databaseName, name))
+		} else {
+			identifiers = append(identifiers, sdk.NewAccountObjectIdentifier(name))
+		}
 	}
-	return tid, sdk.NewAccountObjectIdentifier(name), objectType
+	return tid, identifiers, objectType
 }
 
 func CreateContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -140,31 +152,33 @@ func CreateContextTagAssociation(ctx context.Context, d *schema.ResourceData, me
 	client := sdk.NewClientFromDB(db)
 	tagValue := d.Get("tag_value").(string)
 
-	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
-	request := sdk.NewSetTagRequest(ot, oid).WithSetTags([]sdk.TagAssociation{
-		{
-			Name:  tid,
-			Value: tagValue,
-		},
-	})
-	if err := client.Tags.Set(ctx, request); err != nil {
-		return diag.FromErr(err)
-	}
-	skipValidate := d.Get("skip_validation").(bool)
-	if !skipValidate {
-		log.Println("[DEBUG] validating tag creation")
-		if err := retry.RetryContext(ctx, d.Timeout(schema.TimeoutCreate)-time.Minute, func() *retry.RetryError {
-			tags, err := client.SystemFunctions.GetTags(ctx, tid, oid, ot)
-			if err != nil {
-				return retry.NonRetryableError(fmt.Errorf("error getting tags: %w", err))
+	tid, ids, ot := tagIdentifierAndObjectIdentifier(d)
+	for _, oid := range ids {
+		request := sdk.NewSetTagRequest(ot, oid).WithSetTags([]sdk.TagAssociation{
+			{
+				Name:  tid,
+				Value: tagValue,
+			},
+		})
+		if err := client.Tags.Set(ctx, request); err != nil {
+			return diag.FromErr(err)
+		}
+		skipValidate := d.Get("skip_validation").(bool)
+		if !skipValidate {
+			log.Println("[DEBUG] validating tag creation")
+			if err := retry.RetryContext(ctx, d.Timeout(schema.TimeoutCreate)-time.Minute, func() *retry.RetryError {
+				tags, err := client.SystemFunctions.GetTags(ctx, tid, oid, ot)
+				if err != nil {
+					return retry.NonRetryableError(fmt.Errorf("error getting tags: %w", err))
+				}
+				// if length of response is zero, tag association was not found. retry for up to 70 minutes
+				if len(tags) == 0 {
+					return retry.RetryableError(fmt.Errorf("expected tag association to be created but not yet created"))
+				}
+				return nil
+			}); err != nil {
+				return diag.FromErr(fmt.Errorf("error validating tag creation: %w", err))
 			}
-			// if length of response is zero, tag association was not found. retry for up to 70 minutes
-			if len(tags) == 0 {
-				return retry.RetryableError(fmt.Errorf("expected tag association to be created but not yet created"))
-			}
-			return nil
-		}); err != nil {
-			return diag.FromErr(fmt.Errorf("error validating tag creation: %w", err))
 		}
 	}
 	d.SetId(helpers.EncodeSnowflakeID(tid.DatabaseName(), tid.SchemaName(), tid.Name()))
@@ -176,13 +190,15 @@ func ReadContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
 
-	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
-	tagValue, err := client.SystemFunctions.GetTag(ctx, tid, oid, ot)
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	if err := d.Set("tag_value", tagValue); err != nil {
-		return diag.FromErr(err)
+	tid, ids, ot := tagIdentifierAndObjectIdentifier(d)
+	for _, oid := range ids {
+		tagValue, err := client.SystemFunctions.GetTag(ctx, tid, oid, ot)
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		if err := d.Set("tag_value", tagValue); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	return diags
 }
@@ -191,27 +207,29 @@ func UpdateContextTagAssociation(ctx context.Context, d *schema.ResourceData, me
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
 
-	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
-	if d.HasChange("skip_validation") {
-		o, n := d.GetChange("skip_validation")
-		log.Printf("[DEBUG] skip_validation changed from %v to %v", o, n)
-	}
-	if d.HasChange("tag_value") {
-		tagValue, ok := d.GetOk("tag_value")
-		if ok {
-			request := sdk.NewSetTagRequest(ot, oid).WithSetTags([]sdk.TagAssociation{
-				{
-					Name:  tid,
-					Value: tagValue.(string),
-				},
-			})
-			if err := client.Tags.Set(ctx, request); err != nil {
-				return diag.FromErr(err)
-			}
-		} else {
-			request := sdk.NewUnsetTagRequest(ot, oid).WithUnsetTags([]sdk.ObjectIdentifier{tid})
-			if err := client.Tags.Unset(ctx, request); err != nil {
-				return diag.FromErr(err)
+	tid, ids, ot := tagIdentifierAndObjectIdentifier(d)
+	for _, oid := range ids {
+		if d.HasChange("skip_validation") {
+			o, n := d.GetChange("skip_validation")
+			log.Printf("[DEBUG] skip_validation changed from %v to %v", o, n)
+		}
+		if d.HasChange("tag_value") {
+			tagValue, ok := d.GetOk("tag_value")
+			if ok {
+				request := sdk.NewSetTagRequest(ot, oid).WithSetTags([]sdk.TagAssociation{
+					{
+						Name:  tid,
+						Value: tagValue.(string),
+					},
+				})
+				if err := client.Tags.Set(ctx, request); err != nil {
+					return diag.FromErr(err)
+				}
+			} else {
+				request := sdk.NewUnsetTagRequest(ot, oid).WithUnsetTags([]sdk.ObjectIdentifier{tid})
+				if err := client.Tags.Unset(ctx, request); err != nil {
+					return diag.FromErr(err)
+				}
 			}
 		}
 	}
@@ -222,10 +240,12 @@ func DeleteContextTagAssociation(ctx context.Context, d *schema.ResourceData, me
 	db := meta.(*sql.DB)
 	client := sdk.NewClientFromDB(db)
 
-	tid, oid, ot := tagIdentifierAndObjectIdentifier(d)
-	request := sdk.NewUnsetTagRequest(ot, oid).WithUnsetTags([]sdk.ObjectIdentifier{tid})
-	if err := client.Tags.Unset(ctx, request); err != nil {
-		return diag.FromErr(err)
+	tid, ids, ot := tagIdentifierAndObjectIdentifier(d)
+	for _, oid := range ids {
+		request := sdk.NewUnsetTagRequest(ot, oid).WithUnsetTags([]sdk.ObjectIdentifier{tid})
+		if err := client.Tags.Unset(ctx, request); err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	d.SetId("")
 	return nil

@@ -99,6 +99,33 @@ func TestAcc_TagAssociationColumnIssues1926(t *testing.T) {
 	})
 }
 
+func TestAcc_TagAssociationColumnIssues1909(t *testing.T) {
+	tagName := "tag-" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
+	table1Name := "table-" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
+	table2Name := "table-" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
+	columnName := "test.column"
+
+	resource.ParallelTest(t, resource.TestCase{
+		Providers:    acc.TestAccProviders(),
+		PreCheck:     func() { acc.TestAccPreCheck(t) },
+		CheckDestroy: nil,
+		Steps: []resource.TestStep{
+			{
+				Config: tagAssociationConfigColumnIssues1909(tagName, table1Name, table2Name, acc.TestDatabaseName, acc.TestSchemaName, columnName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_type", "COLUMN"),
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_id", fmt.Sprintf("%s|%s|%s", acc.TestDatabaseName, acc.TestSchemaName, tagName)),
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_value", "v1"),
+					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.%", "3"),
+					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.name", fmt.Sprintf("%s.%s", tableName, columnName)),
+					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.database", acc.TestDatabaseName),
+					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.schema", acc.TestSchemaName),
+				),
+			},
+		},
+	})
+}
+
 func tagAssociationConfig(n string, databaseName string, schemaName string) string {
 	return fmt.Sprintf(`
 resource "snowflake_tag" "test" {
@@ -203,4 +230,47 @@ resource "snowflake_tag_association" "tag_column_association" {
 	tag_value   = "v1"
 }
 `, tagName, tableName, databaseName, schemaName, columeName)
+}
+
+func tagAssociationConfigColumnIssues1909(tagName, table1Name string, table2Name string, databaseName string, schemaName string, columeName string) string {
+	return fmt.Sprintf(`
+resource "snowflake_tag" "test_tag" {
+	name     = "%[1]v"
+	database = "%[4]v"
+	schema   = "%[5]v"
+}
+resource "snowflake_table" "test_table1" {
+	name                = "%[2]v"
+	database            = "%[4]v"
+	schema              = "%[5]v"
+	column {
+		name    = "%[6]v"
+		type    = "VARIANT"
+	}
+}
+resource "snowflake_table" "test_table2" {
+	name                = "%[3]v"
+	database            = "%[4]v"
+	schema              = "%[5]v"
+	column {
+		name    = "%[6]v"
+		type    = "VARIANT"
+	}
+}
+resource "snowflake_tag_association" "tag_column_association" {
+	object_identifier {
+		database   = "%[4]v"
+		schema     = "%[5]v"
+		name       = "${snowflake_table.test_table1.name}.${snowflake_table.test_table1.column[0].name}"
+	}
+	object_identifier {
+		database   = "%[4]v"
+		schema     = "%[5]v"
+		name       = "${snowflake_table.test_table2.name}.${snowflake_table.test_table2.column[0].name}"
+	}
+	object_type = "COLUMN"
+	tag_id      = snowflake_tag.test_tag.id
+	tag_value   = "v1"
+}
+`, tagName, table1Name, table2Name, databaseName, schemaName, columeName)
 }
