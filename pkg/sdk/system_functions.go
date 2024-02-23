@@ -29,15 +29,15 @@ func (c *systemFunctions) GetTag(ctx context.Context, tagID ObjectIdentifier, ob
 }
 
 func (c *systemFunctions) GetTags(ctx context.Context, tagID ObjectIdentifier, objectID ObjectIdentifier, objectType ObjectType) ([]string, error) {
-	s := []struct {
+	res := []struct {
 		Tag string `db:"TAG"`
 	}{}
 	sql := fmt.Sprintf(`SELECT SYSTEM$GET_TAG('%s', '%s', '%s') TAG_VALUE WHERE TAG_VALUE IS NOT NULL`, tagID.FullyQualifiedName(), objectID.FullyQualifiedName(), objectType)
-	if err := c.client.query(ctx, s, sql); err != nil {
+	if err := c.client.query(ctx, res, sql); err != nil {
 		return nil, err
 	}
-	var tags []string
-	for _, item := range s {
+	tags := []string{}
+	for _, item := range res {
 		tags = append(tags, item.Tag)
 	}
 	return tags, nil

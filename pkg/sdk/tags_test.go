@@ -2,7 +2,6 @@ package sdk
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
@@ -391,25 +390,4 @@ func TestTagUnset(t *testing.T) {
 		opts := request.toOpts()
 		assertOptsValidAndSQLEquals(t, opts, `ALTER %s %s MODIFY COLUMN "%s" UNSET TAG "tag1", "tag2"`, opts.objectType, table.FullyQualifiedName(), column)
 	})
-}
-
-func TestIdentifier(t *testing.T) {
-	s := `"terraform_test_database"."terraform_test_schema"."table-SJMC.test.column"`
-	fields := strings.Split(s, ".")
-	t.Logf("n: %d", len(fields))
-
-	database := strings.ReplaceAll(fields[0], `"`, "")
-	schema := strings.ReplaceAll(fields[1], `"`, "")
-	table := strings.ReplaceAll(fields[2], `"`, "")
-	column := strings.ReplaceAll(fields[3], `"`, "")
-	t.Logf("database: %s, schema: %s, table: %s, column: %s", database, schema, table, column)
-
-	if len(fields) > 4 {
-		var parts []string
-		for i := 3; i < len(fields); i++ {
-			parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
-		}
-		column = strings.Join(parts, ".")
-	}
-	t.Logf("column: %s", column)
 }
