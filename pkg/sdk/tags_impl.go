@@ -110,19 +110,18 @@ func (s *SetTagRequest) toOpts() *setTagOptions {
 		SetTags:    s.SetTags,
 	}
 	if o.objectType == ObjectTypeColumn {
-		objectName := o.objectName.FullyQualifiedName()
-		fields := strings.Split(objectName, ".")
+		fields := strings.Split(o.objectName.FullyQualifiedName(), ".")
 		if len(fields) < 4 {
 			return o
 		}
-		database := strings.ReplaceAll(fields[0], "\"", "")
-		schema := strings.ReplaceAll(fields[1], "\"", "")
-		table := strings.ReplaceAll(fields[2], "\"", "")
-		column := strings.ReplaceAll(fields[3], "\"", "")
+		database := strings.ReplaceAll(fields[0], `"`, "")
+		schema := strings.ReplaceAll(fields[1], `"`, "")
+		table := strings.ReplaceAll(fields[2], `"`, "")
+		column := strings.ReplaceAll(fields[3], `"`, "")
 		if len(fields) > 4 {
 			var parts []string
-			for i := 3; i < len(parts); i++ {
-				parts = append(parts, strings.ReplaceAll(parts[i], "\"", ""))
+			for i := 3; i < len(fields); i++ {
+				parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
 			}
 			column = strings.Join(parts, ".")
 		}
@@ -140,19 +139,18 @@ func (s *UnsetTagRequest) toOpts() *unsetTagOptions {
 		UnsetTags:  s.UnsetTags,
 	}
 	if o.objectType == ObjectTypeColumn {
-		objectName := o.objectName.FullyQualifiedName()
-		fields := strings.Split(objectName, ".")
+		fields := strings.Split(o.objectName.FullyQualifiedName(), ".")
 		if len(fields) < 4 {
 			return o
 		}
-		database := strings.ReplaceAll(fields[0], "\"", "")
-		schema := strings.ReplaceAll(fields[1], "\"", "")
-		table := strings.ReplaceAll(fields[2], "\"", "")
-		column := strings.ReplaceAll(fields[3], "\"", "")
+		database := strings.ReplaceAll(fields[0], `"`, "")
+		schema := strings.ReplaceAll(fields[1], `"`, "")
+		table := strings.ReplaceAll(fields[2], `"`, "")
+		column := strings.ReplaceAll(fields[3], `"`, "")
 		if len(fields) > 4 {
 			var parts []string
-			for i := 3; i < len(parts); i++ {
-				parts = append(parts, strings.ReplaceAll(parts[i], "\"", ""))
+			for i := 3; i < len(fields); i++ {
+				parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
 			}
 			column = strings.Join(parts, ".")
 		}

@@ -111,9 +111,7 @@ func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectI
 	tid := sdk.NewSchemaObjectIdentifier(tagDatabase, tagSchema, tagName)
 
 	objectDatabase, objectSchema, objectName := expandObjectIdentifier(objectIdentifier)
-	fullyQualifierObjectIdentifier := snowflakeValidation.FormatFullyQualifiedObjectID(objectDatabase, objectSchema, objectName)
-	oid := sdk.NewObjectIdentifierFromFullyQualifiedName(fullyQualifierObjectIdentifier)
-
+	oid := sdk.NewObjectIdentifier(objectDatabase, objectSchema, objectName)
 	return tid, oid, objectType
 }
 
