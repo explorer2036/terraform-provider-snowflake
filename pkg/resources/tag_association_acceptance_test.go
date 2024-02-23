@@ -143,6 +143,27 @@ func TestAcc_TagAssociationTableIssues1202(t *testing.T) {
 	})
 }
 
+func TestAcc_TagAssociationAccountIssues1910(t *testing.T) {
+	tagName := "tag-" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
+	accountName := "account_" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
+
+	resource.ParallelTest(t, resource.TestCase{
+		Providers:    acc.TestAccProviders(),
+		PreCheck:     func() { acc.TestAccPreCheck(t) },
+		CheckDestroy: nil,
+		Steps: []resource.TestStep{
+			{
+				Config: tagAssociationConfigAccountIssues1910(tagName, accountName, acc.TestDatabaseName, acc.TestSchemaName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_type", "ACCOUNT"),
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_id", fmt.Sprintf("%s|%s|%s", acc.TestDatabaseName, acc.TestSchemaName, tagName)),
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_value", "v1"),
+				),
+			},
+		},
+	})
+}
+
 func tagAssociationConfig(n string, databaseName string, schemaName string) string {
 	return fmt.Sprintf(`
 resource "snowflake_tag" "test" {
@@ -317,4 +338,33 @@ resource "snowflake_tag_association" "tag_column_association" {
 	tag_value   = "v1"
 }
 `, tagName, tableName, databaseName, schemaName)
+}
+
+func tagAssociationConfigAccountIssues1910(tagName, accountName string, databaseName string, schemaName string) string {
+	return fmt.Sprintf(`
+resource "snowflake_tag" "test_tag" {
+	name     = "%[1]v"
+	database = "%[3]v"
+	schema   = "%[4]v"
+}
+resource "snowflake_account" "test_account" {
+  	name = "%[2]v"
+  	admin_name = "someadmin"
+  	admin_password = "123456"
+  	first_name = "Ad"
+  	last_name = "Min"
+  	email = "admin@example.com"
+  	must_change_password = false
+  	edition = "BUSINESS_CRITICAL"
+  	grace_period_in_days = 4
+}
+resource "snowflake_tag_association" "tag_account_association" {
+	object_identifier {
+		name = "${snowflake_account.test_account.name}"
+	}
+	object_type = "ACCOUNT"
+	tag_id      = snowflake_tag.test_tag.id
+	tag_value   = "v1"
+}
+`, tagName, accountName, databaseName, schemaName)
 }
