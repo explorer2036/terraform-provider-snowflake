@@ -103,6 +103,15 @@ func TagAssociation() *schema.Resource {
 	}
 }
 
+func useTagDatabaseAndSchema(ot sdk.ObjectType) bool {
+	switch ot {
+	case sdk.ObjectTypeColumn, sdk.ObjectTypePipe, sdk.ObjectTypeStream, sdk.ObjectTypeStage, sdk.ObjectTypeTable, sdk.ObjectTypeTask, sdk.ObjectTypeView:
+		return true
+	default:
+		return false
+	}
+}
+
 func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectIdentifier, []sdk.ObjectIdentifier, sdk.ObjectType) {
 	tag := d.Get("tag_id").(string)
 	objectType := sdk.ObjectType(d.Get("object_type").(string))
@@ -115,13 +124,20 @@ func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectI
 		m := item.(map[string]interface{})
 		name := strings.Trim(m["name"].(string), `"`)
 		var databaseName, schemaName string
-		if v, ok := m["schema"]; ok {
-			schemaName = strings.Trim(v.(string), `"`)
-		}
 		if v, ok := m["database"]; ok {
 			databaseName = strings.Trim(v.(string), `"`)
+			if databaseName == "" && useTagDatabaseAndSchema(objectType) {
+				databaseName = tagDatabase
+			}
 		}
-		if databaseName != "" && schemaName != "" {
+		if v, ok := m["schema"]; ok {
+			schemaName = strings.Trim(v.(string), `"`)
+			if schemaName == "" && useTagDatabaseAndSchema(objectType) {
+				schemaName = tagSchema
+			}
+		}
+		switch {
+		case databaseName != "" && schemaName != "":
 			if objectType == sdk.ObjectTypeColumn {
 				fields := strings.Split(name, ".")
 				if len(fields) > 1 {
@@ -138,9 +154,9 @@ func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectI
 			} else {
 				identifiers = append(identifiers, sdk.NewSchemaObjectIdentifier(databaseName, schemaName, name))
 			}
-		} else if databaseName != "" {
+		case databaseName != "":
 			identifiers = append(identifiers, sdk.NewDatabaseObjectIdentifier(databaseName, name))
-		} else {
+		default:
 			identifiers = append(identifiers, sdk.NewAccountObjectIdentifier(name))
 		}
 	}

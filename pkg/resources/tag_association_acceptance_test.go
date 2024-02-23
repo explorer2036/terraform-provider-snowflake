@@ -116,10 +116,27 @@ func TestAcc_TagAssociationColumnIssues1909(t *testing.T) {
 					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_type", "COLUMN"),
 					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_id", fmt.Sprintf("%s|%s|%s", acc.TestDatabaseName, acc.TestSchemaName, tagName)),
 					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_value", "v1"),
-					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.%", "3"),
-					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.name", fmt.Sprintf("%s.%s", tableName, columnName)),
-					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.database", acc.TestDatabaseName),
-					// resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_identifier.0.schema", acc.TestSchemaName),
+				),
+			},
+		},
+	})
+}
+
+func TestAcc_TagAssociationTableIssues1202(t *testing.T) {
+	tagName := "tag-" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
+	tableName := "table-" + strings.ToUpper(acctest.RandStringFromCharSet(4, acctest.CharSetAlpha))
+
+	resource.ParallelTest(t, resource.TestCase{
+		Providers:    acc.TestAccProviders(),
+		PreCheck:     func() { acc.TestAccPreCheck(t) },
+		CheckDestroy: nil,
+		Steps: []resource.TestStep{
+			{
+				Config: tagAssociationConfigTableIssues1202(tagName, tableName, acc.TestDatabaseName, acc.TestSchemaName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "object_type", "TABLE"),
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_id", fmt.Sprintf("%s|%s|%s", acc.TestDatabaseName, acc.TestSchemaName, tagName)),
+					resource.TestCheckResourceAttr("snowflake_tag_association.tag_column_association", "tag_value", "v1"),
 				),
 			},
 		},
@@ -139,7 +156,7 @@ resource "snowflake_tag" "test" {
 resource "snowflake_tag_association" "test" {
 	object_identifier {
 		name = "%[2]s"
-	  }
+	}
 	object_type = "DATABASE"
 	tag_id = snowflake_tag.test.id
 	tag_value = "finance"
@@ -273,4 +290,31 @@ resource "snowflake_tag_association" "tag_column_association" {
 	tag_value   = "v1"
 }
 `, tagName, table1Name, table2Name, databaseName, schemaName, columeName)
+}
+
+func tagAssociationConfigTableIssues1202(tagName, tableName string, databaseName string, schemaName string) string {
+	return fmt.Sprintf(`
+resource "snowflake_tag" "test_tag" {
+	name     = "%[1]v"
+	database = "%[3]v"
+	schema   = "%[4]v"
+}
+resource "snowflake_table" "test_table" {
+	name                = "%[2]v"
+	database            = "%[3]v"
+	schema              = "%[4]v"
+	column {
+		name    = "test_column"
+		type    = "VARIANT"
+	}
+}
+resource "snowflake_tag_association" "tag_column_association" {
+	object_identifier {
+		name = "${snowflake_table.test_table.name}"
+	}
+	object_type = "TABLE"
+	tag_id      = snowflake_tag.test_tag.id
+	tag_value   = "v1"
+}
+`, tagName, tableName, databaseName, schemaName)
 }
