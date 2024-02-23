@@ -2,7 +2,6 @@ package sdk
 
 import (
 	"context"
-	"strings"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
 )
@@ -110,24 +109,12 @@ func (s *SetTagRequest) toOpts() *setTagOptions {
 		SetTags:    s.SetTags,
 	}
 	if o.objectType == ObjectTypeColumn {
-		fields := strings.Split(o.objectName.FullyQualifiedName(), ".")
-		if len(fields) < 4 {
-			return o
+		id, ok := o.objectName.(TableColumnIdentifier)
+		if ok {
+			o.objectType = ObjectTypeTable
+			o.objectName = NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), id.TableName())
+			o.column = String(id.Name())
 		}
-		database := strings.ReplaceAll(fields[0], `"`, "")
-		schema := strings.ReplaceAll(fields[1], `"`, "")
-		table := strings.ReplaceAll(fields[2], `"`, "")
-		column := strings.ReplaceAll(fields[3], `"`, "")
-		if len(fields) > 4 {
-			var parts []string
-			for i := 3; i < len(fields); i++ {
-				parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
-			}
-			column = strings.Join(parts, ".")
-		}
-		o.objectName = NewSchemaObjectIdentifier(database, schema, table)
-		o.objectType = ObjectTypeTable
-		o.column = &column
 	}
 	return o
 }
@@ -139,24 +126,12 @@ func (s *UnsetTagRequest) toOpts() *unsetTagOptions {
 		UnsetTags:  s.UnsetTags,
 	}
 	if o.objectType == ObjectTypeColumn {
-		fields := strings.Split(o.objectName.FullyQualifiedName(), ".")
-		if len(fields) < 4 {
-			return o
+		id, ok := o.objectName.(TableColumnIdentifier)
+		if ok {
+			o.objectType = ObjectTypeTable
+			o.objectName = NewSchemaObjectIdentifier(id.DatabaseName(), id.SchemaName(), id.TableName())
+			o.column = String(id.Name())
 		}
-		database := strings.ReplaceAll(fields[0], `"`, "")
-		schema := strings.ReplaceAll(fields[1], `"`, "")
-		table := strings.ReplaceAll(fields[2], `"`, "")
-		column := strings.ReplaceAll(fields[3], `"`, "")
-		if len(fields) > 4 {
-			var parts []string
-			for i := 3; i < len(fields); i++ {
-				parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
-			}
-			column = strings.Join(parts, ".")
-		}
-		o.objectName = NewSchemaObjectIdentifier(database, schema, table)
-		o.objectType = ObjectTypeTable
-		o.column = &column
 	}
 	return o
 }

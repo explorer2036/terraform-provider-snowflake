@@ -29,18 +29,6 @@ func NewObjectIdentifierFromFullyQualifiedName(fullyQualifiedName string) Object
 	return NewAccountObjectIdentifier(fullyQualifiedName)
 }
 
-func NewObjectIdentifier(databaseName, schemaName, name string) ObjectIdentifier {
-	databaseName = strings.Trim(databaseName, `"`)
-	schemaName = strings.Trim(schemaName, `"`)
-	name = strings.Trim(name, `"`)
-	if databaseName != "" && schemaName != "" {
-		return NewSchemaObjectIdentifier(databaseName, schemaName, name)
-	} else if databaseName != "" {
-		return NewDatabaseObjectIdentifier(databaseName, name)
-	}
-	return NewAccountObjectIdentifier(name)
-}
-
 // for objects that live in other accounts
 type ExternalObjectIdentifier struct {
 	objectIdentifier  ObjectIdentifier

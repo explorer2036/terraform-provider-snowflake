@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -111,8 +112,27 @@ func tagIdentifierAndObjectIdentifier(d *schema.ResourceData) (sdk.SchemaObjectI
 	tid := sdk.NewSchemaObjectIdentifier(tagDatabase, tagSchema, tagName)
 
 	objectDatabase, objectSchema, objectName := expandObjectIdentifier(objectIdentifier)
-	oid := sdk.NewObjectIdentifier(objectDatabase, objectSchema, objectName)
-	return tid, oid, objectType
+	databaseName := strings.Trim(objectDatabase, `"`)
+	schemaName := strings.Trim(objectSchema, `"`)
+	name := strings.Trim(objectName, `"`)
+	if databaseName != "" && schemaName != "" {
+		if objectType == sdk.ObjectTypeColumn {
+			fields := strings.Split(name, ".")
+			if len(fields) > 1 {
+				tableName := strings.ReplaceAll(fields[0], `"`, "")
+				var parts []string
+				for i := 1; i < len(fields); i++ {
+					parts = append(parts, strings.ReplaceAll(fields[i], `"`, ""))
+				}
+				columnName := strings.Join(parts, ".")
+				return tid, sdk.NewTableColumnIdentifier(databaseName, schemaName, tableName, columnName), objectType
+			}
+		}
+		return tid, sdk.NewSchemaObjectIdentifier(databaseName, schemaName, name), objectType
+	} else if databaseName != "" {
+		return tid, sdk.NewDatabaseObjectIdentifier(databaseName, name), objectType
+	}
+	return tid, sdk.NewAccountObjectIdentifier(name), objectType
 }
 
 func CreateContextTagAssociation(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
