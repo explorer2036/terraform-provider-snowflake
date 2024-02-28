@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"slices"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -119,29 +120,42 @@ func ReadContextTag(ctx context.Context, d *schema.ResourceData, meta interface{
 	client := sdk.NewClientFromDB(db)
 
 	id := helpers.DecodeSnowflakeID(d.Id()).(sdk.SchemaObjectIdentifier)
-	request := sdk.NewShowTagRequest().WithIn(&sdk.In{Schema: sdk.NewDatabaseObjectIdentifier(id.DatabaseName(), id.SchemaName())}).WithLike(id.Name())
-	tags, err := client.Tags.Show(ctx, request)
+	tag, err := client.Tags.ShowByID(ctx, id)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	for _, item := range tags {
-		if err := d.Set("name", item.Name); err != nil {
-			return diag.FromErr(err)
-		}
-		if err := d.Set("database", item.DatabaseName); err != nil {
-			return diag.FromErr(err)
-		}
-		if err := d.Set("schema", item.SchemaName); err != nil {
-			return diag.FromErr(err)
-		}
-		if err := d.Set("comment", item.Comment); err != nil {
-			return diag.FromErr(err)
-		}
-		if err := d.Set("allowed_values", item.AllowedValues); err != nil {
-			return diag.FromErr(err)
-		}
+	if err := d.Set("name", tag.Name); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("database", tag.DatabaseName); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("schema", tag.SchemaName); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("comment", tag.Comment); err != nil {
+		return diag.FromErr(err)
+	}
+	if err := d.Set("allowed_values", tag.AllowedValues); err != nil {
+		return diag.FromErr(err)
 	}
 	return diags
+}
+
+func diffTwoSlices(oldValues []string, newValues []string) ([]string, []string) {
+	var added []string
+	var removed []string
+	for _, item := range newValues {
+		if !slices.Contains(oldValues, item) {
+			added = append(added, item)
+		}
+	}
+	for _, i := range oldValues {
+		if !slices.Contains(newValues, i) {
+			removed = append(removed, i)
+		}
+	}
+	return added, removed
 }
 
 func UpdateContextTag(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
@@ -166,15 +180,20 @@ func UpdateContextTag(ctx context.Context, d *schema.ResourceData, meta interfac
 	if d.HasChange("allowed_values") {
 		v, ok := d.GetOk("allowed_values")
 		if ok {
-			allowedValues := expandAllowedValues(v)
-			// unset the allowed values
-			unset := sdk.NewTagUnsetRequest().WithAllowedValues(true)
-			if err := client.Tags.Alter(ctx, sdk.NewAlterTagRequest(id).WithUnset(unset)); err != nil {
+			tag, err := client.Tags.ShowByID(ctx, id)
+			if err != nil {
 				return diag.FromErr(err)
 			}
-			// add the allowed values
-			if err := client.Tags.Alter(ctx, sdk.NewAlterTagRequest(id).WithAdd(allowedValues)); err != nil {
-				return diag.FromErr(err)
+			added, removed := diffTwoSlices(tag.AllowedValues, expandAllowedValues(v))
+			if len(removed) > 0 {
+				if err := client.Tags.Alter(ctx, sdk.NewAlterTagRequest(id).WithDrop(removed)); err != nil {
+					return diag.FromErr(err)
+				}
+			}
+			if len(added) > 0 {
+				if err := client.Tags.Alter(ctx, sdk.NewAlterTagRequest(id).WithAdd(added)); err != nil {
+					return diag.FromErr(err)
+				}
 			}
 		} else {
 			unset := sdk.NewTagUnsetRequest().WithAllowedValues(true)
@@ -205,6 +224,5 @@ func expandAllowedValues(avChangeSet interface{}) []string {
 	for idx, value := range avList {
 		newAvs[idx] = fmt.Sprintf("%v", value)
 	}
-
 	return newAvs
 }
