@@ -15,16 +15,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run GoReleaser for linux
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --config .goreleaser.yml --rm-dist --verbose
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
