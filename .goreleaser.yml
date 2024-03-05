@@ -26,7 +26,6 @@ checksum:
 
 release:
   github:
-    owner: Snowflake-Labs
     name: terraform-provider-snowflake
   extra_files:
     - glob: 'terraform-registry-manifest.json'
