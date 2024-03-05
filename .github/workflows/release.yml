@@ -1,8 +1,8 @@
 name: release-please
 on:
   push:
-    branches:
-      - 'cgo-enabled-test'
+    tags:
+      - '*'
 
 jobs:
   release-please:
@@ -24,6 +24,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --config .goreleaser.yml --rm-dist --verbose --snapshot
+          args: release --config .goreleaser.yml --rm-dist --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
