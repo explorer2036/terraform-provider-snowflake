@@ -3,14 +3,13 @@ builds:
     - CGO_ENABLED=0
   goos:
     - linux
-    - freebsd
+    # - freebsd
   goarch:
     - amd64
-    - arm64
-    - '386'
+    # - arm64
+    # - '386'
   flags:
     - -trimpath
-  ignore:
   binary: '{{ .ProjectName }}_v{{ .Version }}'
 
 archives:
@@ -18,15 +17,7 @@ archives:
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 
 checksum:
-  extra_files:
-    - glob: 'terraform-registry-manifest.json'
-      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
-  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
-  algorithm: sha256
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Runtime.Goos }}_checksums.txt'
 
 release:
-  github:
-    name: terraform-provider-snowflake
-  extra_files:
-    - glob: 'terraform-registry-manifest.json'
-      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
+  name_template: "v{{ .Version }}"

@@ -5,11 +5,8 @@ on:
       - '*'
 
 jobs:
-  release-please:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+  release-linux-binaries:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,25 +17,44 @@ jobs:
           go-version-file: ./go.mod
 
       - name: Run GoReleaser for linux
-        if: matrix.os == 'ubuntu-latest'
         uses: goreleaser/goreleaser-action@v5
         with:
           args: release --config .goreleaser.yml --clean --skip=announce,validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Run GoReleaser for windows
-      #   if: matrix.os == 'windows-latest'
-      #   uses: goreleaser/goreleaser-action@v5
-      #   with:
-      #     args: release --config .goreleaser-windows.yml --clean --snapshot --skip=publish
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # release-darwin-binaries:
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      # - name: Run GoReleaser for darwin
-      #   if: matrix.os == 'macos-latest'
-      #   uses: goreleaser/goreleaser-action@v5
-      #   with:
-      #     args: release --config .goreleaser-darwin.yml --clean --snapshot --skip=publish
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - uses: actions/setup-go@v5
+  #       with:
+  #         go-version-file: ./go.mod
+
+  #     - name: Run GoReleaser for darwin
+  #       uses: goreleaser/goreleaser-action@v5
+  #       with:
+  #         args: release --config .goreleaser-darwin.yml --clean --skip=announce,validate
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # release-windows-binaries:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+
+  #     - uses: actions/setup-go@v5
+  #       with:
+  #         go-version-file: ./go.mod
+
+  #     - name: Run GoReleaser for windows
+  #       uses: goreleaser/goreleaser-action@v5
+  #       with:
+  #         args: release --config .goreleaser-windows.yml --clean --skip=announce,validate
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
