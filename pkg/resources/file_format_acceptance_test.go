@@ -13,13 +13,16 @@ import (
 func TestAcc_FileFormatCSV(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
 			{
-				Config: fileFormatConfigCSV(accName, acc.TestDatabaseName, acc.TestSchemaName, ";", "Terraform acceptance test"),
+				Config: fileFormatConfigCSV(accName, acc.TestDatabaseName, acc.TestSchemaName, ";", "'", "Terraform acceptance test"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("snowflake_file_format.test", "name", accName),
 					resource.TestCheckResourceAttr("snowflake_file_format.test", "database", acc.TestDatabaseName),
@@ -52,10 +55,17 @@ func TestAcc_FileFormatCSV(t *testing.T) {
 			},
 			// UPDATE
 			{
-				Config: fileFormatConfigCSV(accName, acc.TestDatabaseName, acc.TestSchemaName, ",", "Terraform acceptance test 2"),
+				Config: fileFormatConfigCSV(accName, acc.TestDatabaseName, acc.TestSchemaName, ",", "'", "Terraform acceptance test 2"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("snowflake_file_format.test", "field_delimiter", ","),
 					resource.TestCheckResourceAttr("snowflake_file_format.test", "comment", "Terraform acceptance test 2"),
+				),
+			},
+			// UPDATE: field_optionally_enclosed_by can take the value NONE
+			{
+				Config: fileFormatConfigCSV(accName, acc.TestDatabaseName, acc.TestSchemaName, ",", "NONE", "Terraform acceptance test 2"),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("snowflake_file_format.test", "field_optionally_enclosed_by", "NONE"),
 				),
 			},
 			// IMPORT
@@ -74,8 +84,11 @@ func TestAcc_FileFormatCSV(t *testing.T) {
 func TestAcc_FileFormatJSON(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -111,8 +124,11 @@ func TestAcc_FileFormatJSON(t *testing.T) {
 func TestAcc_FileFormatAvro(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -137,8 +153,11 @@ func TestAcc_FileFormatAvro(t *testing.T) {
 func TestAcc_FileFormatORC(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -162,8 +181,11 @@ func TestAcc_FileFormatORC(t *testing.T) {
 func TestAcc_FileFormatParquet(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -189,8 +211,11 @@ func TestAcc_FileFormatParquet(t *testing.T) {
 func TestAcc_FileFormatXML(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -219,8 +244,11 @@ func TestAcc_FileFormatXML(t *testing.T) {
 func TestAcc_FileFormatCSVDefaults(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -245,8 +273,11 @@ func TestAcc_FileFormatCSVDefaults(t *testing.T) {
 func TestAcc_FileFormatJSONDefaults(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -271,8 +302,11 @@ func TestAcc_FileFormatJSONDefaults(t *testing.T) {
 func TestAcc_FileFormatAVRODefaults(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -297,8 +331,11 @@ func TestAcc_FileFormatAVRODefaults(t *testing.T) {
 func TestAcc_FileFormatORCDefaults(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -323,8 +360,11 @@ func TestAcc_FileFormatORCDefaults(t *testing.T) {
 func TestAcc_FileFormatPARQUETDefaults(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -349,8 +389,11 @@ func TestAcc_FileFormatPARQUETDefaults(t *testing.T) {
 func TestAcc_FileFormatXMLDefaults(t *testing.T) {
 	accName := acctest.RandStringFromCharSet(10, acctest.CharSetAlpha)
 
-	resource.ParallelTest(t, resource.TestCase{
-		Providers:    acc.TestAccProviders(),
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: acc.TestAccProtoV6ProviderFactories,
+		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
+			tfversion.RequireAbove(tfversion.Version1_5_0),
+		},
 		PreCheck:     func() { acc.TestAccPreCheck(t) },
 		CheckDestroy: nil,
 		Steps: []resource.TestStep{
@@ -406,7 +449,7 @@ func TestAcc_FileFormat_issue1947(t *testing.T) {
 	})
 }
 
-func fileFormatConfigCSV(n string, databaseName string, schemaName string, fieldDelimiter string, comment string) string {
+func fileFormatConfigCSV(n string, databaseName string, schemaName string, fieldDelimiter string, fieldOptionallyEnclosedBy string, comment string) string {
 	return fmt.Sprintf(`
 resource "snowflake_file_format" "test" {
 	name = "%v"
@@ -426,7 +469,7 @@ resource "snowflake_file_format" "test" {
 	escape = "\\"
 	escape_unenclosed_field = "!"
 	trim_space = true
-	field_optionally_enclosed_by = "'"
+	field_optionally_enclosed_by = "%s"
 	null_if = ["NULL", ""]
 	error_on_column_count_mismatch = true
 	replace_invalid_characters = true
@@ -435,7 +478,7 @@ resource "snowflake_file_format" "test" {
 	encoding = "UTF-16"
 	comment = "%s"
 }
-`, n, databaseName, schemaName, fieldDelimiter, comment)
+`, n, databaseName, schemaName, fieldDelimiter, fieldOptionallyEnclosedBy, comment)
 }
 
 func fileFormatConfigJSON(n string, databaseName string, schemaName string) string {
