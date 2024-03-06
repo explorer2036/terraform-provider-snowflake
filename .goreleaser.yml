@@ -10,7 +10,6 @@ builds:
     - '386'
   flags:
     - -trimpath
-  ignore:
   binary: '{{ .ProjectName }}_v{{ .Version }}'
 
 archives:
@@ -21,7 +20,7 @@ checksum:
   extra_files:
     - glob: 'terraform-registry-manifest.json'
       name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
-  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Runtime.Goos }}_SHA256SUMS'
   algorithm: sha256
 
 signs:
@@ -41,4 +40,4 @@ release:
     name: terraform-provider-snowflake
   extra_files:
     - glob: 'terraform-registry-manifest.json'
-      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
+      name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Runtime.Goos }}_manifest.json'

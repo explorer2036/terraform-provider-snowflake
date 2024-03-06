@@ -1,4 +1,4 @@
-name: Release linux binaries
+name: Release windows binaries
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/github-script@v6
         id: configure-changelog
@@ -64,7 +64,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --config .goreleaser.yml --rm-dist --verbose
+          args: release --config .goreleaser-windows.yml --rm-dist --verbose
         env:
           GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
