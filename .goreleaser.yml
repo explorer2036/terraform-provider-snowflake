@@ -17,7 +17,16 @@ archives:
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
 
 checksum:
-  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Runtime.Goos }}_checksums.txt'
+  extra_files:
+    - glob: 'terraform-registry-manifest.json'
+      name_template: '{{ .ProjectName }}_{{ .Version }}_manifest.json'
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Runtime.Goos }}_SHA256SUMS'
+  algorithm: sha256
 
 release:
-  name_template: "v{{ .Version }}"
+  github:
+    owner: explorer2036
+    name: terraform-provider-snowflake
+  extra_files:
+    - glob: 'terraform-registry-manifest.json'
+      name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Runtime.Goos }}_manifest.json'
