@@ -20,4 +20,4 @@ checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Runtime.Goos }}_checksums.txt'
 
 release:
-  name_template: "v{{ .Version }}"cle
+  name_template: "v{{ .Version }}"
