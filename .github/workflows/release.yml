@@ -44,7 +44,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   sha256sums-and-gpg-signature:
-    needs: build-and-publish
+    needs: release-please
     runs-on: ubuntu-latest
     steps:
       - name: Import GPG key
