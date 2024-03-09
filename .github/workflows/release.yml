@@ -23,7 +23,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: goreleaser/goreleaser-action@v5
         with:
-          args: release --config .goreleaser.yml --clean --skip=publish
+          args: release --config .goreleaser.yml --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -31,7 +31,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         uses: goreleaser/goreleaser-action@v5
         with:
-          args: release --config .goreleaser-windows.yml --clean --skip=publish
+          args: release --config .goreleaser-windows.yml --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -39,7 +39,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         uses: goreleaser/goreleaser-action@v5
         with:
-          args: release --config .goreleaser-darwin.yml --clean --skip=publish
+          args: release --config .goreleaser-darwin.yml --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
