@@ -48,6 +48,10 @@ jobs:
     needs: release-please
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Import GPG key
         id: gpg
         uses: crazy-max/ghaction-import-gpg@v6
@@ -74,9 +78,13 @@ jobs:
           for file in `ls *.zip`; do
             sha256sum ${file} >> ${checksums}
           done
-          # rename the manifest file
+
+          # rename the manifest
           manifest=${prefix}_manifest.json
-          [ -f terraform-registry-manifest.json ] && sha256sum terraform-registry-manifest.json >> ${checksums} && cp terraform-registry-manifest.json artifacts/${manifest}
+          if [ -f terraform-registry-manifest.json ]; then
+            sha256sum terraform-registry-manifest.json >> ${checksums}
+            cp terraform-registry-manifest.json artifacts/${manifest}
+          fi
 
           # generate the GPG signature
           fingerprint=${{ steps.gpg.outputs.fingerprint }}
