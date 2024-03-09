@@ -8,7 +8,8 @@ jobs:
   release-please:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -61,26 +62,29 @@ jobs:
           tag: ${{ github.ref_name }}
           fileName: "*.zip"
           out-file-path: "artifacts"
-
+      - run: ls -al terraform-registry-manifest.json && cat terraform-registry-manifest.json
       - name: Generate the sha256 checksums and GPG signature
         id: generate
         run: |
           cd artifacts
           # generate the sha256 checksums
           version=$(echo ${{ github.ref_name }} | sed -e 's/v//')
-          checksums=${{ github.event.repository.name }}_${version}_SHA256SUMS
+          prefix=${{ github.event.repository.name }}_${version}
+          checksums=${prefix}_SHA256SUMS
           for file in `ls *.zip`; do
             sha256sum ${file} >> ${checksums}
           done
+          # rename the manifest file
+          manifest=${prefix}_manifest.json
+          [ -f terraform-registry-manifest.json ] && sha256sum terraform-registry-manifest.json >> ${checksums} && cp terraform-registry-manifest.json artifacts/${manifest}
 
           # generate the GPG signature
-          gpg --batch --local-user ${{ steps.gpg.outputs.fingerprint }} --output ${checksums}.sig --detach-sign ${checksums}
-
-          # rename the manifest file
-          [ -f terraform-registry-manifest.json ] && cat terraform-registry-manifest.json
+          fingerprint=${{ steps.gpg.outputs.fingerprint }}
+          gpg --batch --local-user ${fingerprint} --output ${checksums}.sig --detach-sign ${checksums}
 
           echo "checksums=${checksums}" >> $GITHUB_OUTPUT
           echo "signature=${checksums}.sig" >> $GITHUB_OUTPUT
+          echo "manifest=${manifest}" >> $GITHUB_OUTPUT
 
       - name: Upload the sha256 checksums
         uses: svenstaro/upload-release-action@v2
