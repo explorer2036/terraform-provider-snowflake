@@ -66,10 +66,12 @@ jobs:
           tag: ${{ github.ref_name }}
           fileName: "*.zip"
           out-file-path: "artifacts"
-      - run: ls -al terraform-registry-manifest.json && cat terraform-registry-manifest.json
+      - run: ls -al
       - name: Generate the sha256 checksums and GPG signature
         id: generate
         run: |
+          cp terraform-registry-manifest.json artifacts/terraform-registry-manifest.json
+
           cd artifacts
           # generate the sha256 checksums
           version=$(echo ${{ github.ref_name }} | sed -e 's/v//')
@@ -79,15 +81,12 @@ jobs:
             sha256sum ${file} >> ${checksums}
           done
 
-          # rename the manifest
-          manifest=${prefix}_manifest.json
-          if [ -f terraform-registry-manifest.json ]; then
-            sha256sum terraform-registry-manifest.json >> ${checksums}
-            cp terraform-registry-manifest.json artifacts/${manifest}
-          fi
+          # sha256sum the manifest
+          sha256sum terraform-registry-manifest.json >> ${checksums}
+          mv terraform-registry-manifest.json ${prefix}_manifest.json
 
           # generate the GPG signature
-          fingerprint=${{ steps.gpg.outputs.fingerprint }}
+          fingerprint=::add-mask::${{ steps.gpg.outputs.fingerprint }}
           gpg --batch --local-user ${fingerprint} --output ${checksums}.sig --detach-sign ${checksums}
 
           echo "checksums=${checksums}" >> $GITHUB_OUTPUT
