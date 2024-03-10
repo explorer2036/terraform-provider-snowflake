@@ -34,7 +34,7 @@ jobs:
           app_id: ${{ secrets.CZI_RELEASE_PLEASE_APP_ID }}
           private_key: ${{ secrets.CZI_RELEASE_PLEASE_PK }}
 
-    - name: release please
+      - name: release please
         uses: google-github-actions/release-please-action@v3
         id: release
         with:
@@ -89,6 +89,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      # See https://docs.github.com/en/actions/security-guides/automatic-token-authentication#using-the-github_token-in-a-workflow
+      # For why we need to generate a token and not use the default
+      - name: Generate token
+        id: generate_token
+        uses: chanzuckerberg/github-app-token@v1.1.4
+        with:
+          app_id: ${{ secrets.CZI_RELEASE_PLEASE_APP_ID }}
+          private_key: ${{ secrets.CZI_RELEASE_PLEASE_PK }}
+
+      - name: release please
+        uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: simple
+          bump-minor-pre-major: true
+          changelog-types: ${{ steps.configure-changelog.outputs.result }}
+          token: ${{ steps.generate_token.outputs.token }}
 
       - name: Import GPG key
         id: gpg
