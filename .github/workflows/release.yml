@@ -66,12 +66,12 @@ jobs:
           tag: ${{ github.ref_name }}
           fileName: "*.zip"
           out-file-path: "artifacts"
-      - run: ls -al
+
       - name: Generate the sha256 checksums and GPG signature
         id: generate
         run: |
+          #!/bin/bash
           cp terraform-registry-manifest.json artifacts/terraform-registry-manifest.json
-
           cd artifacts
           # generate the sha256 checksums
           version=$(echo ${{ github.ref_name }} | sed -e 's/v//')
@@ -80,6 +80,9 @@ jobs:
           for file in `ls *.zip`; do
             sha256sum ${file} >> ${checksums}
           done
+
+          out=$(echo "::add-mask::${{ steps.gpg.outputs.fingerprint }}")
+          echo ${out}
 
           # sha256sum the manifest
           sha256sum terraform-registry-manifest.json >> ${checksums}
@@ -106,4 +109,12 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: artifacts/${{ steps.generate.outputs.signature }}
           asset_name: ${{ steps.generate.outputs.signature }}
+          tag: ${{ github.ref }}
+
+      - name: Upload the manifest
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: artifacts/${{ steps.generate.outputs.manifest }}
+          asset_name: ${{ steps.generate.outputs.manifest }}
           tag: ${{ github.ref }}
