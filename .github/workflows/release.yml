@@ -72,6 +72,7 @@ jobs:
         run: |
           #!/bin/bash
           cp terraform-registry-manifest.json artifacts/terraform-registry-manifest.json
+
           cd artifacts
           # generate the sha256 checksums
           version=$(echo ${{ github.ref_name }} | sed -e 's/v//')
@@ -80,9 +81,6 @@ jobs:
           for file in `ls *.zip`; do
             sha256sum ${file} >> ${checksums}
           done
-
-          out=$(echo "::add-mask::${{ steps.gpg.outputs.fingerprint }}")
-          echo ${out}
 
           # sha256sum the manifest
           sha256sum terraform-registry-manifest.json >> ${checksums}
