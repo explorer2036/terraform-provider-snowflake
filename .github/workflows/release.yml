@@ -8,40 +8,71 @@ jobs:
   release-please:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
+        # os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
+      - uses: actions/github-script@v6
+        id: configure-changelog
+        with:
+          result-encoding: string
+          script: |
+            const changelogTypes = [
+              {type: "feat", section: "🎉 **What's new:**", hidden: false},
+              {type: "chore", section: "🔧 **Misc**", hidden: false},
+              {type: "fix", section: "🐛 **Bug fixes:**", hidden: false},
+            ]
+            return JSON.stringify(changelogTypes)
+
+      - name: Create token
+        id: create-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.CZI_RELEASE_PLEASE_APP_ID }}
+          private-key: ${{ secrets.CZI_RELEASE_PLEASE_PK }}
+
+      - name: release please
+        uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: simple
+          bump-minor-pre-major: true
+          changelog-types: ${{ steps.configure-changelog.outputs.result }}
+          token: ${{ steps.create-token.outputs.token }}
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+        if: ${{ steps.release.outputs.release_created }}
 
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
+        if: ${{ steps.release.outputs.release_created }}
 
       - name: Run GoReleaser for linux
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' && ${{ steps.release.outputs.release_created }}
         uses: goreleaser/goreleaser-action@v5
         with:
           args: release --config .goreleaser.yml --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.create-token.outputs.token }}
 
       - name: Run GoReleaser for windows
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest' && ${{ steps.release.outputs.release_created }}
         uses: goreleaser/goreleaser-action@v5
         with:
           args: release --config .goreleaser-windows.yml --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.create-token.outputs.token }}
 
       - name: Run GoReleaser for darwin
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-latest' && ${{ steps.release.outputs.release_created }}
         uses: goreleaser/goreleaser-action@v5
         with:
           args: release --config .goreleaser-darwin.yml --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.create-token.outputs.token }}
 
   sha256sums-and-gpg-signature:
     needs: release-please
@@ -51,12 +82,19 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Create token
+        id: create-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.CZI_RELEASE_PLEASE_APP_ID }}
+          private-key: ${{ secrets.CZI_RELEASE_PLEASE_PK }}
+
       - name: Import GPG key
         id: gpg
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Download all published archives
         uses: robinraju/release-downloader@v1.9
@@ -95,7 +133,7 @@ jobs:
       - name: Upload the sha256 checksums
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ steps.create-token.outputs.token }}
           file: artifacts/${{ steps.generate.outputs.checksums }}
           asset_name: ${{ steps.generate.outputs.checksums }}
           tag: ${{ github.ref }}
@@ -103,7 +141,7 @@ jobs:
       - name: Upload the GPG signature
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ steps.create-token.outputs.token }}
           file: artifacts/${{ steps.generate.outputs.signature }}
           asset_name: ${{ steps.generate.outputs.signature }}
           tag: ${{ github.ref }}
@@ -111,7 +149,7 @@ jobs:
       - name: Upload the manifest
         uses: svenstaro/upload-release-action@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ steps.create-token.outputs.token }}
           file: artifacts/${{ steps.generate.outputs.manifest }}
           asset_name: ${{ steps.generate.outputs.manifest }}
           tag: ${{ github.ref }}
