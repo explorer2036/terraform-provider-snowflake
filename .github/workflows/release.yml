@@ -86,8 +86,7 @@ jobs:
           mv terraform-registry-manifest.json ${prefix}_manifest.json
 
           # generate the GPG signature
-          fingerprint=::add-mask::${{ steps.gpg.outputs.fingerprint }}
-          gpg --batch --local-user ${fingerprint} --output ${checksums}.sig --detach-sign ${checksums}
+          gpg --batch --local-user ${{ steps.gpg.outputs.fingerprint }} --output ${checksums}.sig --detach-sign ${checksums}
 
           echo "checksums=${checksums}" >> $GITHUB_OUTPUT
           echo "signature=${checksums}.sig" >> $GITHUB_OUTPUT
