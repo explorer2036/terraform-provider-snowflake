@@ -118,7 +118,7 @@ jobs:
 
           # sha256sum the manifest
           sha256sum terraform-registry-manifest.json >> ${checksums}
-          manifest=${prefix}_manifest
+          manifest=${prefix}_manifest.json
           mv terraform-registry-manifest.json ${manifest}
 
           # generate the GPG signature
