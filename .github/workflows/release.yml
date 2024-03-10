@@ -31,7 +31,7 @@ jobs:
           app-id: ${{ secrets.CZI_RELEASE_PLEASE_APP_ID }}
           private-key: ${{ secrets.CZI_RELEASE_PLEASE_PK }}
 
-      - name: release please
+      - name: Release please
         uses: google-github-actions/release-please-action@v3
         id: release
         with:
@@ -121,7 +121,8 @@ jobs:
 
           # sha256sum the manifest
           sha256sum terraform-registry-manifest.json >> ${checksums}
-          mv terraform-registry-manifest.json ${prefix}_manifest.json
+          manifest=${prefix}_manifest
+          mv terraform-registry-manifest.json ${manifest}
 
           # generate the GPG signature
           gpg --batch --local-user ${{ steps.gpg.outputs.fingerprint }} --output ${checksums}.sig --detach-sign ${checksums}
