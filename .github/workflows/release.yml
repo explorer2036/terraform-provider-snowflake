@@ -8,8 +8,7 @@ jobs:
   release-please:
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        # os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/github-script@v6
@@ -49,7 +48,7 @@ jobs:
           go-version-file: ./go.mod
 
       - name: Run GoReleaser for linux
-        if: matrix.os == 'ubuntu-latest' && ${{ steps.release.outputs.release_created }}
+        if: matrix.os == 'ubuntu-latest'
         uses: goreleaser/goreleaser-action@v5
         with:
           args: release --config .goreleaser.yml --clean
@@ -57,7 +56,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.create-token.outputs.token }}
 
       - name: Run GoReleaser for windows
-        if: matrix.os == 'windows-latest' && ${{ steps.release.outputs.release_created }}
+        if: matrix.os == 'windows-latest'
         uses: goreleaser/goreleaser-action@v5
         with:
           args: release --config .goreleaser-windows.yml --clean
@@ -65,7 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.create-token.outputs.token }}
 
       - name: Run GoReleaser for darwin
-        if: matrix.os == 'macos-latest' && ${{ steps.release.outputs.release_created }}
+        if: matrix.os == 'macos-latest'
         uses: goreleaser/goreleaser-action@v5
         with:
           args: release --config .goreleaser-darwin.yml --clean
