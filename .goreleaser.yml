@@ -1,6 +1,6 @@
 builds:
 - env:
-    - CGO_ENABLED=0
+    - CGO_ENABLED={{ if eq .Os "windows"}}1{{else}}{{if eq .Os "darwin"}}1{{else}}0{{end}}{{end}}
   goos:
     - windows
     - linux
@@ -12,7 +12,6 @@ builds:
     - '386'
   flags:
     - -trimpath
-  ignore:
   binary: '{{ .ProjectName }}_v{{ .Version }}'
 
 archives:
