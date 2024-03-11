@@ -1,5 +1,6 @@
 builds:
-- env: >-
+- env:
+  - >-
     {{- if or (eq .Os "windows") (eq .Os "darwin") }}
       CGO_ENABLED=1
     {{- else }}
