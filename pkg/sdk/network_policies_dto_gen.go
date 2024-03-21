@@ -20,6 +20,10 @@ type CreateNetworkPolicyRequest struct {
 	Comment                *string
 }
 
+func (r *CreateNetworkPolicyRequest) GetName() AccountObjectIdentifier {
+	return r.name
+}
+
 type IPRequest struct {
 	IP string // required
 }
@@ -43,13 +47,13 @@ type NetworkPolicySetRequest struct {
 }
 
 type AddNetworkRuleRequest struct {
-	AddToAllowedNetworkRuleList *SchemaObjectIdentifier
-	AddToBlockedNetworkRuleList *SchemaObjectIdentifier
+	AddAllowedNetworkRule *SchemaObjectIdentifier
+	AddBlockedNetworkRule *SchemaObjectIdentifier
 }
 
 type RemoveNetworkRuleRequest struct {
-	RemoveFromAllowedNetworkRuleList *SchemaObjectIdentifier
-	RemoveFromBlockedNetworkRuleList *SchemaObjectIdentifier
+	RemoveAllowedNetworkRule *SchemaObjectIdentifier
+	RemoveBlockedNetworkRule *SchemaObjectIdentifier
 }
 
 type DropNetworkPolicyRequest struct {

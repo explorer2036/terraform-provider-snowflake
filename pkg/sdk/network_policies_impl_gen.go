@@ -115,14 +115,14 @@ func (r *AlterNetworkPolicyRequest) toOpts() *AlterNetworkPolicyOptions {
 	}
 	if r.Add != nil {
 		opts.Add = &AddNetworkRule{
-			AddToAllowedNetworkRuleList: r.Add.AddToAllowedNetworkRuleList,
-			AddToBlockedNetworkRuleList: r.Add.AddToBlockedNetworkRuleList,
+			AddAllowedNetworkRule: r.Add.AddAllowedNetworkRule,
+			AddBlockedNetworkRule: r.Add.AddBlockedNetworkRule,
 		}
 	}
 	if r.Remove != nil {
 		opts.Remove = &RemoveNetworkRule{
-			RemoveFromAllowedNetworkRuleList: r.Remove.RemoveFromAllowedNetworkRuleList,
-			RemoveFromBlockedNetworkRuleList: r.Remove.RemoveFromBlockedNetworkRuleList,
+			RemoveAllowedNetworkRule: r.Remove.RemoveAllowedNetworkRule,
+			RemoveBlockedNetworkRule: r.Remove.RemoveBlockedNetworkRule,
 		}
 	}
 	return opts

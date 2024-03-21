@@ -9,18 +9,18 @@ var (
 		Text("IP", g.KeywordOptions().SingleQuotes().Required())
 
 	networkPoliciesAddNetworkRule = g.NewQueryStruct("AddNetworkRule").
-					OptionalIdentifier("AddToAllowedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
-					OptionalIdentifier("AddToBlockedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
-					WithValidation(g.ExactlyOneValueSet, "AddToAllowedNetworkRuleList", "AddToBlockedNetworkRuleList").
-					WithValidation(g.ValidIdentifierIfSet, "AddToAllowedNetworkRuleList").
-					WithValidation(g.ValidIdentifierIfSet, "AddToBlockedNetworkRuleList")
+					OptionalIdentifier("AddAllowedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
+					OptionalIdentifier("AddBlockedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
+					WithValidation(g.ExactlyOneValueSet, "AddAllowedNetworkRule", "AddBlockedNetworkRule").
+					WithValidation(g.ValidIdentifierIfSet, "AddAllowedNetworkRule").
+					WithValidation(g.ValidIdentifierIfSet, "AddBlockedNetworkRule")
 
 	networkPoliciesRemoveNetworkRule = g.NewQueryStruct("RemoveNetworkRule").
-						OptionalIdentifier("RemoveFromAllowedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
-						OptionalIdentifier("RemoveFromBlockedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
-						WithValidation(g.ExactlyOneValueSet, "RemoveFromAllowedNetworkRuleList", "RemoveFromBlockedNetworkRuleList").
-						WithValidation(g.ValidIdentifierIfSet, "RemoveFromAllowedNetworkRuleList").
-						WithValidation(g.ValidIdentifierIfSet, "RemoveFromBlockedNetworkRuleList")
+						OptionalIdentifier("RemoveAllowedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
+						OptionalIdentifier("RemoveBlockedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
+						WithValidation(g.ExactlyOneValueSet, "RemoveAllowedNetworkRule", "RemoveBlockedNetworkRule").
+						WithValidation(g.ValidIdentifierIfSet, "RemoveAllowedNetworkRule").
+						WithValidation(g.ValidIdentifierIfSet, "RemoveBlockedNetworkRule")
 
 	NetworkPoliciesDef = g.NewInterface(
 		"NetworkPolicies",

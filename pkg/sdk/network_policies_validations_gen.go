@@ -39,24 +39,24 @@ func (opts *AlterNetworkPolicyOptions) validate() error {
 		}
 	}
 	if valueSet(opts.Add) {
-		if !exactlyOneValueSet(opts.Add.AddToAllowedNetworkRuleList, opts.Add.AddToBlockedNetworkRuleList) {
-			errs = append(errs, errExactlyOneOf("AlterNetworkPolicyOptions.Add", "AddToAllowedNetworkRuleList", "AddToBlockedNetworkRuleList"))
+		if !exactlyOneValueSet(opts.Add.AddAllowedNetworkRule, opts.Add.AddBlockedNetworkRule) {
+			errs = append(errs, errExactlyOneOf("AlterNetworkPolicyOptions.Add", "AddAllowedNetworkRule", "AddBlockedNetworkRule"))
 		}
-		if opts.Add.AddToAllowedNetworkRuleList != nil && !ValidObjectIdentifier(opts.Add.AddToAllowedNetworkRuleList) {
+		if opts.Add.AddAllowedNetworkRule != nil && !ValidObjectIdentifier(opts.Add.AddAllowedNetworkRule) {
 			errs = append(errs, ErrInvalidObjectIdentifier)
 		}
-		if opts.Add.AddToBlockedNetworkRuleList != nil && !ValidObjectIdentifier(opts.Add.AddToBlockedNetworkRuleList) {
+		if opts.Add.AddBlockedNetworkRule != nil && !ValidObjectIdentifier(opts.Add.AddBlockedNetworkRule) {
 			errs = append(errs, ErrInvalidObjectIdentifier)
 		}
 	}
 	if valueSet(opts.Remove) {
-		if !exactlyOneValueSet(opts.Remove.RemoveFromAllowedNetworkRuleList, opts.Remove.RemoveFromBlockedNetworkRuleList) {
-			errs = append(errs, errExactlyOneOf("AlterNetworkPolicyOptions.Remove", "RemoveFromAllowedNetworkRuleList", "RemoveFromBlockedNetworkRuleList"))
+		if !exactlyOneValueSet(opts.Remove.RemoveAllowedNetworkRule, opts.Remove.RemoveBlockedNetworkRule) {
+			errs = append(errs, errExactlyOneOf("AlterNetworkPolicyOptions.Remove", "RemoveAllowedNetworkRule", "RemoveBlockedNetworkRule"))
 		}
-		if opts.Remove.RemoveFromAllowedNetworkRuleList != nil && !ValidObjectIdentifier(opts.Remove.RemoveFromAllowedNetworkRuleList) {
+		if opts.Remove.RemoveAllowedNetworkRule != nil && !ValidObjectIdentifier(opts.Remove.RemoveAllowedNetworkRule) {
 			errs = append(errs, ErrInvalidObjectIdentifier)
 		}
-		if opts.Remove.RemoveFromBlockedNetworkRuleList != nil && !ValidObjectIdentifier(opts.Remove.RemoveFromBlockedNetworkRuleList) {
+		if opts.Remove.RemoveBlockedNetworkRule != nil && !ValidObjectIdentifier(opts.Remove.RemoveBlockedNetworkRule) {
 			errs = append(errs, ErrInvalidObjectIdentifier)
 		}
 	}

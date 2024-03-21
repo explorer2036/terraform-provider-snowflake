@@ -121,13 +121,13 @@ func NewAddNetworkRuleRequest() *AddNetworkRuleRequest {
 	return &AddNetworkRuleRequest{}
 }
 
-func (s *AddNetworkRuleRequest) WithAddToAllowedNetworkRuleList(AddToAllowedNetworkRuleList *SchemaObjectIdentifier) *AddNetworkRuleRequest {
-	s.AddToAllowedNetworkRuleList = AddToAllowedNetworkRuleList
+func (s *AddNetworkRuleRequest) WithAddAllowedNetworkRule(AddAllowedNetworkRule *SchemaObjectIdentifier) *AddNetworkRuleRequest {
+	s.AddAllowedNetworkRule = AddAllowedNetworkRule
 	return s
 }
 
-func (s *AddNetworkRuleRequest) WithAddToBlockedNetworkRuleList(AddToBlockedNetworkRuleList *SchemaObjectIdentifier) *AddNetworkRuleRequest {
-	s.AddToBlockedNetworkRuleList = AddToBlockedNetworkRuleList
+func (s *AddNetworkRuleRequest) WithAddBlockedNetworkRule(AddBlockedNetworkRule *SchemaObjectIdentifier) *AddNetworkRuleRequest {
+	s.AddBlockedNetworkRule = AddBlockedNetworkRule
 	return s
 }
 
@@ -135,13 +135,13 @@ func NewRemoveNetworkRuleRequest() *RemoveNetworkRuleRequest {
 	return &RemoveNetworkRuleRequest{}
 }
 
-func (s *RemoveNetworkRuleRequest) WithRemoveFromAllowedNetworkRuleList(RemoveFromAllowedNetworkRuleList *SchemaObjectIdentifier) *RemoveNetworkRuleRequest {
-	s.RemoveFromAllowedNetworkRuleList = RemoveFromAllowedNetworkRuleList
+func (s *RemoveNetworkRuleRequest) WithRemoveAllowedNetworkRule(RemoveAllowedNetworkRule *SchemaObjectIdentifier) *RemoveNetworkRuleRequest {
+	s.RemoveAllowedNetworkRule = RemoveAllowedNetworkRule
 	return s
 }
 
-func (s *RemoveNetworkRuleRequest) WithRemoveFromBlockedNetworkRuleList(RemoveFromBlockedNetworkRuleList *SchemaObjectIdentifier) *RemoveNetworkRuleRequest {
-	s.RemoveFromBlockedNetworkRuleList = RemoveFromBlockedNetworkRuleList
+func (s *RemoveNetworkRuleRequest) WithRemoveBlockedNetworkRule(RemoveBlockedNetworkRule *SchemaObjectIdentifier) *RemoveNetworkRuleRequest {
+	s.RemoveBlockedNetworkRule = RemoveBlockedNetworkRule
 	return s
 }
 

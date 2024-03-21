@@ -19,7 +19,7 @@ func TestInt_EventTables(t *testing.T) {
 	tagTest, tagCleaup := createTag(t, client, databaseTest, schemaTest)
 	t.Cleanup(tagCleaup)
 
-	assertEventTableHandle := func(t *testing.T, et *sdk.EventTable, expectedName string, expectedComment string, expectedAllowedValues []string) {
+	assertEventTableHandle := func(t *testing.T, et *sdk.EventTable, expectedName string, expectedComment string) {
 		t.Helper()
 		assert.NotEmpty(t, et.CreatedOn)
 		assert.Equal(t, expectedName, et.Name)
@@ -126,7 +126,7 @@ func TestInt_EventTables(t *testing.T) {
 
 		et, err := client.EventTables.ShowByID(ctx, id)
 		require.NoError(t, err)
-		assertEventTableHandle(t, et, dt.Name, comment, nil)
+		assertEventTableHandle(t, et, dt.Name, comment)
 
 		unset := sdk.NewEventTableUnsetRequest().WithComment(sdk.Bool(true))
 		err = client.EventTables.Alter(ctx, sdk.NewAlterEventTableRequest(id).WithUnset(unset))
@@ -134,7 +134,7 @@ func TestInt_EventTables(t *testing.T) {
 
 		et, err = client.EventTables.ShowByID(ctx, id)
 		require.NoError(t, err)
-		assertEventTableHandle(t, et, dt.Name, "", nil)
+		assertEventTableHandle(t, et, dt.Name, "")
 	})
 
 	t.Run("alter event table: set and unset change tacking", func(t *testing.T) {

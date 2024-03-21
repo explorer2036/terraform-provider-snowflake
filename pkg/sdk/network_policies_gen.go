@@ -50,13 +50,13 @@ type NetworkPolicySet struct {
 }
 
 type AddNetworkRule struct {
-	AddToAllowedNetworkRuleList *SchemaObjectIdentifier `ddl:"identifier" sql:"ALLOWED_NETWORK_RULE_LIST ="`
-	AddToBlockedNetworkRuleList *SchemaObjectIdentifier `ddl:"identifier" sql:"BLOCKED_NETWORK_RULE_LIST ="`
+	AddAllowedNetworkRule *SchemaObjectIdentifier `ddl:"identifier" sql:"ALLOWED_NETWORK_RULE_LIST ="`
+	AddBlockedNetworkRule *SchemaObjectIdentifier `ddl:"identifier" sql:"BLOCKED_NETWORK_RULE_LIST ="`
 }
 
 type RemoveNetworkRule struct {
-	RemoveFromAllowedNetworkRuleList *SchemaObjectIdentifier `ddl:"identifier" sql:"ALLOWED_NETWORK_RULE_LIST ="`
-	RemoveFromBlockedNetworkRuleList *SchemaObjectIdentifier `ddl:"identifier" sql:"BLOCKED_NETWORK_RULE_LIST ="`
+	RemoveAllowedNetworkRule *SchemaObjectIdentifier `ddl:"identifier" sql:"ALLOWED_NETWORK_RULE_LIST ="`
+	RemoveBlockedNetworkRule *SchemaObjectIdentifier `ddl:"identifier" sql:"BLOCKED_NETWORK_RULE_LIST ="`
 }
 
 // DropNetworkPolicyOptions is based on https://docs.snowflake.com/en/sql-reference/sql/drop-network-policy.
