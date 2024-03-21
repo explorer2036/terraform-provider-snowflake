@@ -15,6 +15,16 @@ func (s *CreateNetworkPolicyRequest) WithOrReplace(OrReplace *bool) *CreateNetwo
 	return s
 }
 
+func (s *CreateNetworkPolicyRequest) WithAllowedNetworkRuleList(AllowedNetworkRuleList []SchemaObjectIdentifier) *CreateNetworkPolicyRequest {
+	s.AllowedNetworkRuleList = AllowedNetworkRuleList
+	return s
+}
+
+func (s *CreateNetworkPolicyRequest) WithBlockedNetworkRuleList(BlockedNetworkRuleList []SchemaObjectIdentifier) *CreateNetworkPolicyRequest {
+	s.BlockedNetworkRuleList = BlockedNetworkRuleList
+	return s
+}
+
 func (s *CreateNetworkPolicyRequest) WithAllowedIpList(AllowedIpList []IPRequest) *CreateNetworkPolicyRequest {
 	s.AllowedIpList = AllowedIpList
 	return s

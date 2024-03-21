@@ -59,8 +59,10 @@ func (v *networkPolicies) Describe(ctx context.Context, id AccountObjectIdentifi
 
 func (r *CreateNetworkPolicyRequest) toOpts() *CreateNetworkPolicyOptions {
 	opts := &CreateNetworkPolicyOptions{
-		OrReplace: r.OrReplace,
-		name:      r.name,
+		OrReplace:              r.OrReplace,
+		name:                   r.name,
+		AllowedNetworkRuleList: r.AllowedNetworkRuleList,
+		BlockedNetworkRuleList: r.BlockedNetworkRuleList,
 
 		Comment: r.Comment,
 	}

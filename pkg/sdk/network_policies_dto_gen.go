@@ -11,11 +11,13 @@ var (
 )
 
 type CreateNetworkPolicyRequest struct {
-	OrReplace     *bool
-	name          AccountObjectIdentifier // required
-	AllowedIpList []IPRequest
-	BlockedIpList []IPRequest
-	Comment       *string
+	OrReplace              *bool
+	name                   AccountObjectIdentifier // required
+	AllowedNetworkRuleList []SchemaObjectIdentifier
+	BlockedNetworkRuleList []SchemaObjectIdentifier
+	AllowedIpList          []IPRequest
+	BlockedIpList          []IPRequest
+	Comment                *string
 }
 
 func (r *CreateNetworkPolicyRequest) GetName() AccountObjectIdentifier {
