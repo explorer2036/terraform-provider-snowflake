@@ -9,18 +9,14 @@ var (
 		Text("IP", g.KeywordOptions().SingleQuotes().Required())
 
 	networkPoliciesAddNetworkRule = g.NewQueryStruct("AddNetworkRule").
-					OptionalIdentifier("AddAllowedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
-					OptionalIdentifier("AddBlockedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
-					WithValidation(g.ExactlyOneValueSet, "AddAllowedNetworkRule", "AddBlockedNetworkRule").
-					WithValidation(g.ValidIdentifierIfSet, "AddAllowedNetworkRule").
-					WithValidation(g.ValidIdentifierIfSet, "AddBlockedNetworkRule")
+					ListAssignment("ALLOWED_NETWORK_RULE_LIST", "SchemaObjectIdentifier", g.ParameterOptions().Parentheses()).
+					ListAssignment("BLOCKED_NETWORK_RULE_LIST", "SchemaObjectIdentifier", g.ParameterOptions().Parentheses()).
+					WithValidation(g.ExactlyOneValueSet, "AllowedNetworkRuleList", "BlockedNetworkRuleList")
 
 	networkPoliciesRemoveNetworkRule = g.NewQueryStruct("RemoveNetworkRule").
-						OptionalIdentifier("RemoveAllowedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
-						OptionalIdentifier("RemoveBlockedNetworkRule", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
-						WithValidation(g.ExactlyOneValueSet, "RemoveAllowedNetworkRule", "RemoveBlockedNetworkRule").
-						WithValidation(g.ValidIdentifierIfSet, "RemoveAllowedNetworkRule").
-						WithValidation(g.ValidIdentifierIfSet, "RemoveBlockedNetworkRule")
+						ListAssignment("ALLOWED_NETWORK_RULE_LIST", "SchemaObjectIdentifier", g.ParameterOptions().Parentheses()).
+						ListAssignment("BLOCKED_NETWORK_RULE_LIST", "SchemaObjectIdentifier", g.ParameterOptions().Parentheses()).
+						WithValidation(g.ExactlyOneValueSet, "AllowedNetworkRuleList", "BlockedNetworkRuleList")
 
 	NetworkPoliciesDef = g.NewInterface(
 		"NetworkPolicies",
@@ -91,13 +87,17 @@ var (
 				Field("name", "string").
 				Field("comment", "string").
 				Field("entries_in_allowed_ip_list", "int").
-				Field("entries_in_blocked_ip_list", "int"),
+				Field("entries_in_blocked_ip_list", "int").
+				Field("entries_in_allowed_network_rules", "int").
+				Field("entries_in_blocked_network_rules", "int"),
 			g.PlainStruct("NetworkPolicy").
 				Field("CreatedOn", "string").
 				Field("Name", "string").
 				Field("Comment", "string").
 				Field("EntriesInAllowedIpList", "int").
-				Field("EntriesInBlockedIpList", "int"),
+				Field("EntriesInBlockedIpList", "int").
+				Field("EntriesInAllowedNetworkRules", "int").
+				Field("EntriesInBlockedNetworkRules", "int"),
 			g.NewQueryStruct("ShowNetworkPolicies").
 				Show().
 				SQL("NETWORK POLICIES"),

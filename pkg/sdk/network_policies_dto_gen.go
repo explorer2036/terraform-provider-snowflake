@@ -47,13 +47,13 @@ type NetworkPolicySetRequest struct {
 }
 
 type AddNetworkRuleRequest struct {
-	AddAllowedNetworkRule *SchemaObjectIdentifier
-	AddBlockedNetworkRule *SchemaObjectIdentifier
+	AllowedNetworkRuleList []SchemaObjectIdentifier
+	BlockedNetworkRuleList []SchemaObjectIdentifier
 }
 
 type RemoveNetworkRuleRequest struct {
-	RemoveAllowedNetworkRule *SchemaObjectIdentifier
-	RemoveBlockedNetworkRule *SchemaObjectIdentifier
+	AllowedNetworkRuleList []SchemaObjectIdentifier
+	BlockedNetworkRuleList []SchemaObjectIdentifier
 }
 
 type DropNetworkPolicyRequest struct {

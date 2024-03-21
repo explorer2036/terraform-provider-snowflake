@@ -73,15 +73,26 @@ func TestNetworkPolicies_Alter(t *testing.T) {
 		assertOptsInvalidJoinedErrors(t, opts, errAtLeastOneOf("AlterNetworkPolicyOptions.Set", "AllowedIpList", "BlockedIpList", "Comment", "AllowedNetworkRuleList", "BlockedNetworkRuleList"))
 	})
 
-	t.Run("validation: exactly one field from [opts.Add.AddAllowedNetworkRule opts.Add.AddBlockedNetworkRule] should be present", func(t *testing.T) {
+	t.Run("validation: exactly one field from [opts.Add.AllowedNetworkRuleList opts.Add.BlockedNetworkRuleList] should be present", func(t *testing.T) {
 		allowedNetworkRule := RandomSchemaObjectIdentifier()
 		blockedNetworkRule := RandomSchemaObjectIdentifier()
 		opts := defaultOpts()
 		opts.Add = &AddNetworkRule{
-			AddAllowedNetworkRule: &allowedNetworkRule,
-			AddBlockedNetworkRule: &blockedNetworkRule,
+			AllowedNetworkRuleList: []SchemaObjectIdentifier{allowedNetworkRule},
+			BlockedNetworkRuleList: []SchemaObjectIdentifier{blockedNetworkRule},
 		}
-		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterNetworkPolicyOptions.Add", "AddAllowedNetworkRule", "AddBlockedNetworkRule"))
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterNetworkPolicyOptions.Add", "AllowedNetworkRuleList", "BlockedNetworkRuleList"))
+	})
+
+	t.Run("validation: exactly one field from [opts.Remove.AllowedNetworkRuleList opts.Remove.BlockedNetworkRuleList] should be present", func(t *testing.T) {
+		allowedNetworkRule := RandomSchemaObjectIdentifier()
+		blockedNetworkRule := RandomSchemaObjectIdentifier()
+		opts := defaultOpts()
+		opts.Remove = &RemoveNetworkRule{
+			AllowedNetworkRuleList: []SchemaObjectIdentifier{allowedNetworkRule},
+			BlockedNetworkRuleList: []SchemaObjectIdentifier{blockedNetworkRule},
+		}
+		assertOptsInvalidJoinedErrors(t, opts, errExactlyOneOf("AlterNetworkPolicyOptions.Remove", "AllowedNetworkRuleList", "BlockedNetworkRuleList"))
 	})
 
 	t.Run("set allowed ip list", func(t *testing.T) {
@@ -122,36 +133,36 @@ func TestNetworkPolicies_Alter(t *testing.T) {
 		allowedNetworkRule := RandomSchemaObjectIdentifier()
 		opts := defaultOpts()
 		opts.Add = &AddNetworkRule{
-			AddAllowedNetworkRule: &allowedNetworkRule,
+			AllowedNetworkRuleList: []SchemaObjectIdentifier{allowedNetworkRule},
 		}
-		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s ADD ALLOWED_NETWORK_RULE_LIST = %s", id.FullyQualifiedName(), allowedNetworkRule.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s ADD ALLOWED_NETWORK_RULE_LIST = (%s)", id.FullyQualifiedName(), allowedNetworkRule.FullyQualifiedName())
 	})
 
 	t.Run("add blocked network rule", func(t *testing.T) {
 		blockedNetworkRule := RandomSchemaObjectIdentifier()
 		opts := defaultOpts()
 		opts.Add = &AddNetworkRule{
-			AddBlockedNetworkRule: &blockedNetworkRule,
+			BlockedNetworkRuleList: []SchemaObjectIdentifier{blockedNetworkRule},
 		}
-		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s ADD BLOCKED_NETWORK_RULE_LIST = %s", id.FullyQualifiedName(), blockedNetworkRule.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s ADD BLOCKED_NETWORK_RULE_LIST = (%s)", id.FullyQualifiedName(), blockedNetworkRule.FullyQualifiedName())
 	})
 
 	t.Run("remove allowed network rule", func(t *testing.T) {
 		allowedNetworkRule := RandomSchemaObjectIdentifier()
 		opts := defaultOpts()
 		opts.Remove = &RemoveNetworkRule{
-			RemoveAllowedNetworkRule: &allowedNetworkRule,
+			AllowedNetworkRuleList: []SchemaObjectIdentifier{allowedNetworkRule},
 		}
-		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s REMOVE ALLOWED_NETWORK_RULE_LIST = %s", id.FullyQualifiedName(), allowedNetworkRule.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s REMOVE ALLOWED_NETWORK_RULE_LIST = (%s)", id.FullyQualifiedName(), allowedNetworkRule.FullyQualifiedName())
 	})
 
 	t.Run("remove blocked network rule", func(t *testing.T) {
 		blockedNetworkRule := RandomSchemaObjectIdentifier()
 		opts := defaultOpts()
 		opts.Remove = &RemoveNetworkRule{
-			RemoveBlockedNetworkRule: &blockedNetworkRule,
+			BlockedNetworkRuleList: []SchemaObjectIdentifier{blockedNetworkRule},
 		}
-		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s REMOVE BLOCKED_NETWORK_RULE_LIST = %s", id.FullyQualifiedName(), blockedNetworkRule.FullyQualifiedName())
+		assertOptsValidAndSQLEquals(t, opts, "ALTER NETWORK POLICY IF EXISTS %s REMOVE BLOCKED_NETWORK_RULE_LIST = (%s)", id.FullyQualifiedName(), blockedNetworkRule.FullyQualifiedName())
 	})
 
 	t.Run("set comment", func(t *testing.T) {

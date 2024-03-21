@@ -115,14 +115,14 @@ func (r *AlterNetworkPolicyRequest) toOpts() *AlterNetworkPolicyOptions {
 	}
 	if r.Add != nil {
 		opts.Add = &AddNetworkRule{
-			AddAllowedNetworkRule: r.Add.AddAllowedNetworkRule,
-			AddBlockedNetworkRule: r.Add.AddBlockedNetworkRule,
+			AllowedNetworkRuleList: r.Add.AllowedNetworkRuleList,
+			BlockedNetworkRuleList: r.Add.BlockedNetworkRuleList,
 		}
 	}
 	if r.Remove != nil {
 		opts.Remove = &RemoveNetworkRule{
-			RemoveAllowedNetworkRule: r.Remove.RemoveAllowedNetworkRule,
-			RemoveBlockedNetworkRule: r.Remove.RemoveBlockedNetworkRule,
+			AllowedNetworkRuleList: r.Remove.AllowedNetworkRuleList,
+			BlockedNetworkRuleList: r.Remove.BlockedNetworkRuleList,
 		}
 	}
 	return opts
@@ -143,11 +143,13 @@ func (r *ShowNetworkPolicyRequest) toOpts() *ShowNetworkPolicyOptions {
 
 func (r showNetworkPolicyDBRow) convert() *NetworkPolicy {
 	return &NetworkPolicy{
-		CreatedOn:              r.CreatedOn,
-		Name:                   r.Name,
-		Comment:                r.Comment,
-		EntriesInAllowedIpList: r.EntriesInAllowedIpList,
-		EntriesInBlockedIpList: r.EntriesInBlockedIpList,
+		CreatedOn:                    r.CreatedOn,
+		Name:                         r.Name,
+		Comment:                      r.Comment,
+		EntriesInAllowedIpList:       r.EntriesInAllowedIpList,
+		EntriesInBlockedIpList:       r.EntriesInBlockedIpList,
+		EntriesInAllowedNetworkRules: r.EntriesInAllowedNetworkRules,
+		EntriesInBlockedNetworkRules: r.EntriesInBlockedNetworkRules,
 	}
 }
 
