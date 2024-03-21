@@ -2,6 +2,8 @@
 
 package sdk
 
+import ()
+
 func NewCreateNetworkPolicyRequest(
 	name AccountObjectIdentifier,
 ) *CreateNetworkPolicyRequest {
@@ -66,6 +68,16 @@ func (s *AlterNetworkPolicyRequest) WithSet(Set *NetworkPolicySetRequest) *Alter
 	return s
 }
 
+func (s *AlterNetworkPolicyRequest) WithAdd(Add *AddNetworkRuleRequest) *AlterNetworkPolicyRequest {
+	s.Add = Add
+	return s
+}
+
+func (s *AlterNetworkPolicyRequest) WithRemove(Remove *RemoveNetworkRuleRequest) *AlterNetworkPolicyRequest {
+	s.Remove = Remove
+	return s
+}
+
 func (s *AlterNetworkPolicyRequest) WithUnsetComment(UnsetComment *bool) *AlterNetworkPolicyRequest {
 	s.UnsetComment = UnsetComment
 	return s
@@ -80,6 +92,16 @@ func NewNetworkPolicySetRequest() *NetworkPolicySetRequest {
 	return &NetworkPolicySetRequest{}
 }
 
+func (s *NetworkPolicySetRequest) WithAllowedNetworkRuleList(AllowedNetworkRuleList []SchemaObjectIdentifier) *NetworkPolicySetRequest {
+	s.AllowedNetworkRuleList = AllowedNetworkRuleList
+	return s
+}
+
+func (s *NetworkPolicySetRequest) WithBlockedNetworkRuleList(BlockedNetworkRuleList []SchemaObjectIdentifier) *NetworkPolicySetRequest {
+	s.BlockedNetworkRuleList = BlockedNetworkRuleList
+	return s
+}
+
 func (s *NetworkPolicySetRequest) WithAllowedIpList(AllowedIpList []IPRequest) *NetworkPolicySetRequest {
 	s.AllowedIpList = AllowedIpList
 	return s
@@ -92,6 +114,34 @@ func (s *NetworkPolicySetRequest) WithBlockedIpList(BlockedIpList []IPRequest) *
 
 func (s *NetworkPolicySetRequest) WithComment(Comment *string) *NetworkPolicySetRequest {
 	s.Comment = Comment
+	return s
+}
+
+func NewAddNetworkRuleRequest() *AddNetworkRuleRequest {
+	return &AddNetworkRuleRequest{}
+}
+
+func (s *AddNetworkRuleRequest) WithAddToAllowedNetworkRuleList(AddToAllowedNetworkRuleList *SchemaObjectIdentifier) *AddNetworkRuleRequest {
+	s.AddToAllowedNetworkRuleList = AddToAllowedNetworkRuleList
+	return s
+}
+
+func (s *AddNetworkRuleRequest) WithAddToBlockedNetworkRuleList(AddToBlockedNetworkRuleList *SchemaObjectIdentifier) *AddNetworkRuleRequest {
+	s.AddToBlockedNetworkRuleList = AddToBlockedNetworkRuleList
+	return s
+}
+
+func NewRemoveNetworkRuleRequest() *RemoveNetworkRuleRequest {
+	return &RemoveNetworkRuleRequest{}
+}
+
+func (s *RemoveNetworkRuleRequest) WithRemoveFromAllowedNetworkRuleList(RemoveFromAllowedNetworkRuleList *SchemaObjectIdentifier) *RemoveNetworkRuleRequest {
+	s.RemoveFromAllowedNetworkRuleList = RemoveFromAllowedNetworkRuleList
+	return s
+}
+
+func (s *RemoveNetworkRuleRequest) WithRemoveFromBlockedNetworkRuleList(RemoveFromBlockedNetworkRuleList *SchemaObjectIdentifier) *RemoveNetworkRuleRequest {
+	s.RemoveFromBlockedNetworkRuleList = RemoveFromBlockedNetworkRuleList
 	return s
 }
 

@@ -50,11 +50,11 @@ func (v *networkPolicies) Describe(ctx context.Context, id AccountObjectIdentifi
 	opts := &DescribeNetworkPolicyOptions{
 		name: id,
 	}
-	s, err := validateAndQuery[describeNetworkPolicyDBRow](v.client, ctx, opts)
+	rows, err := validateAndQuery[describeNetworkPolicyDBRow](v.client, ctx, opts)
 	if err != nil {
 		return nil, err
 	}
-	return convertRows[describeNetworkPolicyDBRow, NetworkPolicyDescription](s), nil
+	return convertRows[describeNetworkPolicyDBRow, NetworkPolicyDescription](rows), nil
 }
 
 func (r *CreateNetworkPolicyRequest) toOpts() *CreateNetworkPolicyOptions {
@@ -93,6 +93,9 @@ func (r *AlterNetworkPolicyRequest) toOpts() *AlterNetworkPolicyOptions {
 	}
 	if r.Set != nil {
 		opts.Set = &NetworkPolicySet{
+			AllowedNetworkRuleList: r.Set.AllowedNetworkRuleList,
+			BlockedNetworkRuleList: r.Set.BlockedNetworkRuleList,
+
 			Comment: r.Set.Comment,
 		}
 		if r.Set.AllowedIpList != nil {
@@ -108,6 +111,18 @@ func (r *AlterNetworkPolicyRequest) toOpts() *AlterNetworkPolicyOptions {
 				s[i] = IP(v)
 			}
 			opts.Set.BlockedIpList = s
+		}
+	}
+	if r.Add != nil {
+		opts.Add = &AddNetworkRule{
+			AddToAllowedNetworkRuleList: r.Add.AddToAllowedNetworkRuleList,
+			AddToBlockedNetworkRuleList: r.Add.AddToBlockedNetworkRuleList,
+		}
+	}
+	if r.Remove != nil {
+		opts.Remove = &RemoveNetworkRule{
+			RemoveFromAllowedNetworkRuleList: r.Remove.RemoveFromAllowedNetworkRuleList,
+			RemoveFromBlockedNetworkRuleList: r.Remove.RemoveFromBlockedNetworkRuleList,
 		}
 	}
 	return opts

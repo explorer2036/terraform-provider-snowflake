@@ -8,6 +8,20 @@ var (
 	ip = g.NewQueryStruct("IP").
 		Text("IP", g.KeywordOptions().SingleQuotes().Required())
 
+	networkPoliciesAddNetworkRule = g.NewQueryStruct("AddNetworkRule").
+					OptionalIdentifier("AddToAllowedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
+					OptionalIdentifier("AddToBlockedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
+					WithValidation(g.ExactlyOneValueSet, "AddToAllowedNetworkRuleList", "AddToBlockedNetworkRuleList").
+					WithValidation(g.ValidIdentifierIfSet, "AddToAllowedNetworkRuleList").
+					WithValidation(g.ValidIdentifierIfSet, "AddToBlockedNetworkRuleList")
+
+	networkPoliciesRemoveNetworkRule = g.NewQueryStruct("RemoveNetworkRule").
+						OptionalIdentifier("RemoveFromAllowedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("ALLOWED_NETWORK_RULE_LIST =")).
+						OptionalIdentifier("RemoveFromBlockedNetworkRuleList", g.KindOfTPointer[SchemaObjectIdentifier](), g.IdentifierOptions().SQL("BLOCKED_NETWORK_RULE_LIST =")).
+						WithValidation(g.ExactlyOneValueSet, "RemoveFromAllowedNetworkRuleList", "RemoveFromBlockedNetworkRuleList").
+						WithValidation(g.ValidIdentifierIfSet, "RemoveFromAllowedNetworkRuleList").
+						WithValidation(g.ValidIdentifierIfSet, "RemoveFromBlockedNetworkRuleList")
+
 	NetworkPoliciesDef = g.NewInterface(
 		"NetworkPolicies",
 		"NetworkPolicy",
@@ -42,13 +56,23 @@ var (
 						ListQueryStructField("AllowedIpList", ip, g.ParameterOptions().SQL("ALLOWED_IP_LIST").Parentheses()).
 						ListQueryStructField("BlockedIpList", ip, g.ParameterOptions().SQL("BLOCKED_IP_LIST").Parentheses()).
 						OptionalTextAssignment("COMMENT", g.ParameterOptions().SingleQuotes()).
-						WithValidation(g.AtLeastOneValueSet, "AllowedIpList", "BlockedIpList", "Comment"),
+						WithValidation(g.AtLeastOneValueSet, "AllowedIpList", "BlockedIpList", "Comment", "AllowedNetworkRuleList", "BlockedNetworkRuleList"),
 					g.KeywordOptions().SQL("SET"),
+				).
+				OptionalQueryStructField(
+					"Add",
+					networkPoliciesAddNetworkRule,
+					g.KeywordOptions().SQL("ADD"),
+				).
+				OptionalQueryStructField(
+					"Remove",
+					networkPoliciesRemoveNetworkRule,
+					g.KeywordOptions().SQL("REMOVE"),
 				).
 				OptionalSQL("UNSET COMMENT").
 				Identifier("RenameTo", g.KindOfTPointer[AccountObjectIdentifier](), g.IdentifierOptions().SQL("RENAME TO")).
 				WithValidation(g.ValidIdentifier, "name").
-				WithValidation(g.ExactlyOneValueSet, "Set", "UnsetComment", "RenameTo").
+				WithValidation(g.ExactlyOneValueSet, "Set", "UnsetComment", "RenameTo", "Add", "Remove").
 				WithValidation(g.ValidIdentifierIfSet, "RenameTo"),
 		).
 		DropOperation(
