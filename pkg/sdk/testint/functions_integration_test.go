@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -493,27 +492,22 @@ func TestInt_FunctionsShowByID(t *testing.T) {
 	}
 
 	t.Run("show by id", func(t *testing.T) {
-		schemaName := random.AlphaN(8)
-		schema, schemaCleanup := createSchemaWithIdentifier(t, client, databaseTest, schemaName)
+		schema, schemaCleanup := createSchemaWithIdentifier(t, client, databaseTest, random.AlphaN(8))
 		t.Cleanup(schemaCleanup)
 
-		functionName := random.AlphaN(4)
-		id1 := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, functionName)
-		id2 := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schema.Name, functionName)
+		name := random.AlphaN(4)
+		id1 := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, name)
+		id2 := sdk.NewSchemaObjectIdentifier(databaseTest.Name, schema.Name, name)
 
 		createFunctionForSQLHandle(t, id1)
 		createFunctionForSQLHandle(t, id2)
 
-		f1, err := client.Functions.ShowByID(ctx, id1)
+		e1, err := client.Functions.ShowByID(ctx, id1)
 		require.NoError(t, err)
-		require.Equal(t, id1.DatabaseName(), strings.Trim(f1.CatalogName, "\""))
-		require.Equal(t, id1.SchemaName(), strings.Trim(f1.SchemaName, "\""))
-		require.Equal(t, id1.Name(), f1.Name)
+		require.Equal(t, id1, e1.ID())
 
-		f2, err := client.Functions.ShowByID(ctx, id2)
+		e2, err := client.Functions.ShowByID(ctx, id2)
 		require.NoError(t, err)
-		require.Equal(t, id2.DatabaseName(), strings.Trim(f2.CatalogName, "\""))
-		require.Equal(t, id2.SchemaName(), strings.Trim(f2.SchemaName, "\""))
-		require.Equal(t, id2.Name(), f2.Name)
+		require.Equal(t, id2, e2.ID())
 	})
 }
