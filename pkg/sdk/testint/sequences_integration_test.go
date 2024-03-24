@@ -170,7 +170,7 @@ func TestInt_Sequences(t *testing.T) {
 	})
 }
 
-func TestInt_SequenceShowByID(t *testing.T) {
+func TestInt_SequencesShowByID(t *testing.T) {
 	client := testClient(t)
 	ctx := testContext(t)
 
