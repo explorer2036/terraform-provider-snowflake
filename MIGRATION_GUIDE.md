@@ -4,7 +4,22 @@ This document is meant to help you migrate your Terraform config to the new newe
 describe deprecations or breaking changes and help you to change your configuration to keep the same (or similar) behavior
 across different versions.
 
+## v0.87.0 ➞ v0.88.0
+### snowflake_procedure resource changes
+#### *(behavior change)* Execute as validation added
+From now on, the `snowflake_procedure`'s `execute_as` parameter allows only two values: OWNER and CALLER (case-insensitive). Setting other values earlier resulted in falling back to the Snowflake default (currently OWNER) and creating a permadiff.
+
 ## v0.86.0 ➞ v0.87.0
+### snowflake_database resource changes
+#### *(behavior change)* External object identifier changes
+
+Previously, in `snowflake_database` when creating a database form share, it was possible to provide `from_share.provider`
+in the format of `<org_name>.<account_name>`. It worked even though we expected account locator because our "external" identifier wasn't quoting its string representation.
+To be consistent with other identifier types, we quoted the output of "external" identifiers which makes such configurations break 
+(previously, they were working "by accident"). To fix it, the previous format of `<org_name>.<account_name>` has to be changed
+to account locator format `<account_locator>` (mind that it's now case-sensitive). The account locator can be retrieved by calling `select current_account();` on the sharing account.
+In the future we would like to eventually come back to the `<org_name>.<account_name>` format as it's recommended by Snowflake.
+
 ### Provider configuration changes
 
 #### **IMPORTANT** *(bug fix)* Configuration hierarchy
