@@ -22,22 +22,30 @@ func TestInt_ApplicationRoles(t *testing.T) {
 	client := testClient(t)
 	ctx := testContext(t)
 
-	stageName := "stage_" + random.AlphaN(4)
-	stage, cleanupStage := createStage(t, client, sdk.NewSchemaObjectIdentifier(TestDatabaseName, TestSchemaName, stageName))
-	t.Cleanup(cleanupStage)
+	databaseTest, schemaTest := testDb(t), testSchema(t)
+	createAppHandle := func(t *testing.T, appName string) sdk.AccountObjectIdentifier {
+		t.Helper()
 
-	putOnStage(t, client, stage, "manifest.yml")
-	putOnStage(t, client, stage, "setup.sql")
+		// create stage
+		stage, cleanupStage := createStage(t, client, sdk.NewSchemaObjectIdentifier(databaseTest.Name, schemaTest.Name, random.AlphaN(8)))
+		t.Cleanup(cleanupStage)
+		// upload files onto stage
+		putOnStage(t, client, stage, "manifest.yml")
+		putOnStage(t, client, stage, "setup.sql")
+		// create application package
+		appPackageName := random.AlphaN(8)
+		cleanupAppPackage := createApplicationPackage(t, client, appPackageName)
+		t.Cleanup(cleanupAppPackage)
+		// add application package version
+		versionName := "v1"
+		addApplicationPackageVersion(t, client, stage, appPackageName, versionName)
+		cleanupApp := createApplication(t, client, appName, appPackageName, versionName)
+		t.Cleanup(cleanupApp)
+		return sdk.NewAccountObjectIdentifier(appName)
+	}
 
-	appPackageName := "application_package_" + random.AlphaN(4)
-	versionName := "v1"
-	cleanupAppPackage := createApplicationPackage(t, client, appPackageName)
-	t.Cleanup(cleanupAppPackage)
-	addApplicationPackageVersion(t, client, stage, appPackageName, versionName)
-
-	appName := "application_" + random.AlphaN(4)
-	cleanupApp := createApplication(t, client, appName, appPackageName, versionName)
-	t.Cleanup(cleanupApp)
+	appName := random.AlphaN(8)
+	createAppHandle(t, appName)
 
 	assertApplicationRole := func(t *testing.T, appRole *sdk.ApplicationRole, name string, comment string) {
 		t.Helper()
@@ -90,24 +98,53 @@ func TestInt_ApplicationRoles(t *testing.T) {
 		assertApplicationRoles(t, appRoles, "app_role_2", "some comment2")
 	})
 
-	t.Run("Grant and Revoke role: application", func(t *testing.T) {
+	t.Run("Grant and Revoke: Role", func(t *testing.T) {
 		role, cleanupRole := createRole(t, client)
 		t.Cleanup(cleanupRole)
 
-		name := "app_role_1"
-		id := sdk.NewDatabaseObjectIdentifier(appName, name)
-
+		id := sdk.NewDatabaseObjectIdentifier(appName, "app_role_1")
+		// grant the application role to the role
 		kindOfRole := sdk.NewKindOfRoleRequest().WithRoleName(sdk.Pointer(role.ID()))
-		request := sdk.NewGrantApplicationRoleRequest(id).WithTo(*kindOfRole)
-		err := client.ApplicationRoles.Grant(ctx, request)
+		gr := sdk.NewGrantApplicationRoleRequest(id).WithTo(*kindOfRole)
+		err := client.ApplicationRoles.Grant(ctx, gr)
 		require.NoError(t, err)
 
-		grants, err := client.Grants.Show(ctx, &sdk.ShowGrantOptions{
-			To: &sdk.ShowGrantsTo{
-				Role: role.ID(),
-			},
-		})
+		grants, err := client.Grants.Show(ctx, &sdk.ShowGrantOptions{To: &sdk.ShowGrantsTo{Role: role.ID()}})
 		require.NoError(t, err)
 		assertGrantToRoles(t, grants, id, role.ID(), sdk.ObjectTypeApplicationRole)
+
+		// revoke the application role from the role
+		rr := sdk.NewRevokeApplicationRoleRequest(id).WithFrom(*kindOfRole)
+		err = client.ApplicationRoles.Revoke(ctx, rr)
+		require.NoError(t, err)
+
+		grants, err = client.Grants.Show(ctx, &sdk.ShowGrantOptions{To: &sdk.ShowGrantsTo{Role: role.ID()}})
+		require.NoError(t, err)
+		require.Equal(t, 0, len(grants))
+	})
+
+	t.Run("Grant and Revoke: Application", func(t *testing.T) {
+		otherAppName := random.AlphaN(8)
+		appId := createAppHandle(t, otherAppName)
+
+		id := sdk.NewDatabaseObjectIdentifier(appName, "app_role_1")
+		// grant the application role to the application
+		kindOfRole := sdk.NewKindOfRoleRequest().WithApplicationName(&appId)
+		gr := sdk.NewGrantApplicationRoleRequest(id).WithTo(*kindOfRole)
+		err := client.ApplicationRoles.Grant(ctx, gr)
+		require.NoError(t, err)
+
+		grants, err := client.Grants.Show(ctx, &sdk.ShowGrantOptions{To: &sdk.ShowGrantsTo{Application: appId}})
+		require.NoError(t, err)
+		assertGrantToRoles(t, grants, id, appId, sdk.ObjectTypeApplicationRole)
+
+		// revoke the application role from the role
+		rr := sdk.NewRevokeApplicationRoleRequest(id).WithFrom(*kindOfRole)
+		err = client.ApplicationRoles.Revoke(ctx, rr)
+		require.NoError(t, err)
+
+		grants, err = client.Grants.Show(ctx, &sdk.ShowGrantOptions{To: &sdk.ShowGrantsTo{Application: appId}})
+		require.NoError(t, err)
+		require.Equal(t, 0, len(grants))
 	})
 }

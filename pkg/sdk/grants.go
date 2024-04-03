@@ -176,6 +176,7 @@ type ShowGrantsOn struct {
 }
 
 type ShowGrantsTo struct {
+	Application  AccountObjectIdentifier  `ddl:"identifier" sql:"APPLICATION"`
 	Role         AccountObjectIdentifier  `ddl:"identifier" sql:"ROLE"`
 	User         AccountObjectIdentifier  `ddl:"identifier" sql:"USER"`
 	Share        AccountObjectIdentifier  `ddl:"identifier" sql:"SHARE"`
