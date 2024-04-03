@@ -13,7 +13,7 @@ import (
 // That's why we're only exposing SHOW operations, because only they are the only allowed operations to be called from the program context.
 type ApplicationRoles interface {
 	Show(ctx context.Context, request *ShowApplicationRoleRequest) ([]ApplicationRole, error)
-	ShowByID(ctx context.Context, request *ShowByIDApplicationRoleRequest) (*ApplicationRole, error)
+	ShowByID(ctx context.Context, applicationName AccountObjectIdentifier, id DatabaseObjectIdentifier) (*ApplicationRole, error)
 }
 
 // ShowApplicationRoleOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-application-roles.

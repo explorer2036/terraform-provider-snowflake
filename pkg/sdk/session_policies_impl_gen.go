@@ -38,7 +38,8 @@ func (v *sessionPolicies) Show(ctx context.Context, request *ShowSessionPolicyRe
 }
 
 func (v *sessionPolicies) ShowByID(ctx context.Context, id SchemaObjectIdentifier) (*SessionPolicy, error) {
-	sessionPolicies, err := v.Show(ctx, NewShowSessionPolicyRequest())
+	request := NewShowSessionPolicyRequest().WithLike(&Like{String(id.Name())})
+	sessionPolicies, err := v.Show(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +105,9 @@ func (r *DropSessionPolicyRequest) toOpts() *DropSessionPolicyOptions {
 }
 
 func (r *ShowSessionPolicyRequest) toOpts() *ShowSessionPolicyOptions {
-	opts := &ShowSessionPolicyOptions{}
+	opts := &ShowSessionPolicyOptions{
+		Like: r.Like,
+	}
 	return opts
 }
 

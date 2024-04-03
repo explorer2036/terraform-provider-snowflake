@@ -85,7 +85,8 @@ var SessionPoliciesDef = g.NewInterface(
 			Field("Options", "string"),
 		g.NewQueryStruct("ShowSessionPolicies").
 			Show().
-			SQL("SESSION POLICIES"),
+			SQL("SESSION POLICIES").
+			OptionalLike(),
 	).
 	DescribeOperation(
 		g.DescriptionMappingKindSingleValue,

@@ -8,8 +8,3 @@ type ShowApplicationRoleRequest struct {
 	ApplicationName AccountObjectIdentifier
 	Limit           *LimitFrom
 }
-
-type ShowByIDApplicationRoleRequest struct {
-	name            DatabaseObjectIdentifier // required
-	ApplicationName AccountObjectIdentifier  // required
-}

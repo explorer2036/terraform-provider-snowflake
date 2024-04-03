@@ -61,8 +61,9 @@ type DropSessionPolicyOptions struct {
 
 // ShowSessionPolicyOptions is based on https://docs.snowflake.com/en/sql-reference/sql/show-session-policies.
 type ShowSessionPolicyOptions struct {
-	show            bool `ddl:"static" sql:"SHOW"`
-	sessionPolicies bool `ddl:"static" sql:"SESSION POLICIES"`
+	show            bool  `ddl:"static" sql:"SHOW"`
+	sessionPolicies bool  `ddl:"static" sql:"SESSION POLICIES"`
+	Like            *Like `ddl:"keyword" sql:"LIKE"`
 }
 
 type showSessionPolicyDBRow struct {

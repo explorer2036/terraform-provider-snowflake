@@ -55,12 +55,12 @@ func TestInt_ApplicationRoles(t *testing.T) {
 		assertApplicationRole(t, appRole, name, comment)
 	}
 
-	t.Run("show by id - same name in different schemas", func(t *testing.T) {
+	t.Run("Show by id", func(t *testing.T) {
 		name := "app_role_1"
 		id := sdk.NewDatabaseObjectIdentifier(appName, name)
-		ctx := context.Background()
 
-		appRole, err := client.ApplicationRoles.ShowByID(ctx, sdk.NewShowByIDApplicationRoleRequest(id, sdk.NewAccountObjectIdentifier(appName)))
+		ctx := context.Background()
+		appRole, err := client.ApplicationRoles.ShowByID(ctx, sdk.NewAccountObjectIdentifier(appName), id)
 		require.NoError(t, err)
 
 		assertApplicationRole(t, appRole, name, "some comment")

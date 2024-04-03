@@ -2,6 +2,8 @@
 
 package sdk
 
+import ()
+
 func NewCreateSessionPolicyRequest(
 	name SchemaObjectIdentifier,
 ) *CreateSessionPolicyRequest {
@@ -126,6 +128,11 @@ func (s *DropSessionPolicyRequest) WithIfExists(IfExists *bool) *DropSessionPoli
 
 func NewShowSessionPolicyRequest() *ShowSessionPolicyRequest {
 	return &ShowSessionPolicyRequest{}
+}
+
+func (s *ShowSessionPolicyRequest) WithLike(Like *Like) *ShowSessionPolicyRequest {
+	s.Like = Like
+	return s
 }
 
 func NewDescribeSessionPolicyRequest(

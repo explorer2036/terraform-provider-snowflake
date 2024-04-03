@@ -17,13 +17,3 @@ func (s *ShowApplicationRoleRequest) WithLimit(Limit *LimitFrom) *ShowApplicatio
 	s.Limit = Limit
 	return s
 }
-
-func NewShowByIDApplicationRoleRequest(
-	name DatabaseObjectIdentifier,
-	ApplicationName AccountObjectIdentifier,
-) *ShowByIDApplicationRoleRequest {
-	s := ShowByIDApplicationRoleRequest{}
-	s.name = name
-	s.ApplicationName = ApplicationName
-	return &s
-}
