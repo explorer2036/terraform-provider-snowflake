@@ -1,6 +1,7 @@
 package testint
 
 import (
+	"context"
 	"testing"
 
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
@@ -146,5 +147,42 @@ func TestInt_ApplicationRoles(t *testing.T) {
 		grants, err = client.Grants.Show(ctx, &sdk.ShowGrantOptions{To: &sdk.ShowGrantsTo{Application: appId}})
 		require.NoError(t, err)
 		require.Equal(t, 0, len(grants))
+	})
+
+	t.Run("show grants to application role", func(t *testing.T) {
+		name := "app_role_1"
+		id := sdk.NewDatabaseObjectIdentifier(appName, name)
+		ctx := context.Background()
+
+		opts := new(sdk.ShowGrantOptions)
+		opts.To = &sdk.ShowGrantsTo{
+			ApplicationRole: id,
+		}
+		grants, err := client.Grants.Show(ctx, opts)
+		require.NoError(t, err)
+
+		require.NotEmpty(t, grants)
+		require.NotEmpty(t, grants[0].CreatedOn)
+		require.Equal(t, sdk.ObjectPrivilegeUsage.String(), grants[0].Privilege)
+		require.Equal(t, sdk.ObjectTypeDatabase, grants[0].GrantedOn)
+		require.Equal(t, sdk.ObjectTypeApplicationRole, grants[0].GrantedTo)
+	})
+
+	t.Run("show grants of application role", func(t *testing.T) {
+		name := "app_role_1"
+		id := sdk.NewDatabaseObjectIdentifier(appName, name)
+		ctx := context.Background()
+
+		opts := new(sdk.ShowGrantOptions)
+		opts.Of = &sdk.ShowGrantsOf{
+			ApplicationRole: id,
+		}
+		grants, err := client.Grants.Show(ctx, opts)
+		require.NoError(t, err)
+
+		require.NotEmpty(t, grants)
+		require.NotEmpty(t, grants[0].CreatedOn)
+		require.Equal(t, sdk.ObjectTypeRole, grants[0].GrantedTo)
+		require.Equal(t, sdk.NewAccountObjectIdentifier(appName), grants[0].GrantedBy)
 	})
 }
