@@ -797,6 +797,42 @@ func createRowAccessPolicy(t *testing.T, client *sdk.Client, schema *sdk.Schema)
 	}
 }
 
+func createApiIntegration(t *testing.T, client *sdk.Client) (sdk.AccountObjectIdentifier, func()) {
+	t.Helper()
+	ctx := context.Background()
+	id := sdk.NewAccountObjectIdentifier(random.String())
+	apiAllowedPrefixes := []sdk.ApiIntegrationEndpointPrefix{{Path: "https://xyz.execute-api.us-west-2.amazonaws.com/production"}}
+	req := sdk.NewCreateApiIntegrationRequest(id, apiAllowedPrefixes, true)
+	req.WithAwsApiProviderParams(sdk.NewAwsApiParamsRequest(sdk.ApiIntegrationAwsApiGateway, "arn:aws:iam::123456789012:role/hello_cloud_account_role"))
+	err := client.ApiIntegrations.Create(ctx, req)
+	require.NoError(t, err)
+
+	return id, func() {
+		err := client.ApiIntegrations.Drop(ctx, sdk.NewDropApiIntegrationRequest(id))
+		require.NoError(t, err)
+	}
+}
+
+func createExternalFunction(t *testing.T, client *sdk.Client, schema *sdk.Schema) (sdk.SchemaObjectIdentifier, func()) {
+	t.Helper()
+	ctx := context.Background()
+	apiIntegration, cleanupApiIntegration := createApiIntegration(t, client)
+	id := sdk.NewSchemaObjectIdentifier(schema.DatabaseName, schema.Name, random.StringN(4))
+	argument := sdk.NewExternalFunctionArgumentRequest("x", sdk.DataTypeVARCHAR)
+	argumentsRequest := []sdk.ExternalFunctionArgumentRequest{*argument}
+	as := "https://xyz.execute-api.us-west-2.amazonaws.com/production/remote_echo"
+	request := sdk.NewCreateExternalFunctionRequest(id, sdk.DataTypeVariant, &apiIntegration, as).
+		WithOrReplace(sdk.Bool(true)).
+		WithArguments(argumentsRequest)
+	err := client.ExternalFunctions.Create(ctx, request)
+	require.NoError(t, err)
+	return id, func() {
+		cleanupApiIntegration()
+		err = client.Functions.Drop(ctx, sdk.NewDropFunctionRequest(id, []sdk.DataType{sdk.DataTypeVARCHAR}))
+		require.NoError(t, err)
+	}
+}
+
 // TODO: extract getting row access policies as resource (like getting tag in system functions)
 // getRowAccessPolicyFor is based on https://docs.snowflake.com/en/user-guide/security-row-intro#obtain-database-objects-with-a-row-access-policy.
 func getRowAccessPolicyFor(t *testing.T, client *sdk.Client, id sdk.SchemaObjectIdentifier, objectType sdk.ObjectType) (*policyReference, error) {
@@ -902,4 +938,29 @@ func updateAccountParameterTemporarily(t *testing.T, client *sdk.Client, paramet
 		err = client.Parameters.SetAccountParameter(ctx, parameter, oldValue)
 		require.NoError(t, err)
 	}
+}
+
+func createTaskWithRequest(t *testing.T, client *sdk.Client, request *sdk.CreateTaskRequest) (*sdk.Task, func()) {
+	t.Helper()
+	ctx := context.Background()
+
+	id := request.GetName()
+
+	err := client.Tasks.Create(ctx, request)
+	require.NoError(t, err)
+
+	task, err := client.Tasks.ShowByID(ctx, id)
+	require.NoError(t, err)
+
+	return task, func() {
+		err = client.Tasks.Drop(ctx, sdk.NewDropTaskRequest(id))
+		require.NoError(t, err)
+	}
+}
+
+func createTask(t *testing.T, client *sdk.Client, database *sdk.Database, schema *sdk.Schema) (*sdk.Task, func()) {
+	t.Helper()
+	id := sdk.NewSchemaObjectIdentifier(database.Name, schema.Name, random.AlphaN(20))
+	warehouseReq := sdk.NewCreateTaskWarehouseRequest().WithWarehouse(sdk.Pointer(testWarehouse(t).ID()))
+	return createTaskWithRequest(t, client, sdk.NewCreateTaskRequest(id, "SELECT CURRENT_TIMESTAMP").WithSchedule(sdk.String("60 minutes")).WithWarehouse(warehouseReq))
 }

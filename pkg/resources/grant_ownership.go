@@ -291,6 +291,7 @@ func DeleteGrantOwnership(ctx context.Context, d *schema.ResourceData, meta any)
 
 	if grantOn.Future != nil {
 		// TODO (SNOW-1182623): Still waiting for the response on the behavior/SQL syntax we should use here
+		log.Printf("[WARN] Unsupported operation, please revoke ownership transfer manually")
 	} else {
 		accountRoleName, err := client.ContextFunctions.CurrentRole(ctx)
 		if err != nil {
@@ -333,7 +334,7 @@ func ReadGrantOwnership(ctx context.Context, d *schema.ResourceData, meta any) d
 		}
 	}
 
-	opts, grantedOn := prepareShowGrantsRequestForGrantOwnership(id)
+	opts, expectedGrantedOn := prepareShowGrantsRequestForGrantOwnership(id)
 	if opts == nil {
 		return nil
 	}
@@ -342,10 +343,11 @@ func ReadGrantOwnership(ctx context.Context, d *schema.ResourceData, meta any) d
 
 	grants, err := client.Grants.Show(ctx, opts)
 	if err != nil {
+		d.SetId("")
 		return diag.Diagnostics{
 			diag.Diagnostic{
-				Severity: diag.Error,
-				Summary:  "Failed to retrieve grants",
+				Severity: diag.Warning,
+				Summary:  "Failed to retrieve grants. Marking the resource as removed.",
 				Detail:   fmt.Sprintf("Id: %s\nError: %s", d.Id(), err),
 			},
 		}
@@ -366,7 +368,7 @@ func ReadGrantOwnership(ctx context.Context, d *schema.ResourceData, meta any) d
 
 		// grant_on is for future grants, granted_on is for current grants.
 		// They function the same way though in a test for matching the object type
-		if grantedOn != grant.GrantedOn && grantedOn != grant.GrantOn {
+		if expectedGrantedOn != grant.GrantedOn && expectedGrantedOn != grant.GrantOn {
 			continue
 		}
 
@@ -384,12 +386,11 @@ func ReadGrantOwnership(ctx context.Context, d *schema.ResourceData, meta any) d
 
 	if !ownershipFound {
 		d.SetId("")
-
 		return diag.Diagnostics{
 			diag.Diagnostic{
 				Severity: diag.Warning,
-				Summary:  "Couldn't find OWNERSHIP privilege on the target object. Marking resource as removed.",
-				Detail:   fmt.Sprintf("Id: %s", id.String()),
+				Summary:  "Couldn't find OWNERSHIP privilege on the target object. Marking the resource as removed.",
+				Detail:   fmt.Sprintf("Id: %s", d.Id()),
 			},
 		}
 	}
@@ -520,12 +521,17 @@ func getOwnershipGrantOpts(id *GrantOwnershipId) *sdk.GrantOwnershipOptions {
 
 func prepareShowGrantsRequestForGrantOwnership(id *GrantOwnershipId) (*sdk.ShowGrantOptions, sdk.ObjectType) {
 	opts := new(sdk.ShowGrantOptions)
-	var grantedOn sdk.ObjectType
+	var expectedGrantedOn sdk.ObjectType
 
 	switch id.Kind {
 	case OnObjectGrantOwnershipKind:
 		data := id.Data.(*OnObjectGrantOwnershipData)
-		grantedOn = data.ObjectType
+		switch data.ObjectType {
+		case sdk.ObjectTypeDatabaseRole:
+			expectedGrantedOn = sdk.ObjectTypeRole
+		default:
+			expectedGrantedOn = data.ObjectType
+		}
 		opts.On = &sdk.ShowGrantsOn{
 			Object: &sdk.Object{
 				ObjectType: data.ObjectType,
@@ -542,7 +548,7 @@ func prepareShowGrantsRequestForGrantOwnership(id *GrantOwnershipId) (*sdk.ShowG
 		return nil, ""
 	case OnFutureGrantOwnershipKind:
 		data := id.Data.(*BulkOperationGrantData)
-		grantedOn = data.ObjectNamePlural.Singular()
+		expectedGrantedOn = data.ObjectNamePlural.Singular()
 		opts.Future = sdk.Bool(true)
 
 		switch data.Kind {
@@ -557,7 +563,7 @@ func prepareShowGrantsRequestForGrantOwnership(id *GrantOwnershipId) (*sdk.ShowG
 		}
 	}
 
-	return opts, grantedOn
+	return opts, expectedGrantedOn
 }
 
 func createGrantOwnershipIdFromSchema(d *schema.ResourceData) (*GrantOwnershipId, error) {
