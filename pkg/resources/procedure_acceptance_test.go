@@ -7,6 +7,7 @@ import (
 
 	acc "github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/acceptance"
 
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/provider/resources"
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/acctest"
@@ -19,6 +20,8 @@ func testAccProcedure(t *testing.T, configDirectory string) {
 	t.Helper()
 
 	name := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
+	newName := strings.ToUpper(acctest.RandStringFromCharSet(10, acctest.CharSetAlpha))
+
 	resourceName := "snowflake_procedure.p"
 	m := func() map[string]config.Variable {
 		return map[string]config.Variable{
@@ -30,6 +33,7 @@ func testAccProcedure(t *testing.T, configDirectory string) {
 		}
 	}
 	variableSet2 := m()
+	variableSet2["name"] = config.StringVariable(newName)
 	variableSet2["comment"] = config.StringVariable("Terraform acceptance test - updated")
 	variableSet2["execute_as"] = config.StringVariable("OWNER")
 
@@ -44,7 +48,7 @@ func testAccProcedure(t *testing.T, configDirectory string) {
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.RequireAbove(tfversion.Version1_5_0),
 		},
-		CheckDestroy: testAccCheckDynamicTableDestroy,
+		CheckDestroy: acc.CheckDestroy(t, resources.Procedure),
 		Steps: []resource.TestStep{
 			{
 				ConfigDirectory: acc.ConfigurationDirectory(configDirectory),
@@ -64,12 +68,17 @@ func testAccProcedure(t *testing.T, configDirectory string) {
 				),
 			},
 
-			// test - change comment and caller (proves https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2642)
+			// test - rename + change comment and caller (proves https://github.com/Snowflake-Labs/terraform-provider-snowflake/issues/2642)
 			{
 				ConfigDirectory: acc.ConfigurationDirectory(configDirectory),
 				ConfigVariables: variableSet2,
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectResourceAction(resourceName, plancheck.ResourceActionUpdate),
+					},
+				},
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", name),
+					resource.TestCheckResourceAttr(resourceName, "name", newName),
 					resource.TestCheckResourceAttr(resourceName, "database", acc.TestDatabaseName),
 					resource.TestCheckResourceAttr(resourceName, "schema", acc.TestSchemaName),
 					resource.TestCheckResourceAttr(resourceName, "comment", "Terraform acceptance test - updated"),
@@ -135,7 +144,7 @@ func TestAcc_Procedure_complex(t *testing.T) {
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.RequireAbove(tfversion.Version1_5_0),
 		},
-		CheckDestroy: testAccCheckDynamicTableDestroy,
+		CheckDestroy: acc.CheckDestroy(t, resources.Procedure),
 		Steps: []resource.TestStep{
 			{
 				ConfigDirectory: acc.ConfigurationDirectory("TestAcc_Procedure/complex"),
@@ -198,7 +207,7 @@ func TestAcc_Procedure_migrateFromVersion085(t *testing.T) {
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
 			tfversion.RequireAbove(tfversion.Version1_5_0),
 		},
-		CheckDestroy: nil,
+		CheckDestroy: acc.CheckDestroy(t, resources.Procedure),
 
 		Steps: []resource.TestStep{
 			{

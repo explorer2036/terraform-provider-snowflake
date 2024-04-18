@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/acceptance/helpers/random"
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
-	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -64,7 +64,7 @@ func TestInt_ExternalTables(t *testing.T) {
 		err := client.ExternalTables.Create(ctx, minimalCreateExternalTableReq(name))
 		require.NoError(t, err)
 
-		externalTable, err := client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(externalTableID))
+		externalTable, err := client.ExternalTables.ShowByID(ctx, externalTableID)
 		require.NoError(t, err)
 		assert.Equal(t, name, externalTable.Name)
 	})
@@ -78,7 +78,7 @@ func TestInt_ExternalTables(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		externalTable, err := client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(externalTableID))
+		externalTable, err := client.ExternalTables.ShowByID(ctx, externalTableID)
 		require.NoError(t, err)
 		assert.Equal(t, name, externalTable.Name)
 	})
@@ -105,7 +105,7 @@ func TestInt_ExternalTables(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		externalTable, err := client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(externalTableID))
+		externalTable, err := client.ExternalTables.ShowByID(ctx, externalTableID)
 		require.NoError(t, err)
 		assert.Equal(t, name, externalTable.Name)
 	})
@@ -130,7 +130,7 @@ func TestInt_ExternalTables(t *testing.T) {
 				WithAutoRefresh(sdk.Bool(false)))
 		require.NoError(t, err)
 
-		_, err = client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(id))
+		_, err = client.ExternalTables.ShowByID(ctx, id)
 		require.NoError(t, err)
 	})
 
@@ -140,7 +140,7 @@ func TestInt_ExternalTables(t *testing.T) {
 		err := client.ExternalTables.CreateWithManualPartitioning(ctx, createExternalTableWithManualPartitioningReq(name))
 		require.NoError(t, err)
 
-		externalTable, err := client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(externalTableID))
+		externalTable, err := client.ExternalTables.ShowByID(ctx, externalTableID)
 		require.NoError(t, err)
 		assert.Equal(t, name, externalTable.Name)
 	})
@@ -166,7 +166,7 @@ func TestInt_ExternalTables(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		externalTable, err := client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(externalTableID))
+		externalTable, err := client.ExternalTables.ShowByID(ctx, externalTableID)
 		require.NoError(t, err)
 		assert.Equal(t, name, externalTable.Name)
 	})
@@ -347,7 +347,7 @@ func TestInt_ExternalTables(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		_, err = client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(externalTableID))
+		_, err = client.ExternalTables.ShowByID(ctx, externalTableID)
 		require.ErrorIs(t, err, collections.ErrObjectNotFound)
 	})
 
@@ -447,7 +447,7 @@ func TestInt_ExternalTablesShowByID(t *testing.T) {
 	}
 
 	t.Run("show by id - same name in different schemas", func(t *testing.T) {
-		schema, schemaCleanup := createSchemaWithIdentifier(t, client, databaseTest, random.AlphaN(8))
+		schema, schemaCleanup := testClientHelper().Schema.CreateSchemaWithIdentifier(t, databaseTest, random.AlphaN(8))
 		t.Cleanup(schemaCleanup)
 
 		name := random.AlphaN(4)
@@ -457,11 +457,11 @@ func TestInt_ExternalTablesShowByID(t *testing.T) {
 		createExternalTableHandle(t, id1)
 		createExternalTableHandle(t, id2)
 
-		e1, err := client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(id1))
+		e1, err := client.ExternalTables.ShowByID(ctx, id1)
 		require.NoError(t, err)
 		require.Equal(t, id1, e1.ID())
 
-		e2, err := client.ExternalTables.ShowByID(ctx, sdk.NewShowExternalTableByIDRequest(id2))
+		e2, err := client.ExternalTables.ShowByID(ctx, id2)
 		require.NoError(t, err)
 		require.Equal(t, id2, e2.ID())
 	})

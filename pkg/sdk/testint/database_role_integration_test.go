@@ -3,9 +3,9 @@ package testint
 import (
 	"testing"
 
+	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/acceptance/helpers/random"
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk"
 	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/collections"
-	"github.com/Snowflake-Labs/terraform-provider-snowflake/pkg/sdk/internal/random"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -154,7 +154,7 @@ func TestInt_DatabaseRoles(t *testing.T) {
 	})
 
 	t.Run("alter database_role: rename to other database", func(t *testing.T) {
-		secondDatabase, secondDatabaseCleanup := createDatabase(t, client)
+		secondDatabase, secondDatabaseCleanup := testClientHelper().Database.CreateDatabase(t)
 		t.Cleanup(secondDatabaseCleanup)
 
 		name := random.String()
